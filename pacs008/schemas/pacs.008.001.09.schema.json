@@ -16,19 +16,18 @@
     "debtor_name",
     "debtor_agent_bic",
     "creditor_agent_bic",
-    "creditor_name",
-    "uetr"
+    "creditor_name"
   ],
   "properties": {
     "msg_id": {
       "type": "string",
       "minLength": 1,
       "maxLength": 35,
-      "description": "Message identification (unique identifier)"
+      "description": "Message identification"
     },
     "creation_date_time": {
       "type": "string",
-      "description": "Creation date and time of the message"
+      "description": "Creation date and time"
     },
     "nb_of_txs": {
       "type": "integer",
@@ -37,7 +36,12 @@
     },
     "settlement_method": {
       "type": "string",
-      "enum": ["INGA", "INDA", "CLRG", "COVE"],
+      "enum": [
+        "INGA",
+        "INDA",
+        "CLRG",
+        "COVE"
+      ],
       "description": "Settlement method"
     },
     "end_to_end_id": {
@@ -59,35 +63,35 @@
     },
     "charge_bearer": {
       "type": "string",
-      "enum": ["DEBT", "CRED", "SHAR", "SLEV"],
+      "enum": [
+        "DEBT",
+        "CRED",
+        "SHAR",
+        "SLEV"
+      ],
       "description": "Charge bearer code"
     },
     "debtor_name": {
       "type": "string",
       "minLength": 1,
       "maxLength": 140,
-      "description": "Name of the debtor"
+      "description": "Debtor name"
     },
     "debtor_agent_bic": {
       "type": "string",
       "pattern": "^[A-Z0-9]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
-      "description": "Debtor agent BIC code"
+      "description": "Debtor agent BIC"
     },
     "creditor_agent_bic": {
       "type": "string",
       "pattern": "^[A-Z0-9]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
-      "description": "Creditor agent BIC code"
+      "description": "Creditor agent BIC"
     },
     "creditor_name": {
       "type": "string",
       "minLength": 1,
       "maxLength": 140,
-      "description": "Name of the creditor"
-    },
-    "uetr": {
-      "type": "string",
-      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
-      "description": "Unique End-to-End Transaction Reference (UUID v4)"
+      "description": "Creditor name"
     },
     "tx_id": {
       "type": "string",
@@ -113,18 +117,202 @@
       "maxLength": 140,
       "description": "Remittance information"
     },
+    "instr_id": {
+      "type": "string",
+      "maxLength": 35,
+      "description": "Instruction identification"
+    },
     "interbank_settlement_date": {
       "type": "string",
-      "description": "Interbank settlement date"
+      "description": "Interbank settlement date (ISO date)"
     },
     "instd_amount": {
       "type": "number",
-      "description": "Instructed amount"
+      "minimum": 0.01,
+      "maximum": 999999999.99,
+      "description": "Instructed amount (may differ from settlement amount for FX)"
     },
     "instd_currency": {
       "type": "string",
       "pattern": "^[A-Z]{3}$",
-      "description": "Instructed currency (ISO 4217)"
+      "description": "Instructed amount currency (ISO 4217)"
+    },
+    "xchg_rate": {
+      "type": "number",
+      "description": "Exchange rate between instructed and settlement currencies"
+    },
+    "sttlm_prty": {
+      "type": "string",
+      "enum": [
+        "URGT",
+        "HIGH",
+        "NORM"
+      ],
+      "description": "Settlement priority"
+    },
+    "purpose_cd": {
+      "type": "string",
+      "maxLength": 4,
+      "description": "Purpose code (ISO 20022 ExternalPurpose1Code)"
+    },
+    "ultimate_debtor_name": {
+      "type": "string",
+      "maxLength": 140,
+      "description": "Ultimate debtor name"
+    },
+    "ultimate_creditor_name": {
+      "type": "string",
+      "maxLength": 140,
+      "description": "Ultimate creditor name"
+    },
+    "intermediary_agent1_bic": {
+      "type": "string",
+      "pattern": "^[A-Z0-9]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
+      "description": "Intermediary agent 1 BIC"
+    },
+    "intermediary_agent2_bic": {
+      "type": "string",
+      "pattern": "^[A-Z0-9]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
+      "description": "Intermediary agent 2 BIC"
+    },
+    "intermediary_agent3_bic": {
+      "type": "string",
+      "pattern": "^[A-Z0-9]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
+      "description": "Intermediary agent 3 BIC"
+    },
+    "instr_for_cdtr_agt_cd": {
+      "type": "string",
+      "maxLength": 4,
+      "description": "Instruction for creditor agent code"
+    },
+    "instr_for_cdtr_agt_inf": {
+      "type": "string",
+      "maxLength": 140,
+      "description": "Instruction for creditor agent information"
+    },
+    "instr_for_nxt_agt_inf": {
+      "type": "string",
+      "maxLength": 140,
+      "description": "Instruction for next agent information"
+    },
+    "chrgs_inf_amt": {
+      "type": "number",
+      "minimum": 0.01,
+      "description": "Charges amount"
+    },
+    "chrgs_inf_ccy": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "Charges currency"
+    },
+    "chrgs_inf_agt_bic": {
+      "type": "string",
+      "pattern": "^[A-Z0-9]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
+      "description": "Charges agent BIC"
+    },
+    "pmt_tp_inf_instr_prty": {
+      "type": "string",
+      "enum": [
+        "HIGH",
+        "NORM"
+      ],
+      "description": "Payment type instruction priority"
+    },
+    "pmt_tp_inf_svc_lvl_cd": {
+      "type": "string",
+      "maxLength": 4,
+      "description": "Service level code (e.g., SDVA, SEPA)"
+    },
+    "pmt_tp_inf_lcl_instrm_cd": {
+      "type": "string",
+      "maxLength": 35,
+      "description": "Local instrument code"
+    },
+    "pmt_tp_inf_ctgy_purp_cd": {
+      "type": "string",
+      "maxLength": 4,
+      "description": "Category purpose code"
+    },
+    "rgltry_rptg_dbt_cdt_rptg_ind": {
+      "type": "string",
+      "enum": [
+        "CRED",
+        "DEBT",
+        "BOTH"
+      ],
+      "description": "Debit/credit reporting indicator"
+    },
+    "rgltry_rptg_authrty_nm": {
+      "type": "string",
+      "maxLength": 140,
+      "description": "Regulatory authority name"
+    },
+    "rgltry_rptg_authrty_ctry": {
+      "type": "string",
+      "pattern": "^[A-Z]{2}$",
+      "description": "Regulatory authority country code"
+    },
+    "rgltry_rptg_cd": {
+      "type": "string",
+      "maxLength": 10,
+      "description": "Regulatory reporting code"
+    },
+    "rgltry_rptg_inf": {
+      "type": "string",
+      "maxLength": 140,
+      "description": "Regulatory reporting information"
+    },
+    "btch_bookg": {
+      "type": "boolean",
+      "description": "Batch booking indicator"
+    },
+    "ctrl_sum": {
+      "type": "number",
+      "description": "Control sum of all transaction amounts"
+    },
+    "ttl_intrbank_sttlm_amt": {
+      "type": "number",
+      "description": "Total interbank settlement amount"
+    },
+    "ttl_intrbank_sttlm_ccy": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "Total interbank settlement currency"
+    },
+    "instg_agt_bic": {
+      "type": "string",
+      "pattern": "^[A-Z0-9]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
+      "description": "Instructing agent BIC"
+    },
+    "instd_agt_bic": {
+      "type": "string",
+      "pattern": "^[A-Z0-9]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
+      "description": "Instructed agent BIC"
+    },
+    "uetr": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "description": "Unique End-to-End Transaction Reference (UUID v4)"
+    },
+    "clr_sys_ref": {
+      "type": "string",
+      "maxLength": 35,
+      "description": "Clearing system reference"
+    },
+    "prvs_instg_agt1_bic": {
+      "type": "string",
+      "pattern": "^[A-Z0-9]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
+      "description": "Previous instructing agent 1 BIC"
+    },
+    "prvs_instg_agt2_bic": {
+      "type": "string",
+      "pattern": "^[A-Z0-9]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
+      "description": "Previous instructing agent 2 BIC"
+    },
+    "prvs_instg_agt3_bic": {
+      "type": "string",
+      "pattern": "^[A-Z0-9]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
+      "description": "Previous instructing agent 3 BIC"
     }
   },
   "additionalProperties": true

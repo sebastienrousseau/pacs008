@@ -5,24 +5,115 @@
 		<GrpHdr>
 			<MsgId>{{msg_id}}</MsgId>
 			<CreDtTm>{{creation_date_time}}</CreDtTm>
+			{% if btch_bookg %}<BtchBookg>{{btch_bookg}}</BtchBookg>{% endif %}
 			<NbOfTxs>{{nb_of_txs}}</NbOfTxs>
+			{% if ctrl_sum %}<CtrlSum>{{ctrl_sum}}</CtrlSum>{% endif %}
+			{% if ttl_intrbank_sttlm_amt %}<TtlIntrBkSttlmAmt Ccy="{{ttl_intrbank_sttlm_ccy}}">{{ttl_intrbank_sttlm_amt}}</TtlIntrBkSttlmAmt>{% endif %}
+			{% if interbank_settlement_date %}<IntrBkSttlmDt>{{interbank_settlement_date}}</IntrBkSttlmDt>{% endif %}
 			<SttlmInf>
 				<SttlmMtd>{{settlement_method}}</SttlmMtd>
 			</SttlmInf>
+			{% if instg_agt_bic %}
+			<InstgAgt>
+				<FinInstnId>
+					<BICFI>{{instg_agt_bic}}</BICFI>
+				</FinInstnId>
+			</InstgAgt>
+			{% endif %}
+			{% if instd_agt_bic %}
+			<InstdAgt>
+				<FinInstnId>
+					<BICFI>{{instd_agt_bic}}</BICFI>
+				</FinInstnId>
+			</InstdAgt>
+			{% endif %}
 		</GrpHdr>
 		{% for tx in transactions %}
 		<CdtTrfTxInf>
 			<PmtId>
+				{% if tx.instr_id %}<InstrId>{{tx.instr_id}}</InstrId>{% endif %}
 				<EndToEndId>{{tx.end_to_end_id}}</EndToEndId>
 				{% if tx.tx_id %}<TxId>{{tx.tx_id}}</TxId>{% endif %}
 				{% if tx.uetr %}<UETR>{{tx.uetr}}</UETR>{% endif %}
+				{% if tx.clr_sys_ref %}<ClrSysRef>{{tx.clr_sys_ref}}</ClrSysRef>{% endif %}
 			</PmtId>
+			{% if tx.pmt_tp_inf_instr_prty or tx.pmt_tp_inf_svc_lvl_cd or tx.pmt_tp_inf_lcl_instrm_cd or tx.pmt_tp_inf_ctgy_purp_cd %}
+			<PmtTpInf>
+				{% if tx.pmt_tp_inf_instr_prty %}<InstrPrty>{{tx.pmt_tp_inf_instr_prty}}</InstrPrty>{% endif %}
+				{% if tx.pmt_tp_inf_svc_lvl_cd %}<SvcLvl><Cd>{{tx.pmt_tp_inf_svc_lvl_cd}}</Cd></SvcLvl>{% endif %}
+				{% if tx.pmt_tp_inf_lcl_instrm_cd %}<LclInstrm><Cd>{{tx.pmt_tp_inf_lcl_instrm_cd}}</Cd></LclInstrm>{% endif %}
+				{% if tx.pmt_tp_inf_ctgy_purp_cd %}<CtgyPurp><Cd>{{tx.pmt_tp_inf_ctgy_purp_cd}}</Cd></CtgyPurp>{% endif %}
+			</PmtTpInf>
+			{% endif %}
 			<IntrBkSttlmAmt Ccy="{{tx.interbank_settlement_currency}}">{{tx.interbank_settlement_amount}}</IntrBkSttlmAmt>
+			{% if tx.interbank_settlement_date %}<IntrBkSttlmDt>{{tx.interbank_settlement_date}}</IntrBkSttlmDt>{% endif %}
+			{% if tx.sttlm_prty %}<SttlmPrty>{{tx.sttlm_prty}}</SttlmPrty>{% endif %}
+			{% if tx.instd_amount %}<InstdAmt Ccy="{{tx.instd_currency}}">{{tx.instd_amount}}</InstdAmt>{% endif %}
+			{% if tx.xchg_rate %}<XchgRate>{{tx.xchg_rate}}</XchgRate>{% endif %}
 			{% if tx.charge_bearer %}<ChrgBr>{{tx.charge_bearer}}</ChrgBr>{% endif %}
+			{% if tx.chrgs_inf_amt %}
+			<ChrgsInf>
+				<Amt Ccy="{{tx.chrgs_inf_ccy}}">{{tx.chrgs_inf_amt}}</Amt>
+				{% if tx.chrgs_inf_agt_bic %}
+				<Agt>
+					<FinInstnId>
+						<BICFI>{{tx.chrgs_inf_agt_bic}}</BICFI>
+					</FinInstnId>
+				</Agt>
+				{% endif %}
+			</ChrgsInf>
+			{% endif %}
 			{% if tx.mandate_id %}
 			<MndtRltdInf>
 				<MndtId>{{tx.mandate_id}}</MndtId>
 			</MndtRltdInf>
+			{% endif %}
+			{% if tx.prvs_instg_agt1_bic %}
+			<PrvsInstgAgt1>
+				<FinInstnId>
+					<BICFI>{{tx.prvs_instg_agt1_bic}}</BICFI>
+				</FinInstnId>
+			</PrvsInstgAgt1>
+			{% endif %}
+			{% if tx.prvs_instg_agt2_bic %}
+			<PrvsInstgAgt2>
+				<FinInstnId>
+					<BICFI>{{tx.prvs_instg_agt2_bic}}</BICFI>
+				</FinInstnId>
+			</PrvsInstgAgt2>
+			{% endif %}
+			{% if tx.prvs_instg_agt3_bic %}
+			<PrvsInstgAgt3>
+				<FinInstnId>
+					<BICFI>{{tx.prvs_instg_agt3_bic}}</BICFI>
+				</FinInstnId>
+			</PrvsInstgAgt3>
+			{% endif %}
+			{% if tx.intermediary_agent1_bic %}
+			<IntrmyAgt1>
+				<FinInstnId>
+					<BICFI>{{tx.intermediary_agent1_bic}}</BICFI>
+				</FinInstnId>
+			</IntrmyAgt1>
+			{% endif %}
+			{% if tx.intermediary_agent2_bic %}
+			<IntrmyAgt2>
+				<FinInstnId>
+					<BICFI>{{tx.intermediary_agent2_bic}}</BICFI>
+				</FinInstnId>
+			</IntrmyAgt2>
+			{% endif %}
+			{% if tx.intermediary_agent3_bic %}
+			<IntrmyAgt3>
+				<FinInstnId>
+					<BICFI>{{tx.intermediary_agent3_bic}}</BICFI>
+				</FinInstnId>
+			</IntrmyAgt3>
+			{% endif %}
+			{% if tx.ultimate_debtor_name %}
+			<UltmtDbtr>
+				<Nm>{{tx.ultimate_debtor_name}}</Nm>
+			</UltmtDbtr>
 			{% endif %}
 			{% if tx.debtor_name %}
 			<Dbtr>
@@ -61,6 +152,42 @@
 					<IBAN>{{tx.creditor_account_iban}}</IBAN>
 				</Id>
 			</CdtrAcct>
+			{% endif %}
+			{% if tx.ultimate_creditor_name %}
+			<UltmtCdtr>
+				<Nm>{{tx.ultimate_creditor_name}}</Nm>
+			</UltmtCdtr>
+			{% endif %}
+			{% if tx.instr_for_cdtr_agt_cd or tx.instr_for_cdtr_agt_inf %}
+			<InstrForCdtrAgt>
+				{% if tx.instr_for_cdtr_agt_cd %}<Cd>{{tx.instr_for_cdtr_agt_cd}}</Cd>{% endif %}
+				{% if tx.instr_for_cdtr_agt_inf %}<InstrInf>{{tx.instr_for_cdtr_agt_inf}}</InstrInf>{% endif %}
+			</InstrForCdtrAgt>
+			{% endif %}
+			{% if tx.instr_for_nxt_agt_inf %}
+			<InstrForNxtAgt>
+				<InstrInf>{{tx.instr_for_nxt_agt_inf}}</InstrInf>
+			</InstrForNxtAgt>
+			{% endif %}
+			{% if tx.purpose_cd %}
+			<Purp>
+				<Cd>{{tx.purpose_cd}}</Cd>
+			</Purp>
+			{% endif %}
+			{% if tx.rgltry_rptg_cd %}
+			<RgltryRptg>
+				{% if tx.rgltry_rptg_dbt_cdt_rptg_ind %}<DbtCdtRptgInd>{{tx.rgltry_rptg_dbt_cdt_rptg_ind}}</DbtCdtRptgInd>{% endif %}
+				{% if tx.rgltry_rptg_authrty_nm or tx.rgltry_rptg_authrty_ctry %}
+				<Authrty>
+					{% if tx.rgltry_rptg_authrty_nm %}<Nm>{{tx.rgltry_rptg_authrty_nm}}</Nm>{% endif %}
+					{% if tx.rgltry_rptg_authrty_ctry %}<Ctry>{{tx.rgltry_rptg_authrty_ctry}}</Ctry>{% endif %}
+				</Authrty>
+				{% endif %}
+				<Dtls>
+					<Cd>{{tx.rgltry_rptg_cd}}</Cd>
+					{% if tx.rgltry_rptg_inf %}<Inf>{{tx.rgltry_rptg_inf}}</Inf>{% endif %}
+				</Dtls>
+			</RgltryRptg>
 			{% endif %}
 			{% if tx.remittance_information %}
 			<RmtInf>

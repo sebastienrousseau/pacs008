@@ -146,7 +146,9 @@ class TestSchemaValidator:
         desc = v.get_field_description("msg_id")
         assert desc is not None or desc is None  # may or may not have description
 
-    def test_v08_requires_uetr(self):
+    def test_v08_has_uetr_property(self):
+        """UETR is optional in XSD but defined as a property in v08+."""
         v = SchemaValidator("pacs.008.001.08")
-        required = v.get_required_fields()
-        assert "uetr" in required
+        schema = v.get_field_schema("uetr")
+        assert schema is not None
+        assert schema.get("pattern") is not None
