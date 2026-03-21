@@ -18,15 +18,13 @@ COPY pyproject.toml ./
 
 # Install dependencies without dev deps
 RUN poetry config virtualenvs.create false && \
-    poetry install --no-interaction --no-dev --no-root 2>/dev/null || \
     poetry install --no-interaction --only main --no-root
 
 # Copy application code
 COPY pacs008/ ./pacs008/
 
 # Install the package itself
-RUN poetry install --no-interaction --only-root 2>/dev/null || \
-    pip install --no-cache-dir -e .
+RUN poetry install --no-interaction --only-root
 
 # Create non-root user
 RUN useradd --create-home --shell /bin/bash appuser

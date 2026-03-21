@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - BIC and IBAN validators
 - JSON schema validation for all 13 versions
 - Path traversal protection and security hardening
-- 1,050+ tests with 100% code coverage
+- 1,400+ tests with 100% code coverage
 - Gold master E2E test fixtures for all 13 versions
 - Cross-platform CI (macOS + Linux, Python 3.9-3.12)
 

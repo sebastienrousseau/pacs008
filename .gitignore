@@ -33,4 +33,8 @@ poetry.lock
 
 # Temp
 tmp/
+pacs008/tmp/
 *.tmp
+
+# Benchmarks
+.benchmarks/

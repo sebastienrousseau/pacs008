@@ -13,7 +13,6 @@ packages = [
 include = [
     "pacs008/schemas/*",
     "pacs008/templates/*",
-    "pacs008/test_fixtures/**/*",
 ]
 
 [tool.poetry.scripts]

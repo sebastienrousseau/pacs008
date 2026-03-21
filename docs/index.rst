@@ -5,15 +5,6 @@ pacs008 Documentation
 Customer Credit Transfer XML messages. It supports all 13 versions
 (pacs.008.001.01 through pacs.008.001.13).
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents
-
-   quickstart
-   api
-   compliance
-   versions
-
 Quick Start
 -----------
 
@@ -38,7 +29,12 @@ Quick Start
        "creditor_name": "Widget Industries",
    }]
 
-   xml = generate_xml_string(data, "pacs.008.001.05")
+   xml = generate_xml_string(
+       data,
+       "pacs.008.001.05",
+       "pacs008/templates/pacs.008.001.05/template.xml",
+       "pacs008/templates/pacs.008.001.05/pacs.008.001.05.xsd",
+   )
    print(xml)
 
 Indices and tables

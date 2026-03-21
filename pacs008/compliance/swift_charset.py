@@ -20,7 +20,7 @@ Example:
     >>> raw = [{"debtor_name": "Müller & Söhne™", "msg_id": "X" * 50}]
     >>> clean = cleanse_data(raw)
     >>> clean[0]["debtor_name"]  # non-SWIFT chars replaced
-    'Muller . Sohne.'
+    'Mueller . Soehne.'
     >>> len(clean[0]["msg_id"])  # truncated to 35
     35
 """
