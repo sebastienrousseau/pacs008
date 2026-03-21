@@ -1,0 +1,2 @@
+msg_id,creation_date_time,nb_of_txs,settlement_method,interbank_settlement_date,end_to_end_id,tx_id,interbank_settlement_amount,interbank_settlement_currency,charge_bearer,debtor_name,debtor_account_iban,debtor_agent_bic,creditor_agent_bic,creditor_name,creditor_account_iban,remittance_information
+GOLD-CSV-001,2026-03-15T09:00:00,1,CLRG,2026-03-15,E2E-CSV-001,TX-CSV-001,10000.00,EUR,SHAR,CSV Debtor GmbH,DE89370400440532013000,DEUTDEFF,COBADEFF,CSV Creditor SA,FR7630006000011234567890189,CSV gold master test

@@ -1,0 +1,23 @@
+[
+  {
+    "msg_id": "GOLD-V10-001",
+    "creation_date_time": "2026-03-15T12:00:00",
+    "nb_of_txs": "1",
+    "settlement_method": "COVE",
+    "interbank_settlement_date": "2026-03-15",
+    "end_to_end_id": "E2E-GOLD-V10",
+    "tx_id": "TX-V10-001",
+    "interbank_settlement_amount": "75000.00",
+    "interbank_settlement_currency": "EUR",
+    "charge_bearer": "SLEV",
+    "debtor_name": "Mandate Debtor AG",
+    "debtor_account_iban": "DE89370400440532013000",
+    "debtor_agent_bic": "DEUTDEFF",
+    "creditor_agent_bic": "COBADEFF",
+    "creditor_name": "Mandate Creditor BV",
+    "creditor_account_iban": "NL91ABNA0417164300",
+    "remittance_information": "Direct debit mandate payment",
+    "uetr": "a1b2c3d4-e5f6-4890-abcd-ef1234567890",
+    "mandate_id": "MNDT-GOLD-2026-001"
+  }
+]

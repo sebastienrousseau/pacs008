@@ -1,0 +1,22 @@
+[
+  {
+    "msg_id": "GOLD-V08-001",
+    "creation_date_time": "2026-03-15T11:00:00",
+    "nb_of_txs": "1",
+    "settlement_method": "CLRG",
+    "interbank_settlement_date": "2026-03-15",
+    "end_to_end_id": "E2E-GOLD-V08",
+    "tx_id": "TX-V08-001",
+    "interbank_settlement_amount": "100000.00",
+    "interbank_settlement_currency": "USD",
+    "charge_bearer": "SHAR",
+    "debtor_name": "UETR Corp Americas",
+    "debtor_account_iban": "DE89370400440532013000",
+    "debtor_agent_bic": "DEUTDEFF",
+    "creditor_agent_bic": "CHASUS33",
+    "creditor_name": "JPMorgan Chase Corporate",
+    "creditor_account_iban": "GB29NWBK60161331926819",
+    "remittance_information": "UETR enabled payment v08",
+    "uetr": "eb6305c9-1f7a-4e3d-b9a1-7c5e8f2a9b4d"
+  }
+]

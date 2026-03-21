@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.01"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<pacs.008.001.01>
+		<GrpHdr>
+			<MsgId>MSG-001</MsgId>
+			<CreDtTm>2026-01-15T10:30:00</CreDtTm>
+			<NbOfTxs>1</NbOfTxs>
+			<SttlmInf>
+				<SttlmMtd>CLRG</SttlmMtd>
+			</SttlmInf>
+		</GrpHdr>
+		
+		<CdtTrfTxInf>
+			<PmtId>
+				<EndToEndId>E2E-001</EndToEndId>
+				<TxId>TX-001</TxId>
+			</PmtId>
+			<IntrBkSttlmAmt Ccy="EUR">1000.00</IntrBkSttlmAmt>
+			<ChrgBr>SHAR</ChrgBr>
+			
+			<Dbtr>
+				<Nm>Debtor Corp</Nm>
+			</Dbtr>
+			
+			
+			
+			<DbtrAgt>
+				<FinInstnId>
+					<BIC>DEUTDEFF</BIC>
+				</FinInstnId>
+			</DbtrAgt>
+			
+			
+			<CdtrAgt>
+				<FinInstnId>
+					<BIC>COBADEFF</BIC>
+				</FinInstnId>
+			</CdtrAgt>
+			
+			
+			<Cdtr>
+				<Nm>Creditor Ltd</Nm>
+			</Cdtr>
+			
+			
+			
+		</CdtTrfTxInf>
+		
+	</pacs.008.001.01>
+</Document>

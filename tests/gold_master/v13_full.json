@@ -1,0 +1,24 @@
+[
+  {
+    "msg_id": "GOLD-V13-001",
+    "creation_date_time": "2026-03-15T14:00:00",
+    "nb_of_txs": "1",
+    "settlement_method": "CLRG",
+    "interbank_settlement_date": "2026-03-15",
+    "end_to_end_id": "E2E-GOLD-V13",
+    "tx_id": "TX-V13-001",
+    "interbank_settlement_amount": "250000.00",
+    "interbank_settlement_currency": "CHF",
+    "charge_bearer": "SHAR",
+    "debtor_name": "Swiss Corporate AG",
+    "debtor_account_iban": "CH9300762011623852957",
+    "debtor_agent_bic": "UBSWCHZH",
+    "creditor_agent_bic": "CRESCHZZ",
+    "creditor_name": "Credit Suisse Client SA",
+    "creditor_account_iban": "CH3908704016075473007",
+    "remittance_information": "Full feature test v13 with expiry",
+    "uetr": "f9e8d7c6-b5a4-4210-9876-fedcba987654",
+    "mandate_id": "MNDT-V13-FULL",
+    "expiry_date_time": "2026-12-31T23:59:59"
+  }
+]

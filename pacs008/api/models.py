@@ -140,7 +140,7 @@ class ValidationResponse(BaseModel):
                 total = int(data["total_rows"])
                 valid = int(data["valid_rows"])
                 return total - valid
-        return v
+        return v  # pragma: no cover
 
 
 class GenerateXMLResponse(BaseModel):

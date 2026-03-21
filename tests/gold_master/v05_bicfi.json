@@ -1,0 +1,21 @@
+[
+  {
+    "msg_id": "GOLD-V05-001",
+    "creation_date_time": "2026-03-15T10:00:00",
+    "nb_of_txs": "1",
+    "settlement_method": "INDA",
+    "interbank_settlement_date": "2026-03-15",
+    "end_to_end_id": "E2E-GOLD-V05",
+    "tx_id": "TX-V05-001",
+    "interbank_settlement_amount": "50000.00",
+    "interbank_settlement_currency": "GBP",
+    "charge_bearer": "CRED",
+    "debtor_name": "UK Payments Ltd",
+    "debtor_account_iban": "GB29NWBK60161331926819",
+    "debtor_agent_bic": "NWBKGB2L",
+    "creditor_agent_bic": "BARCGB22",
+    "creditor_name": "Barclays Corporate Client",
+    "creditor_account_iban": "GB82WEST12345698765432",
+    "remittance_information": "BICFI migration test v05"
+  }
+]
