@@ -1,0 +1,23 @@
+[
+  {
+    "msg_id": "GOLD-V11-001",
+    "creation_date_time": "2026-03-15T12:30:00",
+    "nb_of_txs": "1",
+    "settlement_method": "CLRG",
+    "interbank_settlement_date": "2026-03-15",
+    "end_to_end_id": "E2E-GOLD-V11",
+    "tx_id": "TX-V11-001",
+    "interbank_settlement_amount": "9800.00",
+    "interbank_settlement_currency": "USD",
+    "charge_bearer": "SHAR",
+    "debtor_name": "Pacific Rim Holdings Inc",
+    "debtor_account_iban": "GB29NWBK60161331926819",
+    "debtor_agent_bic": "HSBCHKHH",
+    "creditor_agent_bic": "CITIUS33",
+    "creditor_name": "Continental Services Corp",
+    "creditor_account_iban": "DE89370400440532013000",
+    "remittance_information": "Mandate-based recurring payment v11",
+    "uetr": "d1e2f3a4-b5c6-4d78-90ab-cdef12345678",
+    "mandate_id": "MNDT-V11-001"
+  }
+]

@@ -3,6 +3,7 @@
 import csv
 import json
 import os
+import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
@@ -248,7 +249,7 @@ class TestJobStatusFull:
             result={
                 "success": True,
                 "message": "Done",
-                "file_path": "/tmp/out.xml",
+                "file_path": os.path.join(tempfile.gettempdir(), "out.xml"),
                 "validation_errors": [],
             },
         )

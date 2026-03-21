@@ -1,0 +1,22 @@
+[
+  {
+    "msg_id": "GOLD-V09-001",
+    "creation_date_time": "2026-03-15T11:30:00",
+    "nb_of_txs": "1",
+    "settlement_method": "INDA",
+    "interbank_settlement_date": "2026-03-15",
+    "end_to_end_id": "E2E-GOLD-V09",
+    "tx_id": "TX-V09-001",
+    "interbank_settlement_amount": "185000.50",
+    "interbank_settlement_currency": "EUR",
+    "charge_bearer": "CRED",
+    "debtor_name": "Nordic Supply Chain AB",
+    "debtor_account_iban": "NL91ABNA0417164300",
+    "debtor_agent_bic": "ABNANL2A",
+    "creditor_agent_bic": "BNPAFRPP",
+    "creditor_name": "Marseille Logistics SAS",
+    "creditor_account_iban": "FR7630004000031234567890143",
+    "remittance_information": "UETR tracked payment v09",
+    "uetr": "c4d5e6f7-a8b9-4c01-9def-123456789abc"
+  }
+]

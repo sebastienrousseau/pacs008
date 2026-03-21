@@ -15,7 +15,7 @@
 			<PmtId>
 				<EndToEndId>E2E-CORE</EndToEndId>
 				<TxId>TX-CORE</TxId>
-				<UETR>8c23b96c-7b03-4cd7-b1d4-d81809d6d5f4</UETR>
+				<UETR>e6c0ee2c-b1be-4dc0-9a1b-0f00bcca38b2</UETR>
 			</PmtId>
 			<IntrBkSttlmAmt Ccy="EUR">1000.00</IntrBkSttlmAmt>
 			<ChrgBr>SHAR</ChrgBr>

@@ -2,9 +2,10 @@
 
 import os
 import re
+import sys
 import tempfile
 from pathlib import Path
-from typing import Union
+from typing import List, Union
 
 
 class PathValidationError(ValueError):
@@ -15,13 +16,33 @@ class SecurityError(PermissionError):
     """Raised when a security boundary is violated."""
 
 
+def _get_allowed_bases_pathlib() -> List[Path]:
+    bases = [
+        Path.cwd().resolve(),
+        Path(tempfile.gettempdir()).resolve(),
+    ]
+    if sys.platform != "win32":
+        bases.append(
+            Path(os.path.join(os.path.sep, "var", "tmp")).resolve()
+        )
+    return bases
+
+
+def _get_allowed_bases_str() -> List[str]:
+    bases = [
+        os.path.realpath(os.getcwd()),
+        os.path.realpath(tempfile.gettempdir()),
+    ]
+    if sys.platform != "win32":
+        bases.append(
+            os.path.realpath(os.path.join(os.path.sep, "var", "tmp"))
+        )
+    return bases
+
+
 def _is_allowed_directory(resolved_path: Path) -> bool:
     try:
-        allowed_bases = [
-            Path.cwd().resolve(),
-            Path(tempfile.gettempdir()).resolve(),
-            Path(os.path.join(os.path.sep, "var", "tmp")).resolve(),
-        ]
+        allowed_bases = _get_allowed_bases_pathlib()
         resolved_str = str(resolved_path)
         return any(
             resolved_str == str(base)
@@ -50,11 +71,7 @@ def _resolve_within_allowed_bases(
         base_str = os.path.realpath(str(base_dir))
         allowed_bases = [base_str]
     else:
-        allowed_bases = [
-            os.path.realpath(os.getcwd()),
-            os.path.realpath(tempfile.gettempdir()),
-            os.path.realpath(os.path.join(os.path.sep, "var", "tmp")),
-        ]
+        allowed_bases = _get_allowed_bases_str()
     for base in allowed_bases:
         if resolved_str == base or resolved_str.startswith(base + os.sep):
             return base + resolved_str[len(base):]

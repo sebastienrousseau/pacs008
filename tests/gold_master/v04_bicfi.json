@@ -1,0 +1,21 @@
+[
+  {
+    "msg_id": "GOLD-V04-001",
+    "creation_date_time": "2026-03-15T09:45:00",
+    "nb_of_txs": "1",
+    "settlement_method": "CLRG",
+    "interbank_settlement_date": "2026-03-15",
+    "end_to_end_id": "E2E-GOLD-V04",
+    "tx_id": "TX-V04-001",
+    "interbank_settlement_amount": "1500000.00",
+    "interbank_settlement_currency": "JPY",
+    "charge_bearer": "SHAR",
+    "debtor_name": "Sakura Industries KK",
+    "debtor_account_iban": "GB82WEST12345698765432",
+    "debtor_agent_bic": "BOTKJPJT",
+    "creditor_agent_bic": "MABORJPX",
+    "creditor_name": "Tokyo Capital Partners Ltd",
+    "creditor_account_iban": "NL91ABNA0417164300",
+    "remittance_information": "Trade settlement JPY v04"
+  }
+]

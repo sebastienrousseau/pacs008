@@ -341,3 +341,164 @@ class TestEdgeCases:
         data = [minimal]
         xml = _generate(version, data)
         assert "<MsgId>MSG-MIN</MsgId>" in xml
+
+
+# --- 9. Settlement Method Variants ---
+
+SETTLEMENT_METHODS = ["CLRG", "INDA", "COVE"]
+
+
+class TestSettlementMethods:
+    """All settlement methods must produce valid XML across versions."""
+
+    @pytest.mark.parametrize("sttlm", SETTLEMENT_METHODS)
+    @pytest.mark.parametrize(
+        "version", ["pacs.008.001.01", "pacs.008.001.05", "pacs.008.001.10"]
+    )
+    def test_settlement_method_in_xml(self, version, sttlm):
+        data = _enrich_data_for_version(
+            version, {"settlement_method": sttlm}
+        )
+        xml = _generate(version, data)
+        assert f"<SttlmMtd>{sttlm}</SttlmMtd>" in xml
+
+
+# --- 10. Charge Bearer Variants ---
+
+CHARGE_BEARERS = ["DEBT", "CRED", "SHAR", "SLEV"]
+
+
+class TestChargeBearers:
+    """All charge bearer codes must produce valid XML."""
+
+    @pytest.mark.parametrize("cb", CHARGE_BEARERS)
+    @pytest.mark.parametrize(
+        "version", ["pacs.008.001.01", "pacs.008.001.07", "pacs.008.001.13"]
+    )
+    def test_charge_bearer_in_xml(self, version, cb):
+        data = _enrich_data_for_version(version, {"charge_bearer": cb})
+        xml = _generate(version, data)
+        assert f"<ChrgBr>{cb}</ChrgBr>" in xml
+
+
+# --- 11. Currency Variants ---
+
+CURRENCIES = ["EUR", "USD", "GBP", "CHF", "JPY"]
+
+
+class TestCurrencyVariants:
+    """Different currencies must appear correctly in XML."""
+
+    @pytest.mark.parametrize("ccy", CURRENCIES)
+    @pytest.mark.parametrize(
+        "version", ["pacs.008.001.01", "pacs.008.001.08"]
+    )
+    def test_currency_attribute_in_xml(self, version, ccy):
+        data = _enrich_data_for_version(
+            version, {"interbank_settlement_currency": ccy}
+        )
+        xml = _generate(version, data)
+        assert f'Ccy="{ccy}"' in xml
+
+
+# --- 12. Amount Formatting ---
+
+
+class TestAmountFormatting:
+    """Verify amount values appear correctly in XML."""
+
+    @pytest.mark.parametrize(
+        "amount",
+        ["0.01", "999999999.99", "1000.00", "1.50"],
+    )
+    def test_amount_values(self, amount):
+        data = _enrich_data_for_version(
+            "pacs.008.001.05",
+            {"interbank_settlement_amount": amount},
+        )
+        xml = _generate("pacs.008.001.05", data)
+        assert amount in xml
+
+
+# --- 13. IBAN/BIC in XML Output ---
+
+
+class TestIdentifiersInXml:
+    """Verify IBAN and BIC values propagate to XML output."""
+
+    @pytest.mark.parametrize("version", valid_xml_types)
+    def test_debtor_iban_in_xml(self, version):
+        data = _enrich_data_for_version(
+            version, {"debtor_account_iban": "DE89370400440532013000"}
+        )
+        xml = _generate(version, data)
+        assert "DE89370400440532013000" in xml
+
+    @pytest.mark.parametrize("version", valid_xml_types)
+    def test_creditor_iban_in_xml(self, version):
+        data = _enrich_data_for_version(
+            version, {"creditor_account_iban": "GB29NWBK60161331926819"}
+        )
+        xml = _generate(version, data)
+        assert "GB29NWBK60161331926819" in xml
+
+    @pytest.mark.parametrize(
+        "version", ["pacs.008.001.01", "pacs.008.001.02"]
+    )
+    def test_bic_tag_contains_value(self, version):
+        data = _enrich_data_for_version(
+            version, {"debtor_agent_bic": "DEUTDEFF"}
+        )
+        xml = _generate(version, data)
+        root = _parse_xml(xml)
+        ns = f"{{urn:iso:std:iso:20022:tech:xsd:{version}}}"
+        bic = root.find(f".//{ns}BIC")
+        assert bic is not None
+        assert bic.text == "DEUTDEFF"
+
+    @pytest.mark.parametrize("version", BICFI_VERSIONS[:2])
+    def test_bicfi_tag_contains_value(self, version):
+        data = _enrich_data_for_version(
+            version, {"creditor_agent_bic": "COBADEFF"}
+        )
+        xml = _generate(version, data)
+        root = _parse_xml(xml)
+        ns = f"{{urn:iso:std:iso:20022:tech:xsd:{version}}}"
+        bicfi_els = root.findall(f".//{ns}BICFI")
+        assert len(bicfi_els) >= 2  # Debtor + Creditor
+        bicfi_values = [el.text for el in bicfi_els]
+        assert "COBADEFF" in bicfi_values
+
+
+# --- 14. Version-Specific Root Element ---
+
+
+class TestRootElement:
+    """Verify correct root child element per version."""
+
+    def test_v01_root_child(self):
+        xml = _generate("pacs.008.001.01")
+        assert "<pacs.008.001.01>" in xml or "<FIToFICstmrCdtTrf>" in xml
+
+    @pytest.mark.parametrize(
+        "version",
+        [v for v in valid_xml_types if v != "pacs.008.001.01"],
+    )
+    def test_v02_plus_root_child(self, version):
+        xml = _generate(version)
+        assert "<FIToFICstmrCdtTrf>" in xml
+
+
+# --- 15. Remittance Information ---
+
+
+class TestRemittanceInfo:
+    """Verify remittance information propagates across versions."""
+
+    @pytest.mark.parametrize("version", valid_xml_types)
+    def test_remittance_in_xml(self, version):
+        data = _enrich_data_for_version(
+            version, {"remittance_information": "INV-2026-PARAMETRIZED"}
+        )
+        xml = _generate(version, data)
+        assert "INV-2026-PARAMETRIZED" in xml

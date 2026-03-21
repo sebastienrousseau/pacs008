@@ -1,5 +1,8 @@
 """Tests for pacs008.api.models module."""
 
+import os
+import tempfile
+
 from pacs008.api.models import (
     DataSourceType,
     GenerateXMLRequest,
@@ -9,6 +12,8 @@ from pacs008.api.models import (
     ValidationRequest,
     ValidationResponse,
 )
+
+_TMPDIR = tempfile.gettempdir()
 
 
 class TestMessageType:
@@ -39,27 +44,30 @@ class TestDataSourceType:
 
 class TestValidationRequest:
     def test_create(self):
+        fp = os.path.join(_TMPDIR, "data.csv")
         req = ValidationRequest(
             data_source=DataSourceType.CSV,
-            file_path="/tmp/data.csv",
+            file_path=fp,
             message_type=MessageType.PACS_008_01,
         )
-        assert req.file_path == "/tmp/data.csv"
+        assert req.file_path == fp
 
 
 class TestGenerateXMLRequest:
     def test_create_with_defaults(self):
+        fp = os.path.join(_TMPDIR, "data.csv")
         req = GenerateXMLRequest(
             data_source=DataSourceType.CSV,
-            file_path="/tmp/data.csv",
+            file_path=fp,
         )
         assert req.validate_only is False
         assert req.output_dir is None
 
     def test_validate_only(self):
+        fp = os.path.join(_TMPDIR, "data.csv")
         req = GenerateXMLRequest(
             data_source=DataSourceType.CSV,
-            file_path="/tmp/data.csv",
+            file_path=fp,
             validate_only=True,
         )
         assert req.validate_only is True
@@ -86,13 +94,14 @@ class TestValidationResponse:
 
 class TestGenerateXMLResponse:
     def test_success(self):
+        fp = os.path.join(_TMPDIR, "output.xml")
         resp = GenerateXMLResponse(
             success=True,
             message="OK",
-            file_path="/tmp/output.xml",
+            file_path=fp,
         )
         assert resp.success
-        assert resp.file_path == "/tmp/output.xml"
+        assert resp.file_path == fp
 
 
 class TestHealthResponse:

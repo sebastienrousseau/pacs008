@@ -1,60 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.13"
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.02"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<FIToFICstmrCdtTrf>
 		<GrpHdr>
-			<MsgId>MSG-CORE-TEST</MsgId>
+			<MsgId>MSG-001</MsgId>
 			<CreDtTm>2026-01-15T10:30:00</CreDtTm>
-			
-			<XpryDtTm>2026-12-31T23:59:59</XpryDtTm>
-			
 			<NbOfTxs>1</NbOfTxs>
 			<SttlmInf>
 				<SttlmMtd>CLRG</SttlmMtd>
 			</SttlmInf>
 		</GrpHdr>
-		
+
 		<CdtTrfTxInf>
 			<PmtId>
-				<EndToEndId>E2E-CORE</EndToEndId>
-				<TxId>TX-CORE</TxId>
-				<UETR>00bf27b9-1175-4ec4-9114-6c72ca457a9b</UETR>
+				<EndToEndId>E2E-001</EndToEndId>
+				<TxId>TX-001</TxId>
 			</PmtId>
 			<IntrBkSttlmAmt Ccy="EUR">1000.00</IntrBkSttlmAmt>
 			<ChrgBr>SHAR</ChrgBr>
-			
-			<MndtRltdInf>
-				<MndtId>MNDT-CORE</MndtId>
-			</MndtRltdInf>
-			
-			
+
 			<Dbtr>
 				<Nm>Debtor Corp</Nm>
 			</Dbtr>
-			
-			
-			
+
 			<DbtrAgt>
 				<FinInstnId>
-					<BICFI>DEUTDEFF</BICFI>
+					<BIC>DEUTDEFF</BIC>
 				</FinInstnId>
 			</DbtrAgt>
-			
-			
+
 			<CdtrAgt>
 				<FinInstnId>
-					<BICFI>COBADEFF</BICFI>
+					<BIC>COBADEFF</BIC>
 				</FinInstnId>
 			</CdtrAgt>
-			
-			
+
 			<Cdtr>
 				<Nm>Creditor Ltd</Nm>
 			</Cdtr>
-			
-			
-			
+
 		</CdtTrfTxInf>
-		
+
 	</FIToFICstmrCdtTrf>
 </Document>

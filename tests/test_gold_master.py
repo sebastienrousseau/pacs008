@@ -185,3 +185,103 @@ class TestGoldMasterCoverage:
         assert any(
             f.suffix == ".json" for f in _gold_master_files
         ), "Missing JSON gold master file"
+
+    def test_has_v02_sample(self):
+        assert any(
+            f.stem.startswith("v02") for f in _gold_master_files
+        ), "Missing v02 gold master file"
+
+    def test_has_v03_sample(self):
+        assert any(
+            f.stem.startswith("v03") for f in _gold_master_files
+        ), "Missing v03 (BICFI transition) gold master file"
+
+    def test_has_v04_sample(self):
+        assert any(
+            f.stem.startswith("v04") for f in _gold_master_files
+        ), "Missing v04 gold master file"
+
+    def test_has_v06_sample(self):
+        assert any(
+            f.stem.startswith("v06") for f in _gold_master_files
+        ), "Missing v06 gold master file"
+
+    def test_has_v07_sample(self):
+        assert any(
+            f.stem.startswith("v07") for f in _gold_master_files
+        ), "Missing v07 gold master file"
+
+    def test_has_v09_sample(self):
+        assert any(
+            f.stem.startswith("v09") for f in _gold_master_files
+        ), "Missing v09 (UETR) gold master file"
+
+    def test_has_v11_sample(self):
+        assert any(
+            f.stem.startswith("v11") for f in _gold_master_files
+        ), "Missing v11 (mandate) gold master file"
+
+    def test_has_v12_sample(self):
+        assert any(
+            f.stem.startswith("v12") for f in _gold_master_files
+        ), "Missing v12 (mandate) gold master file"
+
+    def test_all_13_versions_covered(self):
+        """Every version v01-v13 must have at least one gold master file."""
+        for v in range(1, 14):
+            prefix = f"v{v:02d}"
+            assert any(
+                f.stem.startswith(prefix) for f in _gold_master_files
+            ), f"Missing gold master file for {prefix}"
+
+
+@pytest.mark.integration
+class TestGoldMasterCompliance:
+    """Gold master data with SWIFT compliance cleansing."""
+
+    @pytest.mark.parametrize(
+        "filepath",
+        _gold_master_files,
+        ids=[f.stem for f in _gold_master_files],
+    )
+    def test_gold_master_data_is_swift_compliant(self, filepath):
+        """Gold master data should already be SWIFT-compliant."""
+        from pacs008.compliance.swift_charset import (
+            cleanse_data_with_report,
+        )
+
+        data = _load_data(filepath)
+        _, report = cleanse_data_with_report(data)
+        assert report.is_clean, (
+            f"{filepath.name} has SWIFT compliance violations: "
+            f"{report.violation_count} violations"
+        )
+
+    @pytest.mark.parametrize(
+        "filepath",
+        [f for f in _gold_master_files if f.suffix == ".json"],
+        ids=[f.stem for f in _gold_master_files if f.suffix == ".json"],
+    )
+    def test_gold_master_roundtrip_preserves_amounts(self, filepath):
+        """Amount values must survive the full pipeline unchanged."""
+        data = _load_data(filepath)
+        version = _version_from_filename(filepath.stem)
+        xml = generate_xml_string(
+            data, version, _template_path(version), _xsd_path(version)
+        )
+        for row in data:
+            assert row["interbank_settlement_amount"] in xml
+
+    @pytest.mark.parametrize(
+        "filepath",
+        [f for f in _gold_master_files if f.suffix == ".json"],
+        ids=[f.stem for f in _gold_master_files if f.suffix == ".json"],
+    )
+    def test_gold_master_settlement_method_preserved(self, filepath):
+        """Settlement method must appear in XML output."""
+        data = _load_data(filepath)
+        version = _version_from_filename(filepath.stem)
+        xml = generate_xml_string(
+            data, version, _template_path(version), _xsd_path(version)
+        )
+        assert f"<SttlmMtd>{data[0]['settlement_method']}</SttlmMtd>" in xml

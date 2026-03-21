@@ -1,0 +1,21 @@
+[
+  {
+    "msg_id": "GOLD-V07-001",
+    "creation_date_time": "2026-03-15T10:45:00",
+    "nb_of_txs": "1",
+    "settlement_method": "COVE",
+    "interbank_settlement_date": "2026-03-15",
+    "end_to_end_id": "E2E-GOLD-V07",
+    "tx_id": "TX-V07-001",
+    "interbank_settlement_amount": "67200.00",
+    "interbank_settlement_currency": "GBP",
+    "charge_bearer": "DEBT",
+    "debtor_name": "Northern Engineering Ltd",
+    "debtor_account_iban": "GB82WEST12345698765432",
+    "debtor_agent_bic": "LOYDGB2L",
+    "creditor_agent_bic": "DEUTDEFF",
+    "creditor_name": "Rhine Manufacturing GmbH",
+    "creditor_account_iban": "DE44500105175407324931",
+    "remittance_information": "Purchase order PO-V07-2026-143"
+  }
+]

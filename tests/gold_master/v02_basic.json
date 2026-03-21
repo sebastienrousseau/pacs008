@@ -1,0 +1,21 @@
+[
+  {
+    "msg_id": "GOLD-V02-001",
+    "creation_date_time": "2026-03-15T09:15:00",
+    "nb_of_txs": "1",
+    "settlement_method": "INDA",
+    "interbank_settlement_date": "2026-03-15",
+    "end_to_end_id": "E2E-GOLD-V02",
+    "tx_id": "TX-V02-001",
+    "interbank_settlement_amount": "42000.00",
+    "interbank_settlement_currency": "USD",
+    "charge_bearer": "DEBT",
+    "debtor_name": "Atlantic Trading Corp",
+    "debtor_account_iban": "GB29NWBK60161331926819",
+    "debtor_agent_bic": "NWBKGB2L",
+    "creditor_agent_bic": "CHASUS33",
+    "creditor_name": "Eastside Financial LLC",
+    "creditor_account_iban": "DE89370400440532013000",
+    "remittance_information": "Invoice INV-2026-V02-0042"
+  }
+]

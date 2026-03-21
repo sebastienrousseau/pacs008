@@ -1,0 +1,21 @@
+[
+  {
+    "msg_id": "GOLD-V06-001",
+    "creation_date_time": "2026-03-15T10:30:00",
+    "nb_of_txs": "1",
+    "settlement_method": "INDA",
+    "interbank_settlement_date": "2026-03-15",
+    "end_to_end_id": "E2E-GOLD-V06",
+    "tx_id": "TX-V06-001",
+    "interbank_settlement_amount": "33750.25",
+    "interbank_settlement_currency": "CHF",
+    "charge_bearer": "SLEV",
+    "debtor_name": "Helvetic Exports AG",
+    "debtor_account_iban": "CH9300762011623852957",
+    "debtor_agent_bic": "UBSWCHZH",
+    "creditor_agent_bic": "BARCGB22",
+    "creditor_name": "London Commodities Trading PLC",
+    "creditor_account_iban": "GB29NWBK60161331926819",
+    "remittance_information": "Commodity contract CTRCT-V06-887"
+  }
+]

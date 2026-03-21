@@ -1,0 +1,21 @@
+[
+  {
+    "msg_id": "GOLD-V03-001",
+    "creation_date_time": "2026-03-15T09:30:00",
+    "nb_of_txs": "1",
+    "settlement_method": "COVE",
+    "interbank_settlement_date": "2026-03-15",
+    "end_to_end_id": "E2E-GOLD-V03",
+    "tx_id": "TX-V03-001",
+    "interbank_settlement_amount": "88500.75",
+    "interbank_settlement_currency": "EUR",
+    "charge_bearer": "CRED",
+    "debtor_name": "BICFI Transition GmbH",
+    "debtor_account_iban": "DE44500105175407324931",
+    "debtor_agent_bic": "INGDDEFF",
+    "creditor_agent_bic": "SOGEFRPP",
+    "creditor_name": "Societe Generale Client SA",
+    "creditor_account_iban": "FR7630006000011234567890189",
+    "remittance_information": "BICFI transition payment v03"
+  }
+]

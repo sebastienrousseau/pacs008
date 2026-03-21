@@ -1,0 +1,23 @@
+[
+  {
+    "msg_id": "GOLD-V12-001",
+    "creation_date_time": "2026-03-15T13:00:00",
+    "nb_of_txs": "1",
+    "settlement_method": "COVE",
+    "interbank_settlement_date": "2026-03-15",
+    "end_to_end_id": "E2E-GOLD-V12",
+    "tx_id": "TX-V12-001",
+    "interbank_settlement_amount": "450000.00",
+    "interbank_settlement_currency": "GBP",
+    "charge_bearer": "SLEV",
+    "debtor_name": "Edinburgh Capital Partners LLP",
+    "debtor_account_iban": "GB82WEST12345698765432",
+    "debtor_agent_bic": "BOFAGB22",
+    "creditor_agent_bic": "COBADEFF",
+    "creditor_name": "Frankfurt Investments KGaA",
+    "creditor_account_iban": "DE44500105175407324931",
+    "remittance_information": "Fund transfer mandate MNDT-V12",
+    "uetr": "b7a6c5d4-e3f2-4109-8765-abcdef012345",
+    "mandate_id": "MNDT-V12-001"
+  }
+]

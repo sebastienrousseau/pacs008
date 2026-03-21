@@ -2,6 +2,8 @@
 
 import json
 import logging
+import os
+import tempfile
 import time
 
 import pytest
@@ -262,8 +264,12 @@ class TestExecutionSummaryTracker:
             with ExecutionSummaryTracker(logger) as tracker:
                 tracker.increment_processed_records(10)
                 tracker.set_validation_result("schema", "PASSED")
-                tracker.set_output_file("/tmp/output.xml")
-                tracker.set_log_file("/tmp/app.log")
+                tracker.set_output_file(
+                    os.path.join(tempfile.gettempdir(), "output.xml")
+                )
+                tracker.set_log_file(
+                    os.path.join(tempfile.gettempdir(), "app.log")
+                )
 
         assert tracker._get_status() == ExecutionStatus.SUCCESS
         assert tracker.total_records_processed == 10

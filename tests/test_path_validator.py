@@ -8,6 +8,8 @@ import pytest
 from pacs008.security.path_validator import (
     PathValidationError,
     SecurityError,
+    _get_allowed_bases_pathlib,
+    _get_allowed_bases_str,
     _is_allowed_directory,
     sanitize_for_log,
     validate_path,
@@ -111,3 +113,50 @@ class TestIsAllowedDirectory:
     def test_root_not_allowed(self):
         from pathlib import Path
         assert not _is_allowed_directory(Path("/usr/bin").resolve())
+
+
+class TestPlatformConditionalBases:
+    """Test that allowed bases adapt to platform."""
+
+    def test_pathlib_bases_include_tmpdir(self):
+        from pathlib import Path
+        bases = _get_allowed_bases_pathlib()
+        tmpdir = Path(tempfile.gettempdir()).resolve()
+        assert tmpdir in bases
+
+    def test_str_bases_include_tmpdir(self):
+        bases = _get_allowed_bases_str()
+        tmpdir = os.path.realpath(tempfile.gettempdir())
+        assert tmpdir in bases
+
+    def test_pathlib_bases_include_cwd(self):
+        from pathlib import Path
+        bases = _get_allowed_bases_pathlib()
+        assert Path.cwd().resolve() in bases
+
+    def test_str_bases_include_cwd(self):
+        bases = _get_allowed_bases_str()
+        assert os.path.realpath(os.getcwd()) in bases
+
+    def test_var_tmp_included_on_linux(self):
+        import sys
+        if sys.platform == "win32":
+            pytest.skip("Linux-only test")
+        bases_str = _get_allowed_bases_str()
+        var_tmp = os.path.realpath(os.path.join(os.path.sep, "var", "tmp"))
+        assert var_tmp in bases_str
+
+    def test_var_tmp_excluded_on_win32(self, monkeypatch):
+        import pacs008.security.path_validator as pv
+        monkeypatch.setattr(pv.sys, "platform", "win32")
+        bases_str = _get_allowed_bases_str()
+        var_tmp = os.path.realpath(os.path.join(os.path.sep, "var", "tmp"))
+        assert var_tmp not in bases_str
+
+    def test_pathlib_var_tmp_excluded_on_win32(self, monkeypatch):
+        from pathlib import Path
+        import pacs008.security.path_validator as pv
+        monkeypatch.setattr(pv.sys, "platform", "win32")
+        bases = _get_allowed_bases_pathlib()
+        var_tmp = Path(os.path.join(os.path.sep, "var", "tmp")).resolve()
+        assert var_tmp not in bases

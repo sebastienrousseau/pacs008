@@ -290,3 +290,163 @@ class TestComplianceViolation:
         )
         assert "debtor_name" in repr(v)
         assert "charset" in repr(v)
+
+
+# --- SWIFT Compliance Integration with XML Pipeline ---
+
+
+class TestComplianceXmlIntegration:
+    """Test SWIFT compliance cleansing before XML generation."""
+
+    def test_cleansed_data_generates_valid_xml(self):
+        """Data with non-SWIFT chars generates valid XML after cleansing."""
+        from pacs008.constants import TEMPLATES_DIR
+        from pacs008.xml.generate_xml import generate_xml_string
+
+        dirty = [{
+            "msg_id": "MSG-COMPLIANCE-001",
+            "creation_date_time": "2026-01-15T10:30:00",
+            "nb_of_txs": "1",
+            "settlement_method": "CLRG",
+            "interbank_settlement_date": "2026-01-15",
+            "end_to_end_id": "E2E-COMPL-001",
+            "tx_id": "TX-COMPL-001",
+            "interbank_settlement_amount": "5000.00",
+            "interbank_settlement_currency": "EUR",
+            "charge_bearer": "SHAR",
+            "debtor_name": "Müller & Söhne™ GmbH",
+            "debtor_account_iban": "DE89370400440532013000",
+            "debtor_agent_bic": "DEUTDEFF",
+            "creditor_agent_bic": "COBADEFF",
+            "creditor_name": "García Café SL",
+            "creditor_account_iban": "ES9121000418450200051332",
+            "remittance_information": "Invoice™ #123 — €500 payment",
+        }]
+        clean = cleanse_data(dirty)
+        version = "pacs.008.001.05"
+        tpl = str(TEMPLATES_DIR / version / "template.xml")
+        xsd = str(TEMPLATES_DIR / version / f"{version}.xsd")
+        xml = generate_xml_string(clean, version, tpl, xsd)
+        assert "Mueller" in xml or "Muller" in xml
+        assert "™" not in xml
+        assert "€" not in xml
+
+    def test_full_pipeline_with_report(self):
+        """cleanse_data_with_report produces report + valid data."""
+        dirty = [
+            {
+                "msg_id": "X" * 50,
+                "debtor_name": "Ñoño Corp",
+                "creditor_name": "Böhm AG",
+                "end_to_end_id": "E2E-001",
+                "remittance_information": "Ä" * 200,
+            }
+        ]
+        result, report = cleanse_data_with_report(dirty)
+        assert not report.is_clean
+        assert report.rows_modified == 1
+        assert report.violation_count >= 3
+        # msg_id truncated to 35
+        assert len(result[0]["msg_id"]) == 35
+        # Names are SWIFT-compliant
+        assert validate_swift_charset(result[0]["debtor_name"]) == []
+        assert validate_swift_charset(result[0]["creditor_name"]) == []
+        # Remittance truncated to 140
+        assert len(result[0]["remittance_information"]) <= 140
+
+    def test_multi_row_compliance(self):
+        """Multiple rows processed correctly with mixed violations."""
+        data = [
+            {"debtor_name": "Clean Corp", "msg_id": "OK-1"},
+            {"debtor_name": "Müller™ AG", "msg_id": "OK-2"},
+            {"debtor_name": "García SL", "msg_id": "Y" * 40},
+        ]
+        result, report = cleanse_data_with_report(data)
+        assert report.rows_processed == 3
+        assert report.rows_modified == 2  # Rows 2 and 3
+        assert result[0]["debtor_name"] == "Clean Corp"  # Unchanged
+
+
+# --- Unicode Edge Cases ---
+
+
+class TestUnicodeEdgeCases:
+    """Test transliteration of complex Unicode scenarios."""
+
+    def test_cjk_characters_removed(self):
+        """CJK characters not in SWIFT set should be replaced."""
+        result = cleanse_string("Payment 支払い")
+        assert validate_swift_charset(result) == []
+
+    def test_mixed_scripts(self):
+        """Mixed Latin + non-Latin should cleanse non-Latin only."""
+        result = cleanse_string("ABC αβγ 123")
+        assert "ABC" in result
+        assert "123" in result
+        assert validate_swift_charset(result) == []
+
+    def test_combining_diacritics(self):
+        """Characters with combining marks should be normalized."""
+        # é can be e + combining acute accent
+        import unicodedata
+        decomposed = unicodedata.normalize("NFD", "é")
+        result = cleanse_string(decomposed)
+        assert validate_swift_charset(result) == []
+
+    def test_zero_width_characters(self):
+        """Zero-width chars should be stripped."""
+        result = cleanse_string("Hello\u200bWorld")  # zero-width space
+        assert validate_swift_charset(result) == []
+
+    def test_full_width_digits(self):
+        """Full-width digits should be replaced."""
+        result = cleanse_string("１２３")  # Full-width 1, 2, 3
+        assert validate_swift_charset(result) == []
+
+    def test_all_transliteration_entries(self):
+        """Every entry in _TRANSLITERATION produces SWIFT-valid output."""
+        from pacs008.compliance.swift_charset import _TRANSLITERATION
+        for char, replacement in _TRANSLITERATION.items():
+            result = cleanse_string(char)
+            violations = validate_swift_charset(result)
+            assert violations == [], (
+                f"Transliteration of '{char}' → '{result}' has violations"
+            )
+
+    def test_long_transliteration_chain(self):
+        """String with many transliterations doesn't break."""
+        from pacs008.compliance.swift_charset import _TRANSLITERATION
+        s = "".join(_TRANSLITERATION.keys())
+        result = cleanse_string(s)
+        assert validate_swift_charset(result) == []
+
+
+# --- Compliance Report ---
+
+
+class TestComplianceReportDetails:
+    """Detailed compliance report testing."""
+
+    def test_summary_with_violations(self):
+        data = [{"msg_id": "X" * 50, "debtor_name": "Müller"}]
+        _, report = cleanse_data_with_report(data)
+        summary = report.summary()
+        assert "violation" in summary.lower() or "modified" in summary.lower()
+
+    def test_violation_count_accurate(self):
+        data = [{
+            "msg_id": "X" * 50,
+            "debtor_name": "Müller™",
+            "creditor_name": "Böhm",
+            "end_to_end_id": "Y" * 40,
+        }]
+        _, report = cleanse_data_with_report(data)
+        # charset violations: debtor_name (ü, ™), creditor_name (ö)
+        # length violations: msg_id, end_to_end_id
+        assert report.violation_count >= 4
+
+    def test_empty_data_clean_report(self):
+        _, report = cleanse_data_with_report([])
+        assert report.is_clean
+        assert report.rows_processed == 0
+        assert report.rows_modified == 0
