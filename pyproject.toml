@@ -1,0 +1,172 @@
+[tool.poetry]
+name = "pacs008"
+version = "0.0.1"
+description = "Pacs008 is a Python Library for Automating ISO 20022 pacs.008 FI-to-FI Customer Credit Transfer XML Messages."
+authors = ["Sebastien Rousseau <sebastian.rousseau@gmail.com>"]
+license = "Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/sebastienrousseau/pacs008"
+homepage = "https://pacs008.com"
+packages = [
+    { include = "pacs008" },
+]
+include = [
+    "pacs008/schemas/*",
+    "pacs008/templates/*",
+    "pacs008/test_fixtures/**/*",
+]
+
+[tool.poetry.scripts]
+pacs008 = "pacs008.__main__:cli"
+
+[tool.poetry.dependencies]
+click = "8.1.7"
+colorama = "0.4.6"
+defusedxml = "0.7.1"
+jinja2 = "3.1.6"
+markupsafe = "2.1.5"
+pygments = "2.18.0"
+python = "^3.9.2"
+rich = "13.7.1"
+xmlschema = ">=3.4.0 <4.0.0"
+cryptography = ">=44.0.1,<47.0.0"
+jsonschema = ">=4.17,<4.18"
+fastapi = ">=0.95"
+uvicorn = {version = ">=0.20", extras = ["standard"]}
+httpx = ">=0.23"
+pyarrow = ">=18.0.0,<19.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+pytest-cov = "^4.0.0"
+pytest-benchmark = "^4.0.0"
+pytest-xdist = "^3.0.0"
+black = "^24.0.0"
+flake8 = "^7.0.0"
+isort = "^5.13.0"
+mypy = "^1.11.0"
+pylint = "^3.0.0"
+bandit = "^1.7.0"
+safety = "^2.3.0"
+ruff = "^0.1.0"
+types-defusedxml = "^0.7.0"
+diff-cover = "^8.0.0"
+types-setuptools = "^65.0.0"
+radon = "^5.1.0"
+mutmut = "^2.4.0"
+hypothesis = "^6.0.0"
+memory-profiler = "^0.60.0"
+sphinx = "^7.0.0"
+sphinx-rtd-theme = "^1.0.0"
+sphinx-autodoc-typehints = "^1.0.0"
+pip-licenses = "^4.0.0"
+twine = "^6.2.0"
+types-jsonschema = "^4.26.0.20260109"
+pandas = "^2.3.3"
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+sphinx = "^7.0.0"
+pydata-sphinx-theme = "^0.15.0"
+sphinx-autodoc-typehints = "^1.0.0"
+sphinx-design = "^0.6.0"
+myst-parser = "^2.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 79
+target-version = ['py39']
+
+[tool.isort]
+profile = "black"
+line_length = 79
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+combine_as_imports = true
+known_first_party = "pacs008"
+known_third_party = "xmlschema"
+skip = ["tmp_env", ".venv", ".git", ".eggs"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = [
+    "--cov=pacs008",
+    "--cov-branch",
+    "--cov-report=term-missing:skip-covered",
+    "--cov-report=xml",
+    "--cov-report=html",
+    "--cov-fail-under=35",
+    "--tb=short",
+    "-ra",
+    "--strict-markers",
+    "--disable-warnings"
+]
+markers = [
+    "integration: end-to-end workflow tests",
+    "version_compat: pacs.008 version compatibility tests (v01-v13)",
+    "slow: tests taking > 1s",
+    "security: XXE and injection prevention tests",
+    "perf: performance/benchmark tests",
+    "smoke: quick sanity checks"
+]
+timeout = 5
+
+[tool.ruff]
+line-length = 79
+target-version = "py39"
+extend-exclude = [".github/*.md", "*.md", "docs/**/*.md", "releases/**/*.md", "tmp_env", ".venv", ".eggs"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "C4", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+
+[tool.mypy]
+python_version = "3.9"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_any_unimported = false
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+check_untyped_defs = true
+strict_equality = true
+exclude = [
+    "pacs008/templates/",
+    "setup.py",
+    "scripts/",
+    "tmp_env/",
+    ".venv/",
+    ".eggs/",
+]
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+disallow_untyped_calls = false
+warn_unused_ignores = false
+disable_error_code = ["arg-type", "return-value", "attr-defined", "assignment"]
+
+[[tool.mypy.overrides]]
+module = "xmlschema.*"
+ignore_missing_imports = true

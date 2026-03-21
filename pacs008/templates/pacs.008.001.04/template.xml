@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.04"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<FIToFICstmrCdtTrf>
+		<GrpHdr>
+			<MsgId>{{msg_id}}</MsgId>
+			<CreDtTm>{{creation_date_time}}</CreDtTm>
+			<NbOfTxs>{{nb_of_txs}}</NbOfTxs>
+			<SttlmInf>
+				<SttlmMtd>{{settlement_method}}</SttlmMtd>
+			</SttlmInf>
+		</GrpHdr>
+		{% for tx in transactions %}
+		<CdtTrfTxInf>
+			<PmtId>
+				<EndToEndId>{{tx.end_to_end_id}}</EndToEndId>
+				{% if tx.tx_id %}<TxId>{{tx.tx_id}}</TxId>{% endif %}
+			</PmtId>
+			<IntrBkSttlmAmt Ccy="{{tx.interbank_settlement_currency}}">{{tx.interbank_settlement_amount}}</IntrBkSttlmAmt>
+			{% if tx.charge_bearer %}<ChrgBr>{{tx.charge_bearer}}</ChrgBr>{% endif %}
+			{% if tx.debtor_name %}
+			<Dbtr>
+				<Nm>{{tx.debtor_name}}</Nm>
+			</Dbtr>
+			{% endif %}
+			{% if tx.debtor_account_iban %}
+			<DbtrAcct>
+				<Id>
+					<IBAN>{{tx.debtor_account_iban}}</IBAN>
+				</Id>
+			</DbtrAcct>
+			{% endif %}
+			{% if tx.debtor_agent_bic %}
+			<DbtrAgt>
+				<FinInstnId>
+					<BICFI>{{tx.debtor_agent_bic}}</BICFI>
+				</FinInstnId>
+			</DbtrAgt>
+			{% endif %}
+			{% if tx.creditor_agent_bic %}
+			<CdtrAgt>
+				<FinInstnId>
+					<BICFI>{{tx.creditor_agent_bic}}</BICFI>
+				</FinInstnId>
+			</CdtrAgt>
+			{% endif %}
+			{% if tx.creditor_name %}
+			<Cdtr>
+				<Nm>{{tx.creditor_name}}</Nm>
+			</Cdtr>
+			{% endif %}
+			{% if tx.creditor_account_iban %}
+			<CdtrAcct>
+				<Id>
+					<IBAN>{{tx.creditor_account_iban}}</IBAN>
+				</Id>
+			</CdtrAcct>
+			{% endif %}
+			{% if tx.remittance_information %}
+			<RmtInf>
+				<Ustrd>{{tx.remittance_information}}</Ustrd>
+			</RmtInf>
+			{% endif %}
+		</CdtTrfTxInf>
+		{% endfor %}
+	</FIToFICstmrCdtTrf>
+</Document>
