@@ -1,6 +1,5 @@
 """Tests for pacs008.compliance module (SWIFT silent rejection prevention)."""
 
-
 from pacs008.compliance.swift_charset import (
     SWIFT_X_CHARSET,
     ComplianceViolation,

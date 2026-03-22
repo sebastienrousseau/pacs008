@@ -1,7 +1,5 @@
 """Tests for the 7 additional pacs message types (non-008)."""
 
-
-
 from pacs008.constants import TEMPLATES_DIR
 from pacs008.xml.generate_xml import generate_xml_string
 
