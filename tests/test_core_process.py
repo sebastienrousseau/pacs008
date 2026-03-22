@@ -4,7 +4,7 @@ import uuid
 
 import pytest
 
-from pacs008.constants import TEMPLATES_DIR, valid_xml_types
+from pacs008.constants import TEMPLATES_DIR
 from pacs008.core.core import (
     _determine_data_source_type,
     _validate_inputs,
@@ -51,12 +51,16 @@ class TestValidateInputs:
     """Test input validation for process_files."""
 
     def test_invalid_message_type_raises(self):
-        with pytest.raises(XMLGenerationError, match="Invalid XML message type"):
+        with pytest.raises(
+            XMLGenerationError, match="Invalid XML message type"
+        ):
             _validate_inputs("pacs.008.001.99", "t.xml", "s.xsd")
 
     def test_missing_template_raises(self):
         with pytest.raises(FileNotFoundError):
-            _validate_inputs("pacs.008.001.01", "/nonexistent/template.xml", "s.xsd")
+            _validate_inputs(
+                "pacs.008.001.01", "/nonexistent/template.xml", "s.xsd"
+            )
 
     def test_missing_schema_raises(self):
         tpl = str(TEMPLATES_DIR / "pacs.008.001.01" / "template.xml")

@@ -1,11 +1,9 @@
 """Full API coverage tests for remaining uncovered lines in api/app.py."""
 
-import csv
 import json
 import os
 import tempfile
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -18,7 +16,6 @@ from pacs008.api.app import (
 )
 from pacs008.api.job_manager import JobStatus, job_manager
 from pacs008.api.models import GenerateXMLRequest, MessageType
-from pacs008.constants import TEMPLATES_DIR
 
 
 @pytest.fixture()
@@ -62,12 +59,14 @@ class TestValidateSafePath:
 
     def test_traversal_raises_400(self):
         from fastapi import HTTPException
+
         with pytest.raises(HTTPException) as exc_info:
             _validate_safe_path("../../etc/passwd")
         assert exc_info.value.status_code in (400, 403)
 
     def test_outside_cwd_raises_403(self, tmp_path, monkeypatch):
         from fastapi import HTTPException
+
         monkeypatch.chdir(tmp_path)
         with pytest.raises(HTTPException) as exc_info:
             _validate_safe_path("/usr/bin/python")
@@ -79,12 +78,21 @@ class TestFormatValidationErrors:
         from pacs008.validation.schema_validator import (
             ValidationError as SchemaValidationError,
         )
+
         errors = [
-            (0, [SchemaValidationError("bad value", "$.field", "val", "type")]),
-            (1, [
-                SchemaValidationError("missing", "$.other", None, "required"),
-                SchemaValidationError("wrong", "$.third", "x", "pattern"),
-            ]),
+            (
+                0,
+                [SchemaValidationError("bad value", "$.field", "val", "type")],
+            ),
+            (
+                1,
+                [
+                    SchemaValidationError(
+                        "missing", "$.other", None, "required"
+                    ),
+                    SchemaValidationError("wrong", "$.third", "x", "pattern"),
+                ],
+            ),
         ]
         result = _format_validation_errors(errors)
         assert len(result) == 3
@@ -261,7 +269,9 @@ class TestJobStatusFull:
 
 
 class TestDownloadEndpointFull:
-    def test_download_success_file_outside_cwd(self, client, tmp_path, monkeypatch):
+    def test_download_success_file_outside_cwd(
+        self, client, tmp_path, monkeypatch
+    ):
         monkeypatch.chdir(tmp_path)
         job_id = job_manager.create_job()
         # File path outside CWD should be rejected
@@ -273,7 +283,9 @@ class TestDownloadEndpointFull:
         response = client.get(f"/api/download/{job_id}")
         assert response.status_code in (400, 403)
 
-    def test_download_success_file_missing(self, client, tmp_path, monkeypatch):
+    def test_download_success_file_missing(
+        self, client, tmp_path, monkeypatch
+    ):
         monkeypatch.chdir(tmp_path)
         job_id = job_manager.create_job()
         missing_path = str(tmp_path / "missing.xml")

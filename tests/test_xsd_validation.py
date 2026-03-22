@@ -2,8 +2,6 @@
 
 import uuid
 
-import pytest
-
 from pacs008.constants import TEMPLATES_DIR
 from pacs008.xml.generate_xml import generate_xml_string
 from pacs008.xml.validate_via_xsd import (
@@ -55,7 +53,9 @@ class TestValidateXmlStringViaXsd:
         assert not validate_xml_string_via_xsd("not xml at all <<<", xsd)
 
     def test_invalid_xsd_path(self):
-        assert not validate_xml_string_via_xsd("<root/>", "/nonexistent/schema.xsd")
+        assert not validate_xml_string_via_xsd(
+            "<root/>", "/nonexistent/schema.xsd"
+        )
 
 
 class TestValidateViaXsd:

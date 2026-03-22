@@ -5,7 +5,7 @@ import re
 import sys
 import tempfile
 from pathlib import Path
-from typing import List, Union
+from typing import Union
 
 
 class PathValidationError(ValueError):
@@ -16,27 +16,23 @@ class SecurityError(PermissionError):
     """Raised when a security boundary is violated."""
 
 
-def _get_allowed_bases_pathlib() -> List[Path]:
+def _get_allowed_bases_pathlib() -> list[Path]:
     bases = [
         Path.cwd().resolve(),
         Path(tempfile.gettempdir()).resolve(),
     ]
     if sys.platform != "win32":
-        bases.append(
-            Path(os.path.join(os.path.sep, "var", "tmp")).resolve()
-        )
+        bases.append(Path(os.path.join(os.path.sep, "var", "tmp")).resolve())
     return bases
 
 
-def _get_allowed_bases_str() -> List[str]:
+def _get_allowed_bases_str() -> list[str]:
     bases = [
         os.path.realpath(os.getcwd()),
         os.path.realpath(tempfile.gettempdir()),
     ]
     if sys.platform != "win32":
-        bases.append(
-            os.path.realpath(os.path.join(os.path.sep, "var", "tmp"))
-        )
+        bases.append(os.path.realpath(os.path.join(os.path.sep, "var", "tmp")))
     return bases
 
 
@@ -74,7 +70,7 @@ def _resolve_within_allowed_bases(
         allowed_bases = _get_allowed_bases_str()
     for base in allowed_bases:
         if resolved_str == base or resolved_str.startswith(base + os.sep):
-            return base + resolved_str[len(base):]
+            return base + resolved_str[len(base) :]
     if base_dir:
         raise SecurityError(
             f"Path '{resolved_str}' escapes base directory '{base_dir}'."

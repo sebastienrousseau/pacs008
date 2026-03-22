@@ -2,8 +2,6 @@
 
 import xml.etree.ElementTree as et
 
-import pytest
-
 from pacs008.xml.write_xml_to_file import indent_xml, write_xml_to_file
 from pacs008.xml.xml_to_string import xml_to_string
 

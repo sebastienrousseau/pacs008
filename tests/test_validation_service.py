@@ -1,13 +1,10 @@
 """Tests for validation/service.py — ValidationService orchestrator."""
 
 import csv
-import json
-import os
 
 import pytest
 
 from pacs008.constants import TEMPLATES_DIR
-from pacs008.exceptions import ConfigurationError
 from pacs008.validation.service import (
     ValidationConfig,
     ValidationReport,
@@ -27,23 +24,40 @@ def valid_csv_file(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     path = tmp_path / "payments.csv"
     fieldnames = [
-        "msg_id", "creation_date_time", "nb_of_txs", "settlement_method",
-        "end_to_end_id", "tx_id", "interbank_settlement_amount",
-        "interbank_settlement_currency", "charge_bearer",
-        "debtor_name", "debtor_agent_bic", "creditor_agent_bic", "creditor_name",
+        "msg_id",
+        "creation_date_time",
+        "nb_of_txs",
+        "settlement_method",
+        "end_to_end_id",
+        "tx_id",
+        "interbank_settlement_amount",
+        "interbank_settlement_currency",
+        "charge_bearer",
+        "debtor_name",
+        "debtor_agent_bic",
+        "creditor_agent_bic",
+        "creditor_name",
     ]
     with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
-        writer.writerow({
-            "msg_id": "MSG-001", "creation_date_time": "2026-01-15T10:30:00",
-            "nb_of_txs": "1", "settlement_method": "CLRG",
-            "end_to_end_id": "E2E-001", "tx_id": "TX-001",
-            "interbank_settlement_amount": "1000.00",
-            "interbank_settlement_currency": "EUR", "charge_bearer": "SHAR",
-            "debtor_name": "Debtor Corp", "debtor_agent_bic": "DEUTDEFF",
-            "creditor_agent_bic": "COBADEFF", "creditor_name": "Creditor Ltd",
-        })
+        writer.writerow(
+            {
+                "msg_id": "MSG-001",
+                "creation_date_time": "2026-01-15T10:30:00",
+                "nb_of_txs": "1",
+                "settlement_method": "CLRG",
+                "end_to_end_id": "E2E-001",
+                "tx_id": "TX-001",
+                "interbank_settlement_amount": "1000.00",
+                "interbank_settlement_currency": "EUR",
+                "charge_bearer": "SHAR",
+                "debtor_name": "Debtor Corp",
+                "debtor_agent_bic": "DEUTDEFF",
+                "creditor_agent_bic": "COBADEFF",
+                "creditor_name": "Creditor Ltd",
+            }
+        )
     return str(path)
 
 
@@ -128,8 +142,12 @@ class TestValidateAll:
         version = "pacs.008.001.01"
         config = ValidationConfig(
             xml_message_type=version,
-            xml_template_file_path=str(TEMPLATES_DIR / version / "template.xml"),
-            xsd_schema_file_path=str(TEMPLATES_DIR / version / f"{version}.xsd"),
+            xml_template_file_path=str(
+                TEMPLATES_DIR / version / "template.xml"
+            ),
+            xsd_schema_file_path=str(
+                TEMPLATES_DIR / version / f"{version}.xsd"
+            ),
             data_file_path=valid_csv_file,
         )
         report = service.validate_all(config)
@@ -139,8 +157,12 @@ class TestValidateAll:
     def test_invalid_message_type(self, service, valid_csv_file):
         config = ValidationConfig(
             xml_message_type="pacs.008.001.99",
-            xml_template_file_path=str(TEMPLATES_DIR / "pacs.008.001.01" / "template.xml"),
-            xsd_schema_file_path=str(TEMPLATES_DIR / "pacs.008.001.01" / "pacs.008.001.01.xsd"),
+            xml_template_file_path=str(
+                TEMPLATES_DIR / "pacs.008.001.01" / "template.xml"
+            ),
+            xsd_schema_file_path=str(
+                TEMPLATES_DIR / "pacs.008.001.01" / "pacs.008.001.01.xsd"
+            ),
             data_file_path=valid_csv_file,
         )
         report = service.validate_all(config)
@@ -151,7 +173,9 @@ class TestValidateAll:
         config = ValidationConfig(
             xml_message_type="pacs.008.001.01",
             xml_template_file_path="/nonexistent/template.xml",
-            xsd_schema_file_path=str(TEMPLATES_DIR / "pacs.008.001.01" / "pacs.008.001.01.xsd"),
+            xsd_schema_file_path=str(
+                TEMPLATES_DIR / "pacs.008.001.01" / "pacs.008.001.01.xsd"
+            ),
             data_file_path=valid_csv_file,
         )
         report = service.validate_all(config)
@@ -161,8 +185,12 @@ class TestValidateAll:
         version = "pacs.008.001.01"
         config = ValidationConfig(
             xml_message_type=version,
-            xml_template_file_path=str(TEMPLATES_DIR / version / "template.xml"),
-            xsd_schema_file_path=str(TEMPLATES_DIR / version / f"{version}.xsd"),
+            xml_template_file_path=str(
+                TEMPLATES_DIR / version / "template.xml"
+            ),
+            xsd_schema_file_path=str(
+                TEMPLATES_DIR / version / f"{version}.xsd"
+            ),
             data_file_path="/nonexistent/data.csv",
         )
         report = service.validate_all(config)

@@ -3,20 +3,16 @@
 import csv
 import json
 import logging
-import os
-import sys
-import tempfile
-from pathlib import Path
-from unittest.mock import MagicMock, patch
 
 import pytest
 
-from pacs008.constants import TEMPLATES_DIR, valid_xml_types
-
+from pacs008.constants import TEMPLATES_DIR
 
 # --- csv/validate_csv_data.py gaps (lines 56, 77-78) ---
-
-from pacs008.csv.validate_csv_data import _validate_datetime, _validate_field_type
+from pacs008.csv.validate_csv_data import (
+    _validate_datetime,
+    _validate_field_type,
+)
 
 
 class TestValidateDatetimeFallback:
@@ -44,6 +40,7 @@ class TestValidateFieldType:
 
     def test_datetime_type(self):
         from datetime import datetime
+
         assert _validate_field_type("2026-01-15T10:30:00", datetime)
 
     def test_int_valid(self):
@@ -61,7 +58,11 @@ class TestValidateFieldType:
 
 # --- compliance/swift_charset.py gaps (lines 136, 156) ---
 
-from pacs008.compliance.swift_charset import ComplianceReport, ComplianceViolation, _transliterate
+from pacs008.compliance.swift_charset import (
+    ComplianceReport,
+    ComplianceViolation,
+    _transliterate,
+)
 
 
 class TestSwiftCharsetGaps:
@@ -137,7 +138,12 @@ class TestIbanChecksumGaps:
 
 # --- validation/schema_validator.py gaps ---
 
-from pacs008.validation.schema_validator import SchemaValidator, ValidationError as SchemaValidationError
+from pacs008.validation.schema_validator import (
+    SchemaValidator,
+)
+from pacs008.validation.schema_validator import (
+    ValidationError as SchemaValidationError,
+)
 
 
 class TestSchemaValidatorGaps:
@@ -234,8 +240,6 @@ class TestSchemaValidatorGaps:
 
 from pacs008.validation.service import (
     ValidationConfig,
-    ValidationReport,
-    ValidationResult,
     ValidationService,
 )
 
@@ -243,26 +247,33 @@ from pacs008.validation.service import (
 class TestValidationServiceGaps:
     def test_validate_template_schema_xsd_failure(self):
         from unittest.mock import patch
+
         from pacs008.exceptions import SchemaValidationError
+
         service = ValidationService()
         # Mock validate_via_xsd to raise SchemaValidationError (line 292-299)
         with patch(
             "pacs008.validation.service.validate_via_xsd",
             side_effect=SchemaValidationError("XSD mismatch"),
         ):
-            result = service.validate_template_schema_compatibility("t.xml", "s.xsd")
+            result = service.validate_template_schema_compatibility(
+                "t.xml", "s.xsd"
+            )
         assert not result.is_valid
         assert "Schema validation failed" in result.error
 
     def test_validate_template_schema_generic_error(self):
         from unittest.mock import patch
+
         service = ValidationService()
         # Mock validate_via_xsd to raise generic Exception (line 339-340)
         with patch(
             "pacs008.validation.service.validate_via_xsd",
             side_effect=RuntimeError("unexpected"),
         ):
-            result = service.validate_template_schema_compatibility("t.xml", "s.xsd")
+            result = service.validate_template_schema_compatibility(
+                "t.xml", "s.xsd"
+            )
         assert not result.is_valid
         assert "Unexpected" in result.error
 
@@ -302,16 +313,18 @@ class TestValidationServiceGaps:
 from pacs008.data.loader import (
     _load_from_file,
     load_payment_data_streaming,
-    _load_from_file_streaming,
 )
 from pacs008.exceptions import PaymentValidationError
 
 
 class TestDataLoaderGaps:
-    def test_load_from_file_unsupported_after_path_validation(self, tmp_path, monkeypatch):
+    def test_load_from_file_unsupported_after_path_validation(
+        self, tmp_path, monkeypatch
+    ):
         monkeypatch.chdir(tmp_path)
         # Create a .db file with no pacs008 table to test DataSourceError path
         import sqlite3
+
         db = tmp_path / "test.db"
         conn = sqlite3.connect(str(db))
         conn.execute("CREATE TABLE other (col TEXT)")
@@ -334,8 +347,7 @@ class TestDataLoaderGaps:
 
 # --- core/core.py gaps (lines 179-192, 292-298, 315-329) ---
 
-from pacs008.core.core import _validate_inputs, _load_data, process_files
-from pacs008.exceptions import XMLGenerationError
+from pacs008.core.core import _load_data, _validate_inputs, process_files
 
 
 class TestCoreGaps:
@@ -358,6 +370,7 @@ class TestCoreGaps:
 
     def test_load_data_error(self, tmp_path, monkeypatch):
         import time
+
         monkeypatch.chdir(tmp_path)
         with pytest.raises(FileNotFoundError):
             _load_data("/nonexistent/file.csv", time.time())
@@ -373,7 +386,7 @@ class TestCoreGaps:
 
 # --- xml/generate_xml.py gaps (lines 149-150, 154-155, 180, 204-205, 209) ---
 
-from pacs008.xml.generate_xml import generate_xml, generate_xml_string
+from pacs008.xml.generate_xml import generate_xml_string
 
 
 class TestGenerateXmlGaps:
@@ -419,7 +432,9 @@ from pacs008.json.load_json_data import (
 
 
 class TestJsonLoaderGaps:
-    def test_json_file_not_exists_after_validation(self, tmp_path, monkeypatch):
+    def test_json_file_not_exists_after_validation(
+        self, tmp_path, monkeypatch
+    ):
         monkeypatch.chdir(tmp_path)
         # Create a valid path that passes validation but file doesn't exist
         # This is hard to trigger - the validate_path with must_exist catches it
@@ -427,7 +442,9 @@ class TestJsonLoaderGaps:
         with pytest.raises(FileNotFoundError):
             load_json_data("/nonexistent/file.json")
 
-    def test_jsonl_file_not_exists_after_validation(self, tmp_path, monkeypatch):
+    def test_jsonl_file_not_exists_after_validation(
+        self, tmp_path, monkeypatch
+    ):
         monkeypatch.chdir(tmp_path)
         with pytest.raises(FileNotFoundError):
             load_jsonl_data("/nonexistent/file.jsonl")
@@ -440,12 +457,14 @@ class TestJsonLoaderGaps:
         # Mock open to raise a generic exception after validation
         original_open = open
         call_count = 0
+
         def mock_open(*args, **kwargs):
             nonlocal call_count
             call_count += 1
             if call_count > 1 and "test.jsonl" in str(args[0]):
                 raise OSError("Simulated IO error")
             return original_open(*args, **kwargs)
+
         # The generic except path is hard to trigger naturally
         # Just test normal load to get the happy path coverage
         data = load_jsonl_data(str(path))
@@ -460,9 +479,9 @@ class TestJsonLoaderGaps:
 # --- logging_schema.py gaps (lines 698, 872, 891-894, 1058) ---
 
 from pacs008.logging_schema import (
-    ExecutionSummaryTracker,
-    ExecutionStatus,
     ExecutionMetrics,
+    ExecutionStatus,
+    ExecutionSummaryTracker,
     configure_json_logging,
 )
 
@@ -480,15 +499,15 @@ class TestLoggingSchemaGaps:
 
     def test_configure_json_logging_no_logger(self):
         # Line 872: logger is None branch
-        result_logger = configure_json_logging(logger=None, console_output=False)
+        result_logger = configure_json_logging(
+            logger=None, console_output=False
+        )
         assert result_logger is not None
 
     def test_configure_json_logging_console_output(self):
         # Lines 891-894: console_output=True branch
         test_logger = logging.getLogger("test_console_gap")
-        configure_json_logging(
-            logger=test_logger, console_output=True
-        )
+        configure_json_logging(logger=test_logger, console_output=True)
         # Should have at least one StreamHandler
         has_stream = any(
             isinstance(h, logging.StreamHandler) for h in test_logger.handlers
@@ -510,7 +529,11 @@ class TestLoggingSchemaGaps:
 
 # --- security/path_validator.py gaps (lines 31-32, 47-48) ---
 
-from pacs008.security.path_validator import _is_allowed_directory, _resolve_within_allowed_bases, PathValidationError
+from pacs008.security.path_validator import (
+    PathValidationError,
+    _is_allowed_directory,
+    _resolve_within_allowed_bases,
+)
 
 
 class TestPathValidatorGaps:
@@ -574,6 +597,7 @@ class TestCsvLoaderGaps:
 
     def test_streaming_empty_csv(self, tmp_path, monkeypatch):
         from pacs008.exceptions import DataSourceError
+
         monkeypatch.chdir(tmp_path)
         path = tmp_path / "empty.csv"
         path.write_text("col1,col2\n", encoding="utf-8")

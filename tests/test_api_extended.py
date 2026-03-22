@@ -1,13 +1,11 @@
 """Extended API tests covering more endpoints and edge cases."""
 
-import csv
 import json
-import os
 
 import pytest
 from fastapi.testclient import TestClient
 
-from pacs008.api.app import app, _format_validation_errors
+from pacs008.api.app import _format_validation_errors, app
 from pacs008.api.job_manager import JobStatus, job_manager
 from pacs008.api.models import ValidationResponse
 
@@ -22,21 +20,23 @@ def valid_json_in_cwd(tmp_path, monkeypatch):
     """Create a valid JSON file in a temp CWD (types preserved)."""
     monkeypatch.chdir(tmp_path)
     path = tmp_path / "payments.json"
-    data = [{
-        "msg_id": "MSG-API-001",
-        "creation_date_time": "2026-01-15T10:30:00",
-        "nb_of_txs": "1",
-        "settlement_method": "CLRG",
-        "end_to_end_id": "E2E-API",
-        "tx_id": "TX-API-001",
-        "interbank_settlement_amount": "1000.00",
-        "interbank_settlement_currency": "EUR",
-        "charge_bearer": "SHAR",
-        "debtor_name": "Debtor Corp",
-        "debtor_agent_bic": "DEUTDEFF",
-        "creditor_agent_bic": "COBADEFF",
-        "creditor_name": "Creditor Ltd",
-    }]
+    data = [
+        {
+            "msg_id": "MSG-API-001",
+            "creation_date_time": "2026-01-15T10:30:00",
+            "nb_of_txs": "1",
+            "settlement_method": "CLRG",
+            "end_to_end_id": "E2E-API",
+            "tx_id": "TX-API-001",
+            "interbank_settlement_amount": "1000.00",
+            "interbank_settlement_currency": "EUR",
+            "charge_bearer": "SHAR",
+            "debtor_name": "Debtor Corp",
+            "debtor_agent_bic": "DEUTDEFF",
+            "creditor_agent_bic": "COBADEFF",
+            "creditor_name": "Creditor Ltd",
+        }
+    ]
     path.write_text(json.dumps(data), encoding="utf-8")
     return str(path)
 

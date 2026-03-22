@@ -29,7 +29,9 @@ class TestValidatePath:
 
     def test_valid_path_must_exist_false(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
-        result = validate_path(str(tmp_path / "nonexistent.txt"), must_exist=False)
+        result = validate_path(
+            str(tmp_path / "nonexistent.txt"), must_exist=False
+        )
         assert "nonexistent.txt" in result
 
     def test_must_exist_raises_if_missing(self, tmp_path, monkeypatch):
@@ -107,14 +109,17 @@ class TestIsAllowedDirectory:
 
     def test_cwd_allowed(self):
         from pathlib import Path
+
         assert _is_allowed_directory(Path.cwd().resolve())
 
     def test_tmp_allowed(self):
         from pathlib import Path
+
         assert _is_allowed_directory(Path(tempfile.gettempdir()).resolve())
 
     def test_root_not_allowed(self):
         from pathlib import Path
+
         assert not _is_allowed_directory(Path("/usr/bin").resolve())
 
 
@@ -124,6 +129,7 @@ class TestPlatformConditionalBases:
 
     def test_pathlib_bases_include_tmpdir(self):
         from pathlib import Path
+
         bases = _get_allowed_bases_pathlib()
         tmpdir = Path(tempfile.gettempdir()).resolve()
         assert tmpdir in bases
@@ -135,6 +141,7 @@ class TestPlatformConditionalBases:
 
     def test_pathlib_bases_include_cwd(self):
         from pathlib import Path
+
         bases = _get_allowed_bases_pathlib()
         assert Path.cwd().resolve() in bases
 
@@ -144,6 +151,7 @@ class TestPlatformConditionalBases:
 
     def test_var_tmp_included_on_linux(self):
         import sys
+
         if sys.platform == "win32":
             pytest.skip("Linux-only test")
         bases_str = _get_allowed_bases_str()
@@ -152,6 +160,7 @@ class TestPlatformConditionalBases:
 
     def test_var_tmp_excluded_on_win32(self, monkeypatch):
         import pacs008.security.path_validator as pv
+
         monkeypatch.setattr(pv.sys, "platform", "win32")
         bases_str = _get_allowed_bases_str()
         var_tmp = os.path.realpath(os.path.join(os.path.sep, "var", "tmp"))
@@ -159,7 +168,9 @@ class TestPlatformConditionalBases:
 
     def test_pathlib_var_tmp_excluded_on_win32(self, monkeypatch):
         from pathlib import Path
+
         import pacs008.security.path_validator as pv
+
         monkeypatch.setattr(pv.sys, "platform", "win32")
         bases = _get_allowed_bases_pathlib()
         var_tmp = Path(os.path.join(os.path.sep, "var", "tmp")).resolve()

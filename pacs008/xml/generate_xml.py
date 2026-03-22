@@ -76,9 +76,7 @@ def _build_tx_base(row: dict[str, Any]) -> dict[str, Any]:
         "end_to_end_id": row["end_to_end_id"],
         "tx_id": row.get("tx_id", ""),
         "interbank_settlement_amount": row["interbank_settlement_amount"],
-        "interbank_settlement_currency": row[
-            "interbank_settlement_currency"
-        ],
+        "interbank_settlement_currency": row["interbank_settlement_currency"],
         "charge_bearer": row.get("charge_bearer", ""),
         "debtor_name": row.get("debtor_name", ""),
         "debtor_account_iban": row.get("debtor_account_iban", ""),
@@ -96,9 +94,7 @@ def _build_tx_base(row: dict[str, Any]) -> dict[str, Any]:
 def _prepare_xml_data_v01(data: list[dict[str, Any]]) -> dict[str, Any]:
     """Prepare XML data for pacs.008.001.01 (root: pacs.008.001.01, BIC)."""
     hdr = _build_header(data)
-    hdr["transactions"] = [
-        _build_tx_base(row) for row in data
-    ]
+    hdr["transactions"] = [_build_tx_base(row) for row in data]
     # v01 uses single PrvsInstgAgt (unnumbered)
     for i, row in enumerate(data):
         hdr["transactions"][i]["prvs_instg_agt_bic"] = row.get(
@@ -112,9 +108,7 @@ def _prepare_xml_data_v02_to_v04(
 ) -> dict[str, Any]:
     """Prepare XML data for pacs.008.001.02-04 (FIToFICstmrCdtTrf, BIC/BICFI)."""
     hdr = _build_header(data)
-    hdr["transactions"] = [
-        _build_tx_base(row) for row in data
-    ]
+    hdr["transactions"] = [_build_tx_base(row) for row in data]
     for i, row in enumerate(data):
         hdr["transactions"][i]["clr_sys_ref"] = row.get("clr_sys_ref", "")
         hdr["transactions"][i]["prvs_instg_agt_bic"] = row.get(
@@ -135,9 +129,7 @@ def _prepare_xml_data_v07(
 ) -> dict[str, Any]:
     """Prepare XML data for pacs.008.001.07 (BICFI, numbered PrvsInstgAgt1/2/3)."""
     hdr = _build_header(data)
-    hdr["transactions"] = [
-        _build_tx_base(row) for row in data
-    ]
+    hdr["transactions"] = [_build_tx_base(row) for row in data]
     for i, row in enumerate(data):
         hdr["transactions"][i]["clr_sys_ref"] = row.get("clr_sys_ref", "")
         hdr["transactions"][i]["prvs_instg_agt1_bic"] = row.get(
@@ -157,9 +149,7 @@ def _prepare_xml_data_v08_to_v09(
 ) -> dict[str, Any]:
     """Prepare XML data for pacs.008.001.08-09 (BICFI + UETR)."""
     hdr = _build_header(data)
-    hdr["transactions"] = [
-        _build_tx_base(row) for row in data
-    ]
+    hdr["transactions"] = [_build_tx_base(row) for row in data]
     for i, row in enumerate(data):
         hdr["transactions"][i]["clr_sys_ref"] = row.get("clr_sys_ref", "")
         hdr["transactions"][i]["uetr"] = row.get("uetr", "")
@@ -207,13 +197,17 @@ def _prepare_xml_data_pacs002(data: list[dict[str, Any]]) -> dict[str, Any]:
     }
     txs = []
     for row in data:
-        txs.append({
-            "original_end_to_end_id": row.get("original_end_to_end_id", ""),
-            "original_tx_id": row.get("original_tx_id", ""),
-            "tx_sts": row.get("tx_sts", ""),
-            "sts_rsn_cd": row.get("sts_rsn_cd", ""),
-            "sts_rsn_addtl_inf": row.get("sts_rsn_addtl_inf", ""),
-        })
+        txs.append(
+            {
+                "original_end_to_end_id": row.get(
+                    "original_end_to_end_id", ""
+                ),
+                "original_tx_id": row.get("original_tx_id", ""),
+                "tx_sts": row.get("tx_sts", ""),
+                "sts_rsn_cd": row.get("sts_rsn_cd", ""),
+                "sts_rsn_addtl_inf": row.get("sts_rsn_addtl_inf", ""),
+            }
+        )
     result["transactions"] = txs
     return result
 
@@ -264,20 +258,24 @@ def _prepare_xml_data_pacs004(data: list[dict[str, Any]]) -> dict[str, Any]:
     }
     txs = []
     for row in data:
-        txs.append({
-            "original_end_to_end_id": row.get("original_end_to_end_id", ""),
-            "original_tx_id": row.get("original_tx_id", ""),
-            "returned_interbank_settlement_amount": row[
-                "returned_interbank_settlement_amount"
-            ],
-            "returned_interbank_settlement_currency": row[
-                "returned_interbank_settlement_currency"
-            ],
-            "return_reason_cd": row["return_reason_cd"],
-            "return_reason_addtl_inf": row.get(
-                "return_reason_addtl_inf", ""
-            ),
-        })
+        txs.append(
+            {
+                "original_end_to_end_id": row.get(
+                    "original_end_to_end_id", ""
+                ),
+                "original_tx_id": row.get("original_tx_id", ""),
+                "returned_interbank_settlement_amount": row[
+                    "returned_interbank_settlement_amount"
+                ],
+                "returned_interbank_settlement_currency": row[
+                    "returned_interbank_settlement_currency"
+                ],
+                "return_reason_cd": row["return_reason_cd"],
+                "return_reason_addtl_inf": row.get(
+                    "return_reason_addtl_inf", ""
+                ),
+            }
+        )
     result["transactions"] = txs
     return result
 
@@ -296,20 +294,24 @@ def _prepare_xml_data_pacs007(data: list[dict[str, Any]]) -> dict[str, Any]:
     }
     txs = []
     for row in data:
-        txs.append({
-            "original_end_to_end_id": row.get("original_end_to_end_id", ""),
-            "original_tx_id": row.get("original_tx_id", ""),
-            "reversed_interbank_settlement_amount": row[
-                "reversed_interbank_settlement_amount"
-            ],
-            "reversed_interbank_settlement_currency": row[
-                "reversed_interbank_settlement_currency"
-            ],
-            "reversal_reason_cd": row["reversal_reason_cd"],
-            "reversal_reason_addtl_inf": row.get(
-                "reversal_reason_addtl_inf", ""
-            ),
-        })
+        txs.append(
+            {
+                "original_end_to_end_id": row.get(
+                    "original_end_to_end_id", ""
+                ),
+                "original_tx_id": row.get("original_tx_id", ""),
+                "reversed_interbank_settlement_amount": row[
+                    "reversed_interbank_settlement_amount"
+                ],
+                "reversed_interbank_settlement_currency": row[
+                    "reversed_interbank_settlement_currency"
+                ],
+                "reversal_reason_cd": row["reversal_reason_cd"],
+                "reversal_reason_addtl_inf": row.get(
+                    "reversal_reason_addtl_inf", ""
+                ),
+            }
+        )
     result["transactions"] = txs
     return result
 
@@ -319,23 +321,27 @@ def _prepare_xml_data_pacs009(data: list[dict[str, Any]]) -> dict[str, Any]:
     hdr = _build_header(data)
     txs = []
     for row in data:
-        txs.append({
-            "end_to_end_id": row["end_to_end_id"],
-            "tx_id": row.get("tx_id", ""),
-            "instr_id": row.get("instr_id", ""),
-            "interbank_settlement_amount": row["interbank_settlement_amount"],
-            "interbank_settlement_currency": row[
-                "interbank_settlement_currency"
-            ],
-            "interbank_settlement_date": row.get(
-                "interbank_settlement_date", ""
-            ),
-            "intermediary_agent1_bic": row.get(
-                "intermediary_agent1_bic", ""
-            ),
-            "debtor_agent_bic": row.get("debtor_agent_bic", ""),
-            "creditor_agent_bic": row.get("creditor_agent_bic", ""),
-        })
+        txs.append(
+            {
+                "end_to_end_id": row["end_to_end_id"],
+                "tx_id": row.get("tx_id", ""),
+                "instr_id": row.get("instr_id", ""),
+                "interbank_settlement_amount": row[
+                    "interbank_settlement_amount"
+                ],
+                "interbank_settlement_currency": row[
+                    "interbank_settlement_currency"
+                ],
+                "interbank_settlement_date": row.get(
+                    "interbank_settlement_date", ""
+                ),
+                "intermediary_agent1_bic": row.get(
+                    "intermediary_agent1_bic", ""
+                ),
+                "debtor_agent_bic": row.get("debtor_agent_bic", ""),
+                "creditor_agent_bic": row.get("creditor_agent_bic", ""),
+            }
+        )
     hdr["transactions"] = txs
     return hdr
 
@@ -358,10 +364,14 @@ def _prepare_xml_data_pacs028(data: list[dict[str, Any]]) -> dict[str, Any]:
     }
     txs = []
     for row in data:
-        txs.append({
-            "original_end_to_end_id": row.get("original_end_to_end_id", ""),
-            "original_tx_id": row.get("original_tx_id", ""),
-        })
+        txs.append(
+            {
+                "original_end_to_end_id": row.get(
+                    "original_end_to_end_id", ""
+                ),
+                "original_tx_id": row.get("original_tx_id", ""),
+            }
+        )
     result["transactions"] = txs
     return result
 

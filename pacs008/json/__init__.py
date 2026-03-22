@@ -16,16 +16,8 @@
 """JSON data loaders for pacs008."""
 
 # pylint: disable=duplicate-code
-from pacs008.json.load_json_data import (
-    load_json_data,
-    load_json_data_streaming,
-    load_jsonl_data,
-    load_jsonl_data_streaming,
-)
+from pacs008.json import load_json_data
 
 __all__ = [
     "load_json_data",
-    "load_json_data_streaming",
-    "load_jsonl_data",
-    "load_jsonl_data_streaming",
 ]

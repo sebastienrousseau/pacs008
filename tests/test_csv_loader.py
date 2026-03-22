@@ -1,7 +1,6 @@
 """Tests for CSV data loader and streaming."""
 
 import csv
-import os
 
 import pytest
 
@@ -17,8 +16,12 @@ def csv_file(tmp_path, monkeypatch):
     with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["msg_id", "amount", "currency"])
         writer.writeheader()
-        writer.writerow({"msg_id": "MSG-001", "amount": "1000.00", "currency": "EUR"})
-        writer.writerow({"msg_id": "MSG-002", "amount": "500.00", "currency": "USD"})
+        writer.writerow(
+            {"msg_id": "MSG-001", "amount": "1000.00", "currency": "EUR"}
+        )
+        writer.writerow(
+            {"msg_id": "MSG-002", "amount": "500.00", "currency": "USD"}
+        )
     return str(path)
 
 
@@ -31,7 +34,9 @@ def large_csv(tmp_path, monkeypatch):
         writer = csv.DictWriter(f, fieldnames=["msg_id", "amount"])
         writer.writeheader()
         for i in range(50):
-            writer.writerow({"msg_id": f"MSG-{i:04d}", "amount": f"{i * 100}.00"})
+            writer.writerow(
+                {"msg_id": f"MSG-{i:04d}", "amount": f"{i * 100}.00"}
+            )
     return str(path)
 
 
@@ -57,7 +62,9 @@ class TestLoadCsvData:
 
     def test_file_not_found(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
-        with pytest.raises(Exception):  # FileNotFoundError or path validation error
+        with pytest.raises(
+            Exception
+        ):  # FileNotFoundError or path validation error
             load_csv_data(str(tmp_path / "nonexistent.csv"))
 
     def test_empty_csv_raises(self, empty_csv):

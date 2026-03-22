@@ -83,9 +83,7 @@ class TestLoadDbData:
     def test_load_multiple_rows(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         db_path = tmp_path / "multi.db"
-        rows = [
-            {**_make_valid_row(), "msg_id": f"MSG-{i}"} for i in range(5)
-        ]
+        rows = [{**_make_valid_row(), "msg_id": f"MSG-{i}"} for i in range(5)]
         _create_test_db(db_path, rows=rows)
         data = load_db_data(str(db_path), "pacs008")
         assert len(data) == 5
@@ -110,11 +108,11 @@ class TestLoadDbDataStreaming:
     def test_stream_valid_db(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         db_path = tmp_path / "stream.db"
-        rows = [
-            {**_make_valid_row(), "msg_id": f"MSG-{i}"} for i in range(5)
-        ]
+        rows = [{**_make_valid_row(), "msg_id": f"MSG-{i}"} for i in range(5)]
         _create_test_db(db_path, rows=rows)
-        chunks = list(load_db_data_streaming(str(db_path), "pacs008", chunk_size=2))
+        chunks = list(
+            load_db_data_streaming(str(db_path), "pacs008", chunk_size=2)
+        )
         assert len(chunks) == 3  # 2+2+1
         assert len(chunks[0]) == 2
         assert len(chunks[-1]) == 1
@@ -123,7 +121,9 @@ class TestLoadDbDataStreaming:
         monkeypatch.chdir(tmp_path)
         db_path = tmp_path / "single.db"
         _create_test_db(db_path)
-        chunks = list(load_db_data_streaming(str(db_path), "pacs008", chunk_size=100))
+        chunks = list(
+            load_db_data_streaming(str(db_path), "pacs008", chunk_size=100)
+        )
         assert len(chunks) == 1
 
     def test_nonexistent_file_raises(self):

@@ -15,14 +15,8 @@
 
 """Parquet data loaders for pacs008 (optional feature)."""
 
-from pacs008.parquet.load_parquet_data import (
-    HAS_PARQUET_SUPPORT,
-    load_parquet_data,
-    load_parquet_data_streaming,
-)
+from pacs008.parquet import load_parquet_data
 
 __all__ = [
-    "HAS_PARQUET_SUPPORT",
     "load_parquet_data",
-    "load_parquet_data_streaming",
 ]

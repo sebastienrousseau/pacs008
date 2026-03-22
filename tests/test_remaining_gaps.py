@@ -4,7 +4,6 @@ import asyncio
 import csv
 import json
 import logging
-import os
 import subprocess
 import sys
 import xml.etree.ElementTree as et
@@ -53,7 +52,7 @@ def reset_context():
 # API: app.py remaining gaps
 # ═══════════════════════════════════════════════════════════════════════
 
-from pacs008.api.app import app, _process_generation_job
+from pacs008.api.app import _process_generation_job, app
 from pacs008.api.job_manager import JobStatus, job_manager
 from pacs008.api.models import GenerateXMLRequest, MessageType
 
@@ -148,7 +147,9 @@ class TestApiValidatePaymentError:
 class TestApiGenerateFullPath:
     """Lines 297-305, 308-333, 342 (generate endpoint paths)."""
 
-    def test_generate_validate_only_success(self, client, tmp_path, monkeypatch):
+    def test_generate_validate_only_success(
+        self, client, tmp_path, monkeypatch
+    ):
         """Lines 308-313: validate_only with valid data."""
         monkeypatch.chdir(tmp_path)
         data = [_make_valid_row()]
@@ -217,7 +218,9 @@ class TestApiGenerateFullPath:
         assert response.status_code == 200
         assert response.json()["success"] is True
 
-    def test_generate_payment_validation_error(self, client, tmp_path, monkeypatch):
+    def test_generate_payment_validation_error(
+        self, client, tmp_path, monkeypatch
+    ):
         """Line 342: PaymentValidationError => 400."""
         monkeypatch.chdir(tmp_path)
         path = tmp_path / "test.json"
@@ -270,7 +273,9 @@ class TestApiResolvePathsGuard:
 class TestApiAsyncException:
     """Lines 384-387: exception in generate_xml_async."""
 
-    def test_generate_async_create_job_fails(self, client, tmp_path, monkeypatch):
+    def test_generate_async_create_job_fails(
+        self, client, tmp_path, monkeypatch
+    ):
         monkeypatch.chdir(tmp_path)
         with patch(
             "pacs008.api.app.job_manager.create_job",
@@ -449,9 +454,7 @@ class TestCoreTemplateNotFound:
                             "pacs008.core.core.os.path.exists",
                             return_value=False,
                         ):
-                            process_files(
-                                version, "t.xml", "s.xsd", "d.csv"
-                            )
+                            process_files(version, "t.xml", "s.xsd", "d.csv")
 
 
 class TestCoreMainBlock:
@@ -462,7 +465,10 @@ class TestCoreMainBlock:
             [
                 sys.executable,
                 str(
-                    Path(__file__).parent.parent / "pacs008" / "core" / "core.py"
+                    Path(__file__).parent.parent
+                    / "pacs008"
+                    / "core"
+                    / "core.py"
                 ),
             ],
             capture_output=True,
@@ -563,17 +569,13 @@ class TestValidateDatetimeStrptime:
     """Line 56: strptime fallback when fromisoformat fails."""
 
     def test_strptime_fallback(self):
-        with patch(
-            "pacs008.csv.validate_csv_data.datetime"
-        ) as mock_dt:
+        with patch("pacs008.csv.validate_csv_data.datetime") as mock_dt:
             mock_dt.fromisoformat.side_effect = ValueError("fail")
             mock_dt.strptime.return_value = True
             assert _validate_datetime("2026-01-15") is True
 
     def test_both_formats_fail(self):
-        with patch(
-            "pacs008.csv.validate_csv_data.datetime"
-        ) as mock_dt:
+        with patch("pacs008.csv.validate_csv_data.datetime") as mock_dt:
             mock_dt.fromisoformat.side_effect = ValueError("fail")
             mock_dt.strptime.side_effect = ValueError("fail")
             assert _validate_datetime("invalid") is False
@@ -622,7 +624,9 @@ class TestDataLoaderGaps:
         with patch(
             "pacs008.data.loader.validate_csv_data", return_value=False
         ):
-            with pytest.raises(PaymentValidationError, match="validation failed"):
+            with pytest.raises(
+                PaymentValidationError, match="validation failed"
+            ):
                 load_payment_data(str(csv_path))
 
     def test_list_validation_fails(self):
@@ -630,9 +634,7 @@ class TestDataLoaderGaps:
         with patch(
             "pacs008.data.loader.validate_csv_data", return_value=False
         ):
-            with pytest.raises(
-                PaymentValidationError, match="Data list"
-            ):
+            with pytest.raises(PaymentValidationError, match="Data list"):
                 load_payment_data([_make_valid_row()])
 
     def test_dict_validation_fails(self):
@@ -650,9 +652,7 @@ class TestDataLoaderGaps:
         with patch(
             "pacs008.data.loader.validate_csv_data", return_value=False
         ):
-            with pytest.raises(
-                PaymentValidationError, match="chunk"
-            ):
+            with pytest.raises(PaymentValidationError, match="chunk"):
                 list(load_payment_data_streaming([_make_valid_row()]))
 
 
@@ -845,9 +845,7 @@ class TestCliInvalidMessageType:
 
         # Call the callback directly to bypass Click's Choice validation
         callback = cli_main.callback
-        with patch(
-            "pacs008.cli.cli.valid_xml_types", ["pacs.008.001.01"]
-        ):
+        with patch("pacs008.cli.cli.valid_xml_types", ["pacs.008.001.01"]):
             with pytest.raises(SystemExit) as exc_info:
                 callback(
                     xml_message_type="pacs.008.001.99",
@@ -1097,7 +1095,9 @@ class TestApiCwdGuardsMocked:
     def api_client(self):
         return TestClient(app)
 
-    def test_validate_path_outside_cwd_tmp(self, api_client, tmp_path, monkeypatch):
+    def test_validate_path_outside_cwd_tmp(
+        self, api_client, tmp_path, monkeypatch
+    ):
         """Line 101: validate_path succeeds but path is outside CWD and tmp."""
         monkeypatch.chdir(tmp_path)
         with patch(
@@ -1113,7 +1113,9 @@ class TestApiCwdGuardsMocked:
             )
         assert response.status_code == 403
 
-    def test_generate_path_outside_cwd_tmp(self, api_client, tmp_path, monkeypatch):
+    def test_generate_path_outside_cwd_tmp(
+        self, api_client, tmp_path, monkeypatch
+    ):
         """Line 282: validate_path succeeds but path is outside CWD."""
         monkeypatch.chdir(tmp_path)
         with patch(
@@ -1129,7 +1131,9 @@ class TestApiCwdGuardsMocked:
             )
         assert response.status_code == 403
 
-    def test_download_path_outside_cwd_tmp(self, api_client, tmp_path, monkeypatch):
+    def test_download_path_outside_cwd_tmp(
+        self, api_client, tmp_path, monkeypatch
+    ):
         """Line 509: download CWD guard with mocked validate_path."""
         monkeypatch.chdir(tmp_path)
         job_id = job_manager.create_job()
@@ -1144,7 +1148,9 @@ class TestApiCwdGuardsMocked:
             response = api_client.get(f"/api/download/{job_id}")
         assert response.status_code == 403
 
-    def test_validate_cwd_guard_line218(self, api_client, tmp_path, monkeypatch):
+    def test_validate_cwd_guard_line218(
+        self, api_client, tmp_path, monkeypatch
+    ):
         """Line 218: inline CWD guard after _validate_safe_path."""
         monkeypatch.chdir(tmp_path)
         # _validate_safe_path must succeed (return path in CWD/tmp)
@@ -1195,7 +1201,9 @@ class TestApiAsyncHttpException:
     def api_client(self):
         return TestClient(app)
 
-    def test_generate_async_http_exception(self, api_client, tmp_path, monkeypatch):
+    def test_generate_async_http_exception(
+        self, api_client, tmp_path, monkeypatch
+    ):
         from fastapi import HTTPException
 
         monkeypatch.chdir(tmp_path)
@@ -1221,7 +1229,9 @@ class TestApiResolvePaths149:
     def api_client(self):
         return TestClient(app)
 
-    def test_resolve_paths_output_dir_guard(self, api_client, tmp_path, monkeypatch):
+    def test_resolve_paths_output_dir_guard(
+        self, api_client, tmp_path, monkeypatch
+    ):
         monkeypatch.chdir(tmp_path)
         data = [_make_valid_row()]
         path = tmp_path / "test.json"
@@ -1268,7 +1278,10 @@ class TestCsvIOError:
             original_open = open
 
             def mock_open(*args, **kwargs):
-                if str(args[0]) == str(path) and kwargs.get("encoding") == "utf-8":
+                if (
+                    str(args[0]) == str(path)
+                    and kwargs.get("encoding") == "utf-8"
+                ):
                     raise OSError("Permission denied")
                 return original_open(*args, **kwargs)
 
@@ -1292,7 +1305,10 @@ class TestCsvIOError:
             original_open = open
 
             def mock_open(*args, **kwargs):
-                if str(args[0]) == str(path) and kwargs.get("encoding") == "utf-8":
+                if (
+                    str(args[0]) == str(path)
+                    and kwargs.get("encoding") == "utf-8"
+                ):
                     raise OSError("Permission denied")
                 return original_open(*args, **kwargs)
 

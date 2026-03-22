@@ -16,7 +16,7 @@
 """Universal data loader supporting multiple input sources."""
 
 from collections.abc import Generator
-from typing import Any, Union
+from typing import Any, Callable, Union
 
 # pylint: disable=duplicate-code
 from pacs008.csv.load_csv_data import load_csv_data, load_csv_data_streaming
@@ -36,8 +36,14 @@ from pacs008.parquet.load_parquet_data import (
     load_parquet_data_streaming,
 )
 
+LoaderFn = Callable[[str], list[dict[str, Any]]]
+StreamLoaderFn = Callable[
+    [str, int], Generator[list[dict[str, Any]], None, None]
+]
+ValidatorFn = Callable[[list[dict[str, Any]]], bool]
 
-def _get_file_loaders() -> dict[str, tuple[Any, Any, str]]:
+
+def _get_file_loaders() -> dict[str, tuple[LoaderFn, ValidatorFn, str]]:
     """Build dispatch table at call time so mocks are respected."""
     return {
         ".csv": (load_csv_data, validate_csv_data, "CSV"),
@@ -52,7 +58,9 @@ def _get_file_loaders() -> dict[str, tuple[Any, Any, str]]:
     }
 
 
-def _get_file_stream_loaders() -> dict[str, tuple[Any, Any, str]]:
+def _get_file_stream_loaders() -> (
+    dict[str, tuple[StreamLoaderFn, ValidatorFn, str]]
+):
     """Build streaming dispatch table at call time so mocks are respected."""
     return {
         ".csv": (load_csv_data_streaming, validate_csv_data, "CSV"),

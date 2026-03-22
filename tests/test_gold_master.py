@@ -8,12 +8,11 @@ file is named with a version prefix (e.g., v01_basic.json, v08_uetr.json).
 """
 
 import json
-import os
 from pathlib import Path
 
 import pytest
 
-from pacs008.constants import TEMPLATES_DIR, valid_xml_types
+from pacs008.constants import TEMPLATES_DIR
 from pacs008.csv.load_csv_data import load_csv_data
 from pacs008.xml.generate_xml import generate_xml_string
 
@@ -69,7 +68,9 @@ def _load_data(filepath: Path) -> list[dict]:
     elif filepath.suffix == ".csv":
         return load_csv_data(str(filepath))
     else:
-        raise ValueError(f"Unsupported gold master file type: {filepath.suffix}")
+        raise ValueError(
+            f"Unsupported gold master file type: {filepath.suffix}"
+        )
 
 
 def _template_path(version: str) -> str:

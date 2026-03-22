@@ -76,7 +76,9 @@ class TestRedactPiiFromDict:
     """Test PII redaction for GDPR/PCI-DSS compliance."""
 
     def test_redacts_iban(self):
-        result = _redact_pii_from_dict({"debtor_iban": "GB29NWBK60161331926819"})
+        result = _redact_pii_from_dict(
+            {"debtor_iban": "GB29NWBK60161331926819"}
+        )
         assert "GB29" in result["debtor_iban"]
         assert "****" in result["debtor_iban"] or "*" in result["debtor_iban"]
 
@@ -145,7 +147,9 @@ class TestLogEvent:
     def test_log_event_produces_json(self, caplog):
         logger = logging.getLogger("test_log_event")
         with caplog.at_level(logging.INFO, logger="test_log_event"):
-            log_event(logger, logging.INFO, Events.PROCESS_START, msg_type="v01")
+            log_event(
+                logger, logging.INFO, Events.PROCESS_START, msg_type="v01"
+            )
 
         assert len(caplog.records) == 1
         data = json.loads(caplog.records[0].getMessage())
@@ -211,14 +215,18 @@ class TestLogHelpers:
     def test_log_data_load_success(self, caplog):
         logger = logging.getLogger("test_dl_ok")
         with caplog.at_level(logging.INFO, logger="test_dl_ok"):
-            log_data_load_event(logger, "csv", True, record_count=5, duration_ms=100)
+            log_data_load_event(
+                logger, "csv", True, record_count=5, duration_ms=100
+            )
         data = json.loads(caplog.records[0].getMessage())
         assert data[Fields.EVENT] == Events.DATA_LOAD_SUCCESS
 
     def test_log_data_load_failure(self, caplog):
         logger = logging.getLogger("test_dl_fail")
         with caplog.at_level(logging.ERROR, logger="test_dl_fail"):
-            log_data_load_event(logger, "csv", False, error=FileNotFoundError("nope"))
+            log_data_load_event(
+                logger, "csv", False, error=FileNotFoundError("nope")
+            )
         data = json.loads(caplog.records[0].getMessage())
         assert data[Fields.EVENT] == Events.DATA_LOAD_ERROR
 
@@ -242,7 +250,10 @@ class TestLogHelpers:
         logger = logging.getLogger("test_xml_fail")
         with caplog.at_level(logging.ERROR, logger="test_xml_fail"):
             log_xml_generation_event(
-                logger, "pacs.008.001.01", False, error=RuntimeError("xsd fail")
+                logger,
+                "pacs.008.001.01",
+                False,
+                error=RuntimeError("xsd fail"),
             )
         data = json.loads(caplog.records[0].getMessage())
         assert data[Fields.EVENT] == Events.XML_GENERATE_ERROR
@@ -304,7 +315,9 @@ class TestExecutionSummaryTracker:
     def test_dry_run_mode(self, caplog):
         logger = logging.getLogger("test_dry")
         with caplog.at_level(logging.INFO, logger="test_dry"):
-            tracker = ExecutionSummaryTracker(logger, dry_run=True, message_type="v01")
+            tracker = ExecutionSummaryTracker(
+                logger, dry_run=True, message_type="v01"
+            )
             tracker.start()
             tracker.log_summary()
 
@@ -328,8 +341,13 @@ class TestJSONFormatter:
     def test_formats_json_message(self):
         formatter = JSONFormatter()
         record = logging.LogRecord(
-            name="test", level=logging.INFO, pathname="",
-            lineno=0, msg='{"event": "test_event"}', args=(), exc_info=None,
+            name="test",
+            level=logging.INFO,
+            pathname="",
+            lineno=0,
+            msg='{"event": "test_event"}',
+            args=(),
+            exc_info=None,
         )
         result = formatter.format(record)
         data = json.loads(result)
@@ -338,8 +356,13 @@ class TestJSONFormatter:
     def test_formats_plain_text(self):
         formatter = JSONFormatter()
         record = logging.LogRecord(
-            name="test", level=logging.WARNING, pathname="",
-            lineno=0, msg="plain text message", args=(), exc_info=None,
+            name="test",
+            level=logging.WARNING,
+            pathname="",
+            lineno=0,
+            msg="plain text message",
+            args=(),
+            exc_info=None,
         )
         result = formatter.format(record)
         data = json.loads(result)
@@ -352,11 +375,17 @@ class TestJSONFormatter:
             raise ValueError("test exception")
         except ValueError:
             import sys
+
             exc_info = sys.exc_info()
 
         record = logging.LogRecord(
-            name="test", level=logging.ERROR, pathname="",
-            lineno=0, msg="error occurred", args=(), exc_info=exc_info,
+            name="test",
+            level=logging.ERROR,
+            pathname="",
+            lineno=0,
+            msg="error occurred",
+            args=(),
+            exc_info=exc_info,
         )
         result = formatter.format(record)
         data = json.loads(result)
@@ -446,9 +475,7 @@ class TestExecutionMetrics:
 
     def test_custom_request_id(self):
         logger = logging.getLogger("test_metrics_rid")
-        metrics = ExecutionMetrics(
-            logger, "test", request_id="req-custom01"
-        )
+        metrics = ExecutionMetrics(logger, "test", request_id="req-custom01")
         assert metrics.request_id == "req-custom01"
 
     def test_telemetry_without_start(self, caplog):
@@ -473,7 +500,10 @@ class TestLogLevelConstants:
         assert ExecutionStatus.SUCCESS == "SUCCESS"
         assert ExecutionStatus.FAILED == "FAILED"
         assert ExecutionStatus.ABORTED == "ABORTED"
-        assert ExecutionStatus.COMPLETED_WITH_WARNINGS == "COMPLETED_WITH_WARNINGS"
+        assert (
+            ExecutionStatus.COMPLETED_WITH_WARNINGS
+            == "COMPLETED_WITH_WARNINGS"
+        )
 
     def test_events(self):
         assert Events.PROCESS_START == "process_start"

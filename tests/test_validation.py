@@ -2,13 +2,11 @@
 
 import pytest
 
+from pacs008.validation.schema_validator import SchemaValidator
 from pacs008.validation.service import (
-    ValidationConfig,
-    ValidationReport,
     ValidationResult,
     ValidationService,
 )
-from pacs008.validation.schema_validator import SchemaValidator
 
 
 class TestValidationResult:
@@ -144,7 +142,9 @@ class TestSchemaValidator:
     def test_get_field_description(self):
         v = SchemaValidator("pacs.008.001.01")
         desc = v.get_field_description("msg_id")
-        assert desc is not None or desc is None  # may or may not have description
+        assert (
+            desc is not None or desc is None
+        )  # may or may not have description
 
     def test_v08_has_uetr_property(self):
         """UETR is optional in XSD but defined as a property in v08+."""

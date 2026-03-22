@@ -2,8 +2,6 @@
 
 import configparser
 import csv
-import json
-import logging
 import os
 from pathlib import Path
 
@@ -75,11 +73,17 @@ class TestValidateSchema:
 
     def test_invalid_schema_exits(self, csv_file):
         from unittest.mock import patch
+
         logger = _configure_logging(False)
         # Mock validate_via_xsd to raise an exception
-        with patch("pacs008.cli.cli.validate_via_xsd", side_effect=Exception("XSD validation failed")):
+        with patch(
+            "pacs008.cli.cli.validate_via_xsd",
+            side_effect=Exception("XSD validation failed"),
+        ):
             with pytest.raises(SystemExit) as exc_info:
-                _validate_schema(logger, "template.xml", "schema.xsd", "pacs.008.001.01")
+                _validate_schema(
+                    logger, "template.xml", "schema.xsd", "pacs.008.001.01"
+                )
             assert exc_info.value.code == 1
 
 
@@ -112,9 +116,7 @@ class TestValidatePaymentData:
         path = tmp_path / "bad.json"
         path.write_text("{invalid", encoding="utf-8")
         with pytest.raises(SystemExit):
-            _validate_payment_data(
-                logger, str(path), "pacs.008.001.01"
-            )
+            _validate_payment_data(logger, str(path), "pacs.008.001.01")
 
 
 class TestWorkingDirectory:
@@ -145,8 +147,13 @@ class TestGenerateXmlFiles:
         xsd.write_text("bad")
         with pytest.raises(SystemExit) as exc_info:
             _generate_xml_files(
-                logger, "pacs.008.001.01",
-                str(tpl), str(xsd), csv_file, None, False,
+                logger,
+                "pacs.008.001.01",
+                str(tpl),
+                str(xsd),
+                csv_file,
+                None,
+                False,
             )
         assert exc_info.value.code == 1
 
@@ -159,11 +166,18 @@ class TestGenerateXmlFiles:
         xsd.write_text("bad")
         with pytest.raises(SystemExit):
             _generate_xml_files(
-                logger, "pacs.008.001.01",
-                str(tpl), str(xsd), csv_file, None, True,
+                logger,
+                "pacs.008.001.01",
+                str(tpl),
+                str(xsd),
+                csv_file,
+                None,
+                True,
             )
 
-    def test_generation_with_output_dir_exits_on_path_error(self, csv_file, tmp_path, monkeypatch):
+    def test_generation_with_output_dir_exits_on_path_error(
+        self, csv_file, tmp_path, monkeypatch
+    ):
         # When output_dir is set, _working_directory changes CWD to output_dir.
         # Template paths then fall outside the new CWD, triggering a SystemExit.
         # This tests the error handling branch (lines 261-269).
@@ -175,7 +189,9 @@ class TestGenerateXmlFiles:
         out_dir = str(tmp_path / "output")
         os.makedirs(out_dir, exist_ok=True)
         with pytest.raises(SystemExit):
-            _generate_xml_files(logger, version, tpl, xsd, csv_file, out_dir, False)
+            _generate_xml_files(
+                logger, version, tpl, xsd, csv_file, out_dir, False
+            )
 
 
 class TestLoadConfiguration:
@@ -217,7 +233,18 @@ class TestMainCli:
         runner = CliRunner()
         result = runner.invoke(
             main,
-            ["-t", version, "-m", tpl, "-s", xsd, "-d", csv_file, "-o", out_dir],
+            [
+                "-t",
+                version,
+                "-m",
+                tpl,
+                "-s",
+                xsd,
+                "-d",
+                csv_file,
+                "-o",
+                out_dir,
+            ],
         )
         # May succeed or fail depending on path validation
         assert result.exit_code in (0, 1)
@@ -253,11 +280,16 @@ class TestMainCli:
         result = runner.invoke(
             main,
             [
-                "-t", version,
-                "-m", tpl,
-                "-s", xsd,
-                "-d", csv_file,
-                "-c", str(config_path),
+                "-t",
+                version,
+                "-m",
+                tpl,
+                "-s",
+                xsd,
+                "-d",
+                csv_file,
+                "-c",
+                str(config_path),
                 "--dry-run",
             ],
         )

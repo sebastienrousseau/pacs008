@@ -61,8 +61,10 @@ class TestJobManager:
         mgr = JobManager()
         job_id = mgr.create_job()
         mgr.update_status(
-            job_id, JobStatus.SUCCESS,
-            progress=100, result={"file": "out.xml"},
+            job_id,
+            JobStatus.SUCCESS,
+            progress=100,
+            result={"file": "out.xml"},
         )
         job = mgr.get_job(job_id)
         assert job.result == {"file": "out.xml"}
@@ -70,9 +72,7 @@ class TestJobManager:
     def test_update_with_error(self):
         mgr = JobManager()
         job_id = mgr.create_job()
-        mgr.update_status(
-            job_id, JobStatus.FAILED, error="something broke"
-        )
+        mgr.update_status(job_id, JobStatus.FAILED, error="something broke")
         job = mgr.get_job(job_id)
         assert job.error == "something broke"
 

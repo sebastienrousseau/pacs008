@@ -24,7 +24,6 @@ from pacs008.compliance.swift_charset import (
 )
 from pacs008.context.context import Context
 
-
 # --- 1. job_manager.py:175->exit ---
 
 
@@ -167,7 +166,9 @@ class TestParquetEmptyBatch:
 
     def test_empty_batch_skipped(self, tmp_path):
         """When iter_batches yields an empty batch, it should be skipped."""
-        from pacs008.parquet.load_parquet_data import load_parquet_data_streaming
+        from pacs008.parquet.load_parquet_data import (
+            load_parquet_data_streaming,
+        )
 
         # Create a small parquet file
         table = pa.table({"col": [1, 2, 3]})
@@ -188,9 +189,7 @@ class TestParquetEmptyBatch:
                 empty_batch,
                 real_batch,
             ]
-            chunks = list(
-                load_parquet_data_streaming(str(path), chunk_size=1)
-            )
+            chunks = list(load_parquet_data_streaming(str(path), chunk_size=1))
 
         # Only the non-empty batch should be yielded
         assert len(chunks) == 1

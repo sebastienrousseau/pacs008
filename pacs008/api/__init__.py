@@ -15,12 +15,8 @@
 
 """Pacs008 FastAPI REST API module."""
 
-from pacs008.api.app import app  # noqa: F401
-from pacs008.api.job_manager import (  # noqa: F401
-    JobManager,
-    JobStatus,
-    job_manager,
-)
+from pacs008.api import app, job_manager, models
+from pacs008.api.job_manager import JobManager, JobStatus
 from pacs008.api.models import (
     DataSourceType,
     GenerateXMLRequest,
@@ -38,6 +34,7 @@ __all__ = [
     "JobManager",
     "JobStatus",
     "job_manager",
+    "models",
     "DataSourceType",
     "GenerateXMLRequest",
     "GenerateXMLResponse",

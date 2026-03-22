@@ -1,11 +1,8 @@
 """Tests for pacs008.compliance module (SWIFT silent rejection prevention)."""
 
-import pytest
 
 from pacs008.compliance.swift_charset import (
-    FIELD_MAX_LENGTHS,
     SWIFT_X_CHARSET,
-    ComplianceReport,
     ComplianceViolation,
     cleanse_data,
     cleanse_data_with_report,
@@ -13,7 +10,6 @@ from pacs008.compliance.swift_charset import (
     enforce_field_lengths,
     validate_swift_charset,
 )
-
 
 # --- SWIFT X Character Set ---
 
@@ -113,7 +109,9 @@ class TestCleanseString:
         for s in test_strings:
             result = cleanse_string(s)
             violations = validate_swift_charset(result)
-            assert violations == [], f"Cleansed '{s}' → '{result}' still has violations: {violations}"
+            assert (
+                violations == []
+            ), f"Cleansed '{s}' → '{result}' still has violations: {violations}"
 
 
 # --- enforce_field_lengths ---
@@ -273,7 +271,9 @@ class TestCleanseDataWithReport:
         assert report.violation_count >= 2  # charset + length
 
     def test_report_summary(self):
-        data = [{"msg_id": "OK", "debtor_name": "Clean", "creditor_name": "Clean"}]
+        data = [
+            {"msg_id": "OK", "debtor_name": "Clean", "creditor_name": "Clean"}
+        ]
         _, report = cleanse_data_with_report(data)
         assert "SWIFT-compliant" in report.summary()
 
@@ -303,25 +303,27 @@ class TestComplianceXmlIntegration:
         from pacs008.constants import TEMPLATES_DIR
         from pacs008.xml.generate_xml import generate_xml_string
 
-        dirty = [{
-            "msg_id": "MSG-COMPLIANCE-001",
-            "creation_date_time": "2026-01-15T10:30:00",
-            "nb_of_txs": "1",
-            "settlement_method": "CLRG",
-            "interbank_settlement_date": "2026-01-15",
-            "end_to_end_id": "E2E-COMPL-001",
-            "tx_id": "TX-COMPL-001",
-            "interbank_settlement_amount": "5000.00",
-            "interbank_settlement_currency": "EUR",
-            "charge_bearer": "SHAR",
-            "debtor_name": "Müller & Söhne™ GmbH",
-            "debtor_account_iban": "DE89370400440532013000",
-            "debtor_agent_bic": "DEUTDEFF",
-            "creditor_agent_bic": "COBADEFF",
-            "creditor_name": "García Café SL",
-            "creditor_account_iban": "ES9121000418450200051332",
-            "remittance_information": "Invoice™ #123 — €500 payment",
-        }]
+        dirty = [
+            {
+                "msg_id": "MSG-COMPLIANCE-001",
+                "creation_date_time": "2026-01-15T10:30:00",
+                "nb_of_txs": "1",
+                "settlement_method": "CLRG",
+                "interbank_settlement_date": "2026-01-15",
+                "end_to_end_id": "E2E-COMPL-001",
+                "tx_id": "TX-COMPL-001",
+                "interbank_settlement_amount": "5000.00",
+                "interbank_settlement_currency": "EUR",
+                "charge_bearer": "SHAR",
+                "debtor_name": "Müller & Söhne™ GmbH",
+                "debtor_account_iban": "DE89370400440532013000",
+                "debtor_agent_bic": "DEUTDEFF",
+                "creditor_agent_bic": "COBADEFF",
+                "creditor_name": "García Café SL",
+                "creditor_account_iban": "ES9121000418450200051332",
+                "remittance_information": "Invoice™ #123 — €500 payment",
+            }
+        ]
         clean = cleanse_data(dirty)
         version = "pacs.008.001.05"
         tpl = str(TEMPLATES_DIR / version / "template.xml")
@@ -389,6 +391,7 @@ class TestUnicodeEdgeCases:
         """Characters with combining marks should be normalized."""
         # é can be e + combining acute accent
         import unicodedata
+
         decomposed = unicodedata.normalize("NFD", "é")
         result = cleanse_string(decomposed)
         assert validate_swift_charset(result) == []
@@ -406,16 +409,18 @@ class TestUnicodeEdgeCases:
     def test_all_transliteration_entries(self):
         """Every entry in _TRANSLITERATION produces SWIFT-valid output."""
         from pacs008.compliance.swift_charset import _TRANSLITERATION
-        for char, replacement in _TRANSLITERATION.items():
+
+        for char, _replacement in _TRANSLITERATION.items():
             result = cleanse_string(char)
             violations = validate_swift_charset(result)
-            assert violations == [], (
-                f"Transliteration of '{char}' → '{result}' has violations"
-            )
+            assert (
+                violations == []
+            ), f"Transliteration of '{char}' → '{result}' has violations"
 
     def test_long_transliteration_chain(self):
         """String with many transliterations doesn't break."""
         from pacs008.compliance.swift_charset import _TRANSLITERATION
+
         s = "".join(_TRANSLITERATION.keys())
         result = cleanse_string(s)
         assert validate_swift_charset(result) == []
@@ -434,12 +439,14 @@ class TestComplianceReportDetails:
         assert "violation" in summary.lower() or "modified" in summary.lower()
 
     def test_violation_count_accurate(self):
-        data = [{
-            "msg_id": "X" * 50,
-            "debtor_name": "Müller™",
-            "creditor_name": "Böhm",
-            "end_to_end_id": "Y" * 40,
-        }]
+        data = [
+            {
+                "msg_id": "X" * 50,
+                "debtor_name": "Müller™",
+                "creditor_name": "Böhm",
+                "end_to_end_id": "Y" * 40,
+            }
+        ]
         _, report = cleanse_data_with_report(data)
         # charset violations: debtor_name (ü, ™), creditor_name (ö)
         # length violations: msg_id, end_to_end_id

@@ -19,7 +19,7 @@
 import logging
 import os
 from collections.abc import Generator
-from typing import Any
+from typing import Any, cast
 
 from pacs008.exceptions import DataSourceError
 from pacs008.security import validate_path
@@ -28,7 +28,7 @@ logging.basicConfig(level=logging.ERROR, format="%(levelname)s: %(message)s")
 
 # Optional import: pyarrow is not a required dependency
 try:
-    import pyarrow.parquet as pq  # type: ignore[import-not-found]
+    import pyarrow.parquet as pq  # type: ignore[import-untyped]
 
     HAS_PARQUET_SUPPORT = True
 except ImportError:  # pragma: no cover
@@ -75,7 +75,9 @@ def load_parquet_data(file_path: str) -> list[dict[str, Any]]:
     # Validate path to prevent traversal attacks
 
     try:
-        safe_path = validate_path(file_path)  # nosec B108 - Returns sanitized string
+        safe_path = validate_path(
+            file_path
+        )  # nosec B108 - Returns sanitized string
     except Exception as e:
         raise FileNotFoundError(
             f"Parquet file path validation failed: {file_path}"
@@ -95,7 +97,7 @@ def load_parquet_data(file_path: str) -> list[dict[str, Any]]:
         if not data:
             raise DataSourceError(f"Parquet file is empty: {file_path}")
 
-        return data
+        return cast(list[dict[str, Any]], data)
 
     except Exception as e:
         if isinstance(e, (FileNotFoundError, DataSourceError)):

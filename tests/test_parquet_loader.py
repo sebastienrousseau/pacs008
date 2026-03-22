@@ -2,13 +2,13 @@
 
 import pytest
 
+from pacs008.exceptions import DataSourceError
 from pacs008.parquet.load_parquet_data import (
     HAS_PARQUET_SUPPORT,
     _check_parquet_support,
     load_parquet_data,
     load_parquet_data_streaming,
 )
-from pacs008.exceptions import DataSourceError
 
 
 def _make_valid_row():
@@ -66,7 +66,6 @@ def empty_parquet(tmp_path, monkeypatch):
 
     monkeypatch.chdir(tmp_path)
     path = tmp_path / "empty.parquet"
-    schema = pa.schema([("msg_id", pa.string())])
     table = pa.table({"msg_id": pa.array([], type=pa.string())})
     pq.write_table(table, str(path))
     return str(path)
@@ -116,13 +115,17 @@ class TestLoadParquetData:
 @pytest.mark.skipif(not HAS_PARQUET_SUPPORT, reason="pyarrow not installed")
 class TestLoadParquetDataStreaming:
     def test_stream_valid(self, multi_row_parquet):
-        chunks = list(load_parquet_data_streaming(multi_row_parquet, chunk_size=2))
+        chunks = list(
+            load_parquet_data_streaming(multi_row_parquet, chunk_size=2)
+        )
         assert len(chunks) >= 1
         total = sum(len(c) for c in chunks)
         assert total == 5
 
     def test_stream_single_chunk(self, parquet_file):
-        chunks = list(load_parquet_data_streaming(parquet_file, chunk_size=100))
+        chunks = list(
+            load_parquet_data_streaming(parquet_file, chunk_size=100)
+        )
         assert len(chunks) == 1
 
     def test_stream_nonexistent_raises(self, tmp_path, monkeypatch):

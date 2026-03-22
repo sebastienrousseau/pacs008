@@ -130,6 +130,9 @@ ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
+"tests/test_coverage_gaps.py" = ["E402", "B017"]
+"tests/test_remaining_gaps.py" = ["E402"]
+"tests/test_csv_loader.py" = ["B017"]
 
 [tool.ruff.format]
 quote-style = "double"

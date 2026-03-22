@@ -2,13 +2,11 @@
 
 import csv
 import json
-import os
 
 import pytest
 
 from pacs008.data.loader import (
     _load_from_dict,
-    _load_from_file,
     _load_from_list,
     load_payment_data,
     load_payment_data_streaming,
@@ -110,7 +108,9 @@ class TestLoadPaymentDataFromFile:
             load_payment_data(str(path))
 
     def test_unsupported_type_raises(self):
-        with pytest.raises(DataSourceError, match="Unsupported data source type"):
+        with pytest.raises(
+            DataSourceError, match="Unsupported data source type"
+        ):
             load_payment_data(42)
 
 

@@ -1,6 +1,5 @@
 """Tests for XML generation across all 13 pacs.008 versions."""
 
-import os
 import uuid
 
 import pytest
@@ -206,4 +205,6 @@ class TestAllVersionsValidateAgainstXsd:
         xml = generate_xml_string(
             data, version, _template_path(version), _xsd_path(version)
         )
-        assert xml.strip().startswith("<?xml") or xml.strip().startswith("<Document")
+        assert xml.strip().startswith("<?xml") or xml.strip().startswith(
+            "<Document"
+        )

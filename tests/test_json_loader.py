@@ -1,7 +1,6 @@
 """Tests for JSON and JSONL data loaders."""
 
 import json
-import os
 
 import pytest
 
@@ -19,8 +18,16 @@ def json_array_file(tmp_path, monkeypatch):
     """Create a JSON file with array of payment data."""
     monkeypatch.chdir(tmp_path)
     data = [
-        {"msg_id": "MSG-001", "end_to_end_id": "E2E-001", "interbank_settlement_amount": "1000.00"},
-        {"msg_id": "MSG-002", "end_to_end_id": "E2E-002", "interbank_settlement_amount": "500.00"},
+        {
+            "msg_id": "MSG-001",
+            "end_to_end_id": "E2E-001",
+            "interbank_settlement_amount": "1000.00",
+        },
+        {
+            "msg_id": "MSG-002",
+            "end_to_end_id": "E2E-002",
+            "interbank_settlement_amount": "500.00",
+        },
     ]
     path = tmp_path / "payments.json"
     path.write_text(json.dumps(data), encoding="utf-8")
@@ -100,7 +107,9 @@ class TestLoadJsonDataStreaming:
         assert len(chunks[0]) == 1
 
     def test_single_chunk(self, json_array_file):
-        chunks = list(load_json_data_streaming(json_array_file, chunk_size=100))
+        chunks = list(
+            load_json_data_streaming(json_array_file, chunk_size=100)
+        )
         assert len(chunks) == 1
         assert len(chunks[0]) == 2
 
@@ -132,7 +141,7 @@ class TestLoadJsonlData:
     def test_non_dict_line(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         path = tmp_path / "array_line.jsonl"
-        path.write_text('[1,2,3]\n', encoding="utf-8")
+        path.write_text("[1,2,3]\n", encoding="utf-8")
         with pytest.raises(DataSourceError, match="Expected JSON object"):
             load_jsonl_data(str(path))
 
@@ -164,7 +173,7 @@ class TestLoadJsonlDataStreaming:
     def test_invalid_json_line(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         path = tmp_path / "bad_stream.jsonl"
-        path.write_text('{bad}\n', encoding="utf-8")
+        path.write_text("{bad}\n", encoding="utf-8")
         with pytest.raises(DataSourceError):
             list(load_jsonl_data_streaming(str(path)))
 

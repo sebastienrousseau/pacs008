@@ -1,7 +1,6 @@
 """Tests for __main__.py entry point."""
 
 import csv
-import json
 
 import pytest
 
@@ -94,6 +93,7 @@ class TestMainDryRun:
 class TestMainGenerate:
     def test_generate_xml(self, test_data_csv, monkeypatch):
         from pathlib import Path
+
         # CWD must contain the template dir for path validation
         monkeypatch.chdir(Path(__file__).resolve().parent.parent)
         version = "pacs.008.001.01"

@@ -176,9 +176,7 @@ class TestMandateInfo:
 
     @pytest.mark.parametrize("version", MANDATE_VERSIONS)
     def test_mandate_element_structure(self, version):
-        data = _enrich_data_for_version(
-            version, {"mandate_id": "MNDT-STRUCT"}
-        )
+        data = _enrich_data_for_version(version, {"mandate_id": "MNDT-STRUCT"})
         xml = _generate(version, data)
         assert "<MndtRltdInf>" in xml
         assert "</MndtRltdInf>" in xml
@@ -359,9 +357,7 @@ class TestSettlementMethods:
         "version", ["pacs.008.001.01", "pacs.008.001.05", "pacs.008.001.10"]
     )
     def test_settlement_method_in_xml(self, version, sttlm):
-        data = _enrich_data_for_version(
-            version, {"settlement_method": sttlm}
-        )
+        data = _enrich_data_for_version(version, {"settlement_method": sttlm})
         xml = _generate(version, data)
         assert f"<SttlmMtd>{sttlm}</SttlmMtd>" in xml
 
@@ -393,9 +389,7 @@ class TestCurrencyVariants:
     """Different currencies must appear correctly in XML."""
 
     @pytest.mark.parametrize("ccy", CURRENCIES)
-    @pytest.mark.parametrize(
-        "version", ["pacs.008.001.01", "pacs.008.001.08"]
-    )
+    @pytest.mark.parametrize("version", ["pacs.008.001.01", "pacs.008.001.08"])
     def test_currency_attribute_in_xml(self, version, ccy):
         data = _enrich_data_for_version(
             version, {"interbank_settlement_currency": ccy}
@@ -445,9 +439,7 @@ class TestIdentifiersInXml:
         xml = _generate(version, data)
         assert "GB29NWBK60161331926819" in xml
 
-    @pytest.mark.parametrize(
-        "version", ["pacs.008.001.01", "pacs.008.001.02"]
-    )
+    @pytest.mark.parametrize("version", ["pacs.008.001.01", "pacs.008.001.02"])
     def test_bic_tag_contains_value(self, version):
         data = _enrich_data_for_version(
             version, {"debtor_agent_bic": "DEUTDEFF"}
