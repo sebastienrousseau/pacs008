@@ -72,6 +72,7 @@ class TestValidateInputs:
         assert version in safe_xsd
 
 
+@pytest.mark.integration
 class TestProcessFiles:
     """Test the process_files orchestration function."""
 

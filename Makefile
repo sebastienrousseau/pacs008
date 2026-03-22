@@ -1,4 +1,4 @@
-.PHONY: help install dev test lint format type-check security clean docs docker
+.PHONY: help install dev test lint format type-check security clean docs docker smoke examples
 
 PYTHON ?= python3
 POETRY ?= poetry
@@ -53,4 +53,12 @@ docker: ## Build Docker image
 docker-run: ## Run Docker container
 	docker run -p 8000:8000 pacs008:latest
 
-check: lint type-check security test ## Run all checks (lint + type-check + security + test)
+smoke: ## Run smoke tests only
+	$(POETRY) run pytest tests/ -m smoke -v --no-cov
+
+examples: ## Verify example scripts run
+	$(POETRY) run python examples/generate_xml.py
+	$(POETRY) run python examples/swift_compliance.py
+	@rm -f output_pacs008.xml
+
+check: lint type-check security test examples ## Run all checks

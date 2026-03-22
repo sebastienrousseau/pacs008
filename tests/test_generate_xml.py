@@ -45,6 +45,7 @@ def _xsd_path(version):
 class TestGenerateXmlV01:
     """Tests for pacs.008.001.01."""
 
+    @pytest.mark.smoke
     @pytest.mark.version_compat
     def test_v01_generates_valid_xml(self):
         version = "pacs.008.001.01"
@@ -62,6 +63,7 @@ class TestGenerateXmlV01:
 class TestGenerateXmlV02:
     """Tests for pacs.008.001.02 (BIC identifiers)."""
 
+    @pytest.mark.smoke
     @pytest.mark.version_compat
     def test_v02_generates_valid_xml(self):
         version = "pacs.008.001.02"
@@ -78,6 +80,7 @@ class TestGenerateXmlV02:
 class TestGenerateXmlV03ToV04:
     """Tests for pacs.008.001.03 through .04 (BICFI identifiers)."""
 
+    @pytest.mark.smoke
     @pytest.mark.version_compat
     @pytest.mark.parametrize("ver", ["03", "04"])
     def test_v03_to_v04_generates_valid_xml(self, ver):
@@ -95,6 +98,7 @@ class TestGenerateXmlV03ToV04:
 class TestGenerateXmlV05ToV07:
     """Tests for pacs.008.001.05 through .07 (BICFI)."""
 
+    @pytest.mark.smoke
     @pytest.mark.version_compat
     @pytest.mark.parametrize("ver", ["05", "06", "07"])
     def test_v05_to_v07_uses_bicfi(self, ver):
@@ -110,6 +114,7 @@ class TestGenerateXmlV05ToV07:
 class TestGenerateXmlV08ToV09:
     """Tests for pacs.008.001.08 through .09 (UETR)."""
 
+    @pytest.mark.smoke
     @pytest.mark.version_compat
     @pytest.mark.parametrize("ver", ["08", "09"])
     def test_v08_to_v09_includes_uetr(self, ver):
@@ -126,6 +131,7 @@ class TestGenerateXmlV08ToV09:
 class TestGenerateXmlV10ToV12:
     """Tests for pacs.008.001.10 through .12 (MndtRltdInf)."""
 
+    @pytest.mark.smoke
     @pytest.mark.version_compat
     @pytest.mark.parametrize("ver", ["10", "11", "12"])
     def test_v10_to_v12_includes_mandate(self, ver):
@@ -142,6 +148,7 @@ class TestGenerateXmlV10ToV12:
 class TestGenerateXmlV13:
     """Tests for pacs.008.001.13."""
 
+    @pytest.mark.smoke
     @pytest.mark.version_compat
     def test_v13_includes_expiry_date_time(self):
         version = "pacs.008.001.13"

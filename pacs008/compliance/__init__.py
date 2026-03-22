@@ -2,7 +2,10 @@
 
 from pacs008.compliance.swift_charset import (
     SWIFT_X_CHARSET,
+    ComplianceReport,
+    ComplianceViolation,
     cleanse_data,
+    cleanse_data_with_report,
     cleanse_string,
     enforce_field_lengths,
     validate_swift_charset,
@@ -10,7 +13,10 @@ from pacs008.compliance.swift_charset import (
 
 __all__ = [
     "SWIFT_X_CHARSET",
+    "ComplianceReport",
+    "ComplianceViolation",
     "cleanse_data",
+    "cleanse_data_with_report",
     "cleanse_string",
     "enforce_field_lengths",
     "validate_swift_charset",

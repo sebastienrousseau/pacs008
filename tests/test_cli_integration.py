@@ -80,6 +80,7 @@ class TestCliHelp:
         assert result.exit_code == 0
 
 
+@pytest.mark.integration
 class TestCliDryRun:
     """Test CLI dry-run mode."""
 
@@ -98,6 +99,7 @@ class TestCliDryRun:
         assert "validations passed" in result.output.lower() or "dry" in result.output.lower()
 
 
+@pytest.mark.integration
 class TestCliGenerate:
     """Test CLI XML generation."""
 

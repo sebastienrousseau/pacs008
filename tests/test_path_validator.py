@@ -16,6 +16,7 @@ from pacs008.security.path_validator import (
 )
 
 
+@pytest.mark.security
 class TestValidatePath:
     """Test path validation against traversal attacks."""
 
@@ -67,6 +68,7 @@ class TestValidatePath:
         assert "test_pacs008.txt" in result
 
 
+@pytest.mark.security
 class TestSanitizeForLog:
     """Test log sanitization (CWE-117 prevention)."""
 
@@ -99,6 +101,7 @@ class TestSanitizeForLog:
         assert result == "abcde..."
 
 
+@pytest.mark.security
 class TestIsAllowedDirectory:
     """Test internal allowed directory check."""
 
@@ -115,6 +118,7 @@ class TestIsAllowedDirectory:
         assert not _is_allowed_directory(Path("/usr/bin").resolve())
 
 
+@pytest.mark.security
 class TestPlatformConditionalBases:
     """Test that allowed bases adapt to platform."""
 

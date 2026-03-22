@@ -120,6 +120,7 @@ def _full(v_num):
 # ── Parametrized minimal tests (required-only, all 13 versions) ──────
 
 
+@pytest.mark.smoke
 class TestMinimalXsdValid:
     """Every version must produce valid XML with only required fields."""
 
