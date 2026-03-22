@@ -37,6 +37,15 @@ Quick Start
    )
    print(xml)
 
+Design History File
+-------------------
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Design History File (DHF)
+
+   dhf/index
+
 Indices and tables
 ------------------
 
