@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.010.001.05"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<FIDrctDbt>
+		<GrpHdr>
+			<MsgId>{{msg_id}}</MsgId>
+			<CreDtTm>{{creation_date_time}}</CreDtTm>
+			<NbOfTxs>{{nb_of_txs}}</NbOfTxs>
+			{% if ctrl_sum %}<CtrlSum>{{ctrl_sum}}</CtrlSum>{% endif %}
+			{% if interbank_settlement_date %}<IntrBkSttlmDt>{{interbank_settlement_date}}</IntrBkSttlmDt>{% endif %}
+			<SttlmInf>
+				<SttlmMtd>{{settlement_method}}</SttlmMtd>
+			</SttlmInf>
+			{% if instg_agt_bic %}
+			<InstgAgt>
+				<FinInstnId>
+					<BICFI>{{instg_agt_bic}}</BICFI>
+				</FinInstnId>
+			</InstgAgt>
+			{% endif %}
+			{% if instd_agt_bic %}
+			<InstdAgt>
+				<FinInstnId>
+					<BICFI>{{instd_agt_bic}}</BICFI>
+				</FinInstnId>
+			</InstdAgt>
+			{% endif %}
+		</GrpHdr>
+		{% for tx in transactions %}
+		<CdtTrfTxInf>
+			<PmtId>
+				{% if tx.instr_id %}<InstrId>{{tx.instr_id}}</InstrId>{% endif %}
+				<EndToEndId>{{tx.end_to_end_id}}</EndToEndId>
+				{% if tx.tx_id %}<TxId>{{tx.tx_id}}</TxId>{% endif %}
+			</PmtId>
+			<IntrBkSttlmAmt Ccy="{{tx.interbank_settlement_currency}}">{{tx.interbank_settlement_amount}}</IntrBkSttlmAmt>
+			{% if tx.interbank_settlement_date %}<IntrBkSttlmDt>{{tx.interbank_settlement_date}}</IntrBkSttlmDt>{% endif %}
+			{% if tx.intermediary_agent1_bic %}
+			<IntrmyAgt1>
+				<FinInstnId>
+					<BICFI>{{tx.intermediary_agent1_bic}}</BICFI>
+				</FinInstnId>
+			</IntrmyAgt1>
+			{% endif %}
+			{% if tx.debtor_agent_bic %}
+			<DbtrAgt>
+				<FinInstnId>
+					<BICFI>{{tx.debtor_agent_bic}}</BICFI>
+				</FinInstnId>
+			</DbtrAgt>
+			{% endif %}
+			{% if tx.creditor_agent_bic %}
+			<CdtrAgt>
+				<FinInstnId>
+					<BICFI>{{tx.creditor_agent_bic}}</BICFI>
+				</FinInstnId>
+			</CdtrAgt>
+			{% endif %}
+		</CdtTrfTxInf>
+		{% endfor %}
+	</FIDrctDbt>
+</Document>

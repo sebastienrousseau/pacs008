@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.028.001.05"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<FIToFIPmtStsReq>
+		<GrpHdr>
+			<MsgId>{{msg_id}}</MsgId>
+			<CreDtTm>{{creation_date_time}}</CreDtTm>
+			{% if instg_agt_bic %}
+			<InstgAgt>
+				<FinInstnId>
+					<BICFI>{{instg_agt_bic}}</BICFI>
+				</FinInstnId>
+			</InstgAgt>
+			{% endif %}
+			{% if instd_agt_bic %}
+			<InstdAgt>
+				<FinInstnId>
+					<BICFI>{{instd_agt_bic}}</BICFI>
+				</FinInstnId>
+			</InstdAgt>
+			{% endif %}
+		</GrpHdr>
+		<OrgnlGrpInf>
+			<OrgnlMsgId>{{original_msg_id}}</OrgnlMsgId>
+			<OrgnlMsgNmId>{{original_msg_nm_id}}</OrgnlMsgNmId>
+		</OrgnlGrpInf>
+		{% for tx in transactions %}
+		<TxInf>
+			{% if tx.original_end_to_end_id %}<OrgnlEndToEndId>{{tx.original_end_to_end_id}}</OrgnlEndToEndId>{% endif %}
+			{% if tx.original_tx_id %}<OrgnlTxId>{{tx.original_tx_id}}</OrgnlTxId>{% endif %}
+		</TxInf>
+		{% endfor %}
+	</FIToFIPmtStsReq>
+</Document>

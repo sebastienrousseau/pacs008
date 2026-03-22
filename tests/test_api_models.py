@@ -17,12 +17,12 @@ _TMPDIR = tempfile.gettempdir()
 
 
 class TestMessageType:
-    def test_has_13_members(self):
-        assert len(MessageType) == 13
+    def test_has_20_members(self):
+        assert len(MessageType) == 20
 
     def test_values_format(self):
         for mt in MessageType:
-            assert mt.value.startswith("pacs.008.001.")
+            assert mt.value.startswith("pacs.")
 
     def test_v01(self):
         assert MessageType.PACS_008_01.value == "pacs.008.001.01"

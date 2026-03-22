@@ -34,8 +34,12 @@ class DataSourceType(str, Enum):
 
 
 class MessageType(str, Enum):
-    """Supported ISO 20022 pacs.008 message types."""
+    """Supported ISO 20022 pacs message types."""
 
+    PACS_002_12 = "pacs.002.001.12"
+    PACS_003_09 = "pacs.003.001.09"
+    PACS_004_11 = "pacs.004.001.11"
+    PACS_007_11 = "pacs.007.001.11"
     PACS_008_01 = "pacs.008.001.01"
     PACS_008_02 = "pacs.008.001.02"
     PACS_008_03 = "pacs.008.001.03"
@@ -49,6 +53,9 @@ class MessageType(str, Enum):
     PACS_008_11 = "pacs.008.001.11"
     PACS_008_12 = "pacs.008.001.12"
     PACS_008_13 = "pacs.008.001.13"
+    PACS_009_10 = "pacs.009.001.10"
+    PACS_010_05 = "pacs.010.001.05"
+    PACS_028_05 = "pacs.028.001.05"
 
 
 class ValidationRequest(BaseModel):  # pylint: disable=too-few-public-methods

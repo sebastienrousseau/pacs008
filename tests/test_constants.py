@@ -10,13 +10,13 @@ from pacs008.constants import (
 )
 
 
-def test_valid_xml_types_has_13_entries():
-    assert len(valid_xml_types) == 13
+def test_valid_xml_types_has_20_entries():
+    assert len(valid_xml_types) == 20
 
 
 def test_valid_xml_types_format():
     for t in valid_xml_types:
-        assert t.startswith("pacs.008.001.")
+        assert t.startswith("pacs.")
 
 
 def test_app_name():

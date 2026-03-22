@@ -1,4 +1,4 @@
-"""XML generator for pacs.008 FI-to-FI Customer Credit Transfer messages."""
+"""XML generator for ISO 20022 pacs payment messages."""
 
 import os
 from typing import Any
@@ -193,14 +193,191 @@ def _prepare_xml_data_v13(data: list[dict[str, Any]]) -> dict[str, Any]:
     return base
 
 
+def _prepare_xml_data_pacs002(data: list[dict[str, Any]]) -> dict[str, Any]:
+    """Prepare XML data for pacs.002.001.12 (FI-to-FI Payment Status Report)."""
+    first = data[0]
+    result: dict[str, Any] = {
+        "msg_id": first["msg_id"],
+        "creation_date_time": first["creation_date_time"],
+        "original_msg_id": first["original_msg_id"],
+        "original_msg_nm_id": first["original_msg_nm_id"],
+        "grp_sts": first.get("grp_sts", ""),
+        "instg_agt_bic": first.get("instg_agt_bic", ""),
+        "instd_agt_bic": first.get("instd_agt_bic", ""),
+    }
+    txs = []
+    for row in data:
+        txs.append({
+            "original_end_to_end_id": row.get("original_end_to_end_id", ""),
+            "original_tx_id": row.get("original_tx_id", ""),
+            "tx_sts": row.get("tx_sts", ""),
+            "sts_rsn_cd": row.get("sts_rsn_cd", ""),
+            "sts_rsn_addtl_inf": row.get("sts_rsn_addtl_inf", ""),
+        })
+    result["transactions"] = txs
+    return result
+
+
+def _prepare_xml_data_pacs003(data: list[dict[str, Any]]) -> dict[str, Any]:
+    """Prepare XML data for pacs.003.001.09 (FI-to-FI Customer Direct Debit)."""
+    hdr = _build_header(data)
+    txs = []
+    for row in data:
+        tx: dict[str, Any] = {
+            "end_to_end_id": row["end_to_end_id"],
+            "tx_id": row.get("tx_id", ""),
+            "instr_id": row.get("instr_id", ""),
+            "interbank_settlement_amount": row["interbank_settlement_amount"],
+            "interbank_settlement_currency": row[
+                "interbank_settlement_currency"
+            ],
+            "interbank_settlement_date": row.get(
+                "interbank_settlement_date", ""
+            ),
+            "charge_bearer": row.get("charge_bearer", ""),
+            "mandate_id": row.get("mandate_id", ""),
+            "seq_tp": row.get("seq_tp", ""),
+            "debtor_name": row.get("debtor_name", ""),
+            "debtor_account_iban": row.get("debtor_account_iban", ""),
+            "debtor_agent_bic": row.get("debtor_agent_bic", ""),
+            "creditor_agent_bic": row.get("creditor_agent_bic", ""),
+            "creditor_name": row.get("creditor_name", ""),
+            "creditor_account_iban": row.get("creditor_account_iban", ""),
+            "remittance_information": row.get("remittance_information", ""),
+        }
+        txs.append(tx)
+    hdr["transactions"] = txs
+    return hdr
+
+
+def _prepare_xml_data_pacs004(data: list[dict[str, Any]]) -> dict[str, Any]:
+    """Prepare XML data for pacs.004.001.11 (Payment Return)."""
+    first = data[0]
+    result: dict[str, Any] = {
+        "msg_id": first["msg_id"],
+        "creation_date_time": first["creation_date_time"],
+        "nb_of_txs": first.get("nb_of_txs", ""),
+        "original_msg_id": first["original_msg_id"],
+        "original_msg_nm_id": first["original_msg_nm_id"],
+        "instg_agt_bic": first.get("instg_agt_bic", ""),
+        "instd_agt_bic": first.get("instd_agt_bic", ""),
+    }
+    txs = []
+    for row in data:
+        txs.append({
+            "original_end_to_end_id": row.get("original_end_to_end_id", ""),
+            "original_tx_id": row.get("original_tx_id", ""),
+            "returned_interbank_settlement_amount": row[
+                "returned_interbank_settlement_amount"
+            ],
+            "returned_interbank_settlement_currency": row[
+                "returned_interbank_settlement_currency"
+            ],
+            "return_reason_cd": row["return_reason_cd"],
+            "return_reason_addtl_inf": row.get(
+                "return_reason_addtl_inf", ""
+            ),
+        })
+    result["transactions"] = txs
+    return result
+
+
+def _prepare_xml_data_pacs007(data: list[dict[str, Any]]) -> dict[str, Any]:
+    """Prepare XML data for pacs.007.001.11 (FI-to-FI Payment Reversal)."""
+    first = data[0]
+    result: dict[str, Any] = {
+        "msg_id": first["msg_id"],
+        "creation_date_time": first["creation_date_time"],
+        "nb_of_txs": first.get("nb_of_txs", ""),
+        "original_msg_id": first["original_msg_id"],
+        "original_msg_nm_id": first["original_msg_nm_id"],
+        "instg_agt_bic": first.get("instg_agt_bic", ""),
+        "instd_agt_bic": first.get("instd_agt_bic", ""),
+    }
+    txs = []
+    for row in data:
+        txs.append({
+            "original_end_to_end_id": row.get("original_end_to_end_id", ""),
+            "original_tx_id": row.get("original_tx_id", ""),
+            "reversed_interbank_settlement_amount": row[
+                "reversed_interbank_settlement_amount"
+            ],
+            "reversed_interbank_settlement_currency": row[
+                "reversed_interbank_settlement_currency"
+            ],
+            "reversal_reason_cd": row["reversal_reason_cd"],
+            "reversal_reason_addtl_inf": row.get(
+                "reversal_reason_addtl_inf", ""
+            ),
+        })
+    result["transactions"] = txs
+    return result
+
+
+def _prepare_xml_data_pacs009(data: list[dict[str, Any]]) -> dict[str, Any]:
+    """Prepare XML data for pacs.009.001.10 (Financial Institution Credit Transfer)."""
+    hdr = _build_header(data)
+    txs = []
+    for row in data:
+        txs.append({
+            "end_to_end_id": row["end_to_end_id"],
+            "tx_id": row.get("tx_id", ""),
+            "instr_id": row.get("instr_id", ""),
+            "interbank_settlement_amount": row["interbank_settlement_amount"],
+            "interbank_settlement_currency": row[
+                "interbank_settlement_currency"
+            ],
+            "interbank_settlement_date": row.get(
+                "interbank_settlement_date", ""
+            ),
+            "intermediary_agent1_bic": row.get(
+                "intermediary_agent1_bic", ""
+            ),
+            "debtor_agent_bic": row.get("debtor_agent_bic", ""),
+            "creditor_agent_bic": row.get("creditor_agent_bic", ""),
+        })
+    hdr["transactions"] = txs
+    return hdr
+
+
+def _prepare_xml_data_pacs010(data: list[dict[str, Any]]) -> dict[str, Any]:
+    """Prepare XML data for pacs.010.001.05 (Financial Institution Direct Debit)."""
+    return _prepare_xml_data_pacs009(data)
+
+
+def _prepare_xml_data_pacs028(data: list[dict[str, Any]]) -> dict[str, Any]:
+    """Prepare XML data for pacs.028.001.05 (FI-to-FI Payment Status Request)."""
+    first = data[0]
+    result: dict[str, Any] = {
+        "msg_id": first["msg_id"],
+        "creation_date_time": first["creation_date_time"],
+        "original_msg_id": first["original_msg_id"],
+        "original_msg_nm_id": first["original_msg_nm_id"],
+        "instg_agt_bic": first.get("instg_agt_bic", ""),
+        "instd_agt_bic": first.get("instd_agt_bic", ""),
+    }
+    txs = []
+    for row in data:
+        txs.append({
+            "original_end_to_end_id": row.get("original_end_to_end_id", ""),
+            "original_tx_id": row.get("original_tx_id", ""),
+        })
+    result["transactions"] = txs
+    return result
+
+
 def generate_xml_string(
     data: list[dict[str, Any]],
     payment_initiation_message_type: str,
     xml_template_path: str,
     xsd_schema_path: str,
 ) -> str:
-    """Generate ISO 20022 pacs.008 XML content as a string."""
+    """Generate ISO 20022 pacs XML content as a string."""
     xml_data_preparers = {
+        "pacs.002.001.12": _prepare_xml_data_pacs002,
+        "pacs.003.001.09": _prepare_xml_data_pacs003,
+        "pacs.004.001.11": _prepare_xml_data_pacs004,
+        "pacs.007.001.11": _prepare_xml_data_pacs007,
         "pacs.008.001.01": _prepare_xml_data_v01,
         "pacs.008.001.02": _prepare_xml_data_v02_to_v04,
         "pacs.008.001.03": _prepare_xml_data_v02_to_v04,
@@ -214,6 +391,9 @@ def generate_xml_string(
         "pacs.008.001.11": _prepare_xml_data_v10_to_v12,
         "pacs.008.001.12": _prepare_xml_data_v10_to_v12,
         "pacs.008.001.13": _prepare_xml_data_v13,
+        "pacs.009.001.10": _prepare_xml_data_pacs009,
+        "pacs.010.001.05": _prepare_xml_data_pacs010,
+        "pacs.028.001.05": _prepare_xml_data_pacs028,
     }
 
     try:
@@ -262,7 +442,7 @@ def generate_xml(
     xml_file_path: str,
     xsd_file_path: str,
 ) -> None:
-    """Generates an ISO 20022 pacs.008 XML file from input data."""
+    """Generates an ISO 20022 pacs XML file from input data."""
     xml_content = generate_xml_string(
         data, payment_initiation_message_type, xml_file_path, xsd_file_path
     )

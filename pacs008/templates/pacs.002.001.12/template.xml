@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.002.001.12"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<FIToFIPmtStsRpt>
+		<GrpHdr>
+			<MsgId>{{msg_id}}</MsgId>
+			<CreDtTm>{{creation_date_time}}</CreDtTm>
+			{% if instg_agt_bic %}
+			<InstgAgt>
+				<FinInstnId>
+					<BICFI>{{instg_agt_bic}}</BICFI>
+				</FinInstnId>
+			</InstgAgt>
+			{% endif %}
+			{% if instd_agt_bic %}
+			<InstdAgt>
+				<FinInstnId>
+					<BICFI>{{instd_agt_bic}}</BICFI>
+				</FinInstnId>
+			</InstdAgt>
+			{% endif %}
+		</GrpHdr>
+		<OrgnlGrpInfAndSts>
+			<OrgnlMsgId>{{original_msg_id}}</OrgnlMsgId>
+			<OrgnlMsgNmId>{{original_msg_nm_id}}</OrgnlMsgNmId>
+			{% if grp_sts %}<GrpSts>{{grp_sts}}</GrpSts>{% endif %}
+		</OrgnlGrpInfAndSts>
+		{% for tx in transactions %}
+		<TxInfAndSts>
+			{% if tx.original_end_to_end_id or tx.original_tx_id %}
+			<OrgnlEndToEndId>{{tx.original_end_to_end_id}}</OrgnlEndToEndId>
+			{% if tx.original_tx_id %}<OrgnlTxId>{{tx.original_tx_id}}</OrgnlTxId>{% endif %}
+			{% endif %}
+			{% if tx.tx_sts %}<TxSts>{{tx.tx_sts}}</TxSts>{% endif %}
+			{% if tx.sts_rsn_cd %}
+			<StsRsnInf>
+				<Rsn>
+					<Cd>{{tx.sts_rsn_cd}}</Cd>
+				</Rsn>
+				{% if tx.sts_rsn_addtl_inf %}<AddtlInf>{{tx.sts_rsn_addtl_inf}}</AddtlInf>{% endif %}
+			</StsRsnInf>
+			{% endif %}
+		</TxInfAndSts>
+		{% endfor %}
+	</FIToFIPmtStsRpt>
+</Document>

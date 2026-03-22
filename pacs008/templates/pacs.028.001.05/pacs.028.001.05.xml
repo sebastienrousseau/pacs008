@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.028.001.05"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<FIToFIPmtStsReq>
+		<GrpHdr>
+			<MsgId>MSG-STSREQ-001</MsgId>
+			<CreDtTm>2026-01-15T10:30:00</CreDtTm>
+		</GrpHdr>
+		<OrgnlGrpInf>
+			<OrgnlMsgId>MSG-ORIG-001</OrgnlMsgId>
+			<OrgnlMsgNmId>pacs.008.001.13</OrgnlMsgNmId>
+		</OrgnlGrpInf>
+		<TxInf>
+			<OrgnlEndToEndId>E2E-ORIG-001</OrgnlEndToEndId>
+			<OrgnlTxId>TX-ORIG-001</OrgnlTxId>
+		</TxInf>
+	</FIToFIPmtStsReq>
+</Document>

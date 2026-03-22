@@ -10,6 +10,10 @@ SCHEMAS_DIR = BASE_DIR / "schemas"
 TEMPLATES_DIR = BASE_DIR / "templates"
 
 valid_xml_types = [
+    "pacs.002.001.12",
+    "pacs.003.001.09",
+    "pacs.004.001.11",
+    "pacs.007.001.11",
     "pacs.008.001.01",
     "pacs.008.001.02",
     "pacs.008.001.03",
@@ -23,6 +27,9 @@ valid_xml_types = [
     "pacs.008.001.11",
     "pacs.008.001.12",
     "pacs.008.001.13",
+    "pacs.009.001.10",
+    "pacs.010.001.05",
+    "pacs.028.001.05",
 ]
 
 APP_NAME = "Pacs008"

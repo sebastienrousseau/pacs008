@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.010.001.05"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<FIDrctDbt>
+		<GrpHdr>
+			<MsgId>MSG-FIDD-001</MsgId>
+			<CreDtTm>2026-01-15T10:30:00</CreDtTm>
+			<NbOfTxs>1</NbOfTxs>
+			<IntrBkSttlmDt>2026-01-15</IntrBkSttlmDt>
+			<SttlmInf>
+				<SttlmMtd>CLRG</SttlmMtd>
+			</SttlmInf>
+		</GrpHdr>
+		<CdtTrfTxInf>
+			<PmtId>
+				<EndToEndId>E2E-FIDD-001</EndToEndId>
+				<TxId>TX-FIDD-001</TxId>
+			</PmtId>
+			<IntrBkSttlmAmt Ccy="EUR">25000.00</IntrBkSttlmAmt>
+			<DbtrAgt>
+				<FinInstnId>
+					<BICFI>DEUTDEFF</BICFI>
+				</FinInstnId>
+			</DbtrAgt>
+			<CdtrAgt>
+				<FinInstnId>
+					<BICFI>COBADEFF</BICFI>
+				</FinInstnId>
+			</CdtrAgt>
+		</CdtTrfTxInf>
+	</FIDrctDbt>
+</Document>

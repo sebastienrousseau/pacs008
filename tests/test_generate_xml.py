@@ -8,6 +8,8 @@ import pytest
 from pacs008.constants import TEMPLATES_DIR, valid_xml_types
 from pacs008.xml.generate_xml import generate_xml_string
 
+pacs008_types = [v for v in valid_xml_types if v.startswith("pacs.008.")]
+
 
 def _make_base_data(**overrides):
     """Create minimal valid pacs.008 data."""
@@ -191,7 +193,7 @@ class TestAllVersionsValidateAgainstXsd:
     """Ensure every version generates XSD-valid XML."""
 
     @pytest.mark.version_compat
-    @pytest.mark.parametrize("version", valid_xml_types)
+    @pytest.mark.parametrize("version", pacs008_types)
     def test_xsd_validation(self, version):
         ver_num = int(version.split(".")[-1])
         extra = {}

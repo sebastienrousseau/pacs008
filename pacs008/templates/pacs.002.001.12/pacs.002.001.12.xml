@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.002.001.12"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<FIToFIPmtStsRpt>
+		<GrpHdr>
+			<MsgId>MSG-STATUS-001</MsgId>
+			<CreDtTm>2026-01-15T10:30:00</CreDtTm>
+		</GrpHdr>
+		<OrgnlGrpInfAndSts>
+			<OrgnlMsgId>MSG-ORIG-001</OrgnlMsgId>
+			<OrgnlMsgNmId>pacs.008.001.13</OrgnlMsgNmId>
+		</OrgnlGrpInfAndSts>
+		<TxInfAndSts>
+			<OrgnlEndToEndId>E2E-ORIG-001</OrgnlEndToEndId>
+			<OrgnlTxId>TX-ORIG-001</OrgnlTxId>
+			<TxSts>ACSC</TxSts>
+			<StsRsnInf>
+				<Rsn>
+					<Cd>AB05</Cd>
+				</Rsn>
+				<AddtlInf>Payment accepted and settled</AddtlInf>
+			</StsRsnInf>
+		</TxInfAndSts>
+	</FIToFIPmtStsRpt>
+</Document>

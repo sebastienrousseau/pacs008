@@ -1,4 +1,4 @@
-"""Schema-driven parametrized tests across all 13 pacs.008 versions.
+"""Schema-driven parametrized tests across all pacs.008 versions.
 
 Instead of separate test functions per version, this module uses
 pytest.mark.parametrize to run a single validation logic across every
@@ -13,6 +13,9 @@ import pytest
 
 from pacs008.constants import TEMPLATES_DIR, valid_xml_types
 from pacs008.xml.generate_xml import generate_xml_string
+
+# Only pacs.008.xxx versions use the shared pacs.008 data structure
+pacs008_types = [v for v in valid_xml_types if v.startswith("pacs.008.")]
 
 
 # --- Fixtures & Helpers ---
@@ -83,17 +86,17 @@ def _parse_xml(xml_string):
 
 
 class TestAllVersionsXsdValid:
-    """Every version must produce XSD-valid XML."""
+    """Every pacs.008 version must produce XSD-valid XML."""
 
     @pytest.mark.version_compat
-    @pytest.mark.parametrize("version", valid_xml_types)
+    @pytest.mark.parametrize("version", pacs008_types)
     def test_generates_xsd_valid_xml(self, version):
         xml = _generate(version)
         assert xml.strip().startswith("<?xml") or xml.strip().startswith(
             "<Document"
         )
 
-    @pytest.mark.parametrize("version", valid_xml_types)
+    @pytest.mark.parametrize("version", pacs008_types)
     def test_contains_namespace(self, version):
         xml = _generate(version)
         assert f"urn:iso:std:iso:20022:tech:xsd:{version}" in xml
@@ -102,7 +105,7 @@ class TestAllVersionsXsdValid:
 # --- 2. BIC vs BICFI (version-dependent identifier) ---
 
 BIC_VERSIONS = ["pacs.008.001.01", "pacs.008.001.02"]
-BICFI_VERSIONS = [v for v in valid_xml_types if v not in BIC_VERSIONS]
+BICFI_VERSIONS = [v for v in pacs008_types if v not in BIC_VERSIONS]
 
 
 class TestBicIdentifier:
@@ -122,8 +125,8 @@ class TestBicIdentifier:
 
 # --- 3. UETR (required v08+, UUID v4 format, exactly 36 chars) ---
 
-UETR_VERSIONS = [v for v in valid_xml_types if _version_num(v) >= 8]
-NO_UETR_VERSIONS = [v for v in valid_xml_types if _version_num(v) < 8]
+UETR_VERSIONS = [v for v in pacs008_types if _version_num(v) >= 8]
+NO_UETR_VERSIONS = [v for v in pacs008_types if _version_num(v) < 8]
 
 
 class TestUetrGeneration:
@@ -156,8 +159,8 @@ class TestUetrGeneration:
 
 # --- 4. Mandate Information (MndtRltdInf, v10+) ---
 
-MANDATE_VERSIONS = [v for v in valid_xml_types if _version_num(v) >= 10]
-NO_MANDATE_VERSIONS = [v for v in valid_xml_types if _version_num(v) < 10]
+MANDATE_VERSIONS = [v for v in pacs008_types if _version_num(v) >= 10]
+NO_MANDATE_VERSIONS = [v for v in pacs008_types if _version_num(v) < 10]
 
 
 class TestMandateInfo:
@@ -202,7 +205,7 @@ class TestExpiryDateTime:
 
     @pytest.mark.parametrize(
         "version",
-        [v for v in valid_xml_types if v != "pacs.008.001.13"],
+        [v for v in pacs008_types if v != "pacs.008.001.13"],
     )
     def test_no_expiry_in_other_versions(self, version):
         xml = _generate(version)
@@ -213,35 +216,35 @@ class TestExpiryDateTime:
 
 
 class TestCoreElements:
-    """Every version must contain mandatory pacs.008 elements."""
+    """Every pacs.008 version must contain mandatory pacs.008 elements."""
 
-    @pytest.mark.parametrize("version", valid_xml_types)
+    @pytest.mark.parametrize("version", pacs008_types)
     def test_msg_id_present(self, version):
         xml = _generate(version)
         assert "<MsgId>MSG-TEST-001</MsgId>" in xml
 
-    @pytest.mark.parametrize("version", valid_xml_types)
+    @pytest.mark.parametrize("version", pacs008_types)
     def test_settlement_method_present(self, version):
         xml = _generate(version)
         assert "<SttlmMtd>CLRG</SttlmMtd>" in xml
 
-    @pytest.mark.parametrize("version", valid_xml_types)
+    @pytest.mark.parametrize("version", pacs008_types)
     def test_interbank_amount_present(self, version):
         xml = _generate(version)
         assert "1000.00" in xml
         assert "<IntrBkSttlmAmt" in xml
 
-    @pytest.mark.parametrize("version", valid_xml_types)
+    @pytest.mark.parametrize("version", pacs008_types)
     def test_debtor_name_present(self, version):
         xml = _generate(version)
         assert "<Nm>Debtor Corp</Nm>" in xml
 
-    @pytest.mark.parametrize("version", valid_xml_types)
+    @pytest.mark.parametrize("version", pacs008_types)
     def test_creditor_name_present(self, version):
         xml = _generate(version)
         assert "<Nm>Creditor Ltd</Nm>" in xml
 
-    @pytest.mark.parametrize("version", valid_xml_types)
+    @pytest.mark.parametrize("version", pacs008_types)
     def test_end_to_end_id_present(self, version):
         xml = _generate(version)
         assert "<EndToEndId>E2E-TEST-001</EndToEndId>" in xml
@@ -312,7 +315,7 @@ class TestEdgeCases:
                 [{"msg_id": "X"}], "pacs.008.001.99", "t.xml", "s.xsd"
             )
 
-    @pytest.mark.parametrize("version", valid_xml_types)
+    @pytest.mark.parametrize("version", pacs008_types)
     def test_optional_fields_can_be_empty(self, version):
         """XML generation works with only XSD-required fields populated."""
         minimal = {
@@ -426,7 +429,7 @@ class TestAmountFormatting:
 class TestIdentifiersInXml:
     """Verify IBAN and BIC values propagate to XML output."""
 
-    @pytest.mark.parametrize("version", valid_xml_types)
+    @pytest.mark.parametrize("version", pacs008_types)
     def test_debtor_iban_in_xml(self, version):
         data = _enrich_data_for_version(
             version, {"debtor_account_iban": "DE89370400440532013000"}
@@ -434,7 +437,7 @@ class TestIdentifiersInXml:
         xml = _generate(version, data)
         assert "DE89370400440532013000" in xml
 
-    @pytest.mark.parametrize("version", valid_xml_types)
+    @pytest.mark.parametrize("version", pacs008_types)
     def test_creditor_iban_in_xml(self, version):
         data = _enrich_data_for_version(
             version, {"creditor_account_iban": "GB29NWBK60161331926819"}
@@ -482,7 +485,7 @@ class TestRootElement:
 
     @pytest.mark.parametrize(
         "version",
-        [v for v in valid_xml_types if v != "pacs.008.001.01"],
+        [v for v in pacs008_types if v != "pacs.008.001.01"],
     )
     def test_v02_plus_root_child(self, version):
         xml = _generate(version)
@@ -495,7 +498,7 @@ class TestRootElement:
 class TestRemittanceInfo:
     """Verify remittance information propagates across versions."""
 
-    @pytest.mark.parametrize("version", valid_xml_types)
+    @pytest.mark.parametrize("version", pacs008_types)
     def test_remittance_in_xml(self, version):
         data = _enrich_data_for_version(
             version, {"remittance_information": "INV-2026-PARAMETRIZED"}

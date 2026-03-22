@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.004.001.11"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<PmtRtr>
+		<GrpHdr>
+			<MsgId>MSG-RTR-001</MsgId>
+			<CreDtTm>2026-01-15T10:30:00</CreDtTm>
+			<NbOfTxs>1</NbOfTxs>
+		</GrpHdr>
+		<OrgnlGrpInf>
+			<OrgnlMsgId>MSG-ORIG-001</OrgnlMsgId>
+			<OrgnlMsgNmId>pacs.008.001.13</OrgnlMsgNmId>
+		</OrgnlGrpInf>
+		<TxInf>
+			<OrgnlEndToEndId>E2E-ORIG-001</OrgnlEndToEndId>
+			<OrgnlTxId>TX-ORIG-001</OrgnlTxId>
+			<RtrdIntrBkSttlmAmt Ccy="EUR">1000.00</RtrdIntrBkSttlmAmt>
+			<RtrRsnInf>
+				<Rsn>
+					<Cd>AC01</Cd>
+				</Rsn>
+				<AddtlInf>Account number invalid</AddtlInf>
+			</RtrRsnInf>
+		</TxInf>
+	</PmtRtr>
+</Document>

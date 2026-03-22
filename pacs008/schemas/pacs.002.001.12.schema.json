@@ -1,0 +1,101 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "pacs.002.001.12 Payment Data Schema",
+  "description": "Schema for ISO 20022 pacs.002.001.12 FI-to-FI Payment Status Report",
+  "version": "0.0.1",
+  "type": "object",
+  "required": [
+    "msg_id",
+    "creation_date_time",
+    "original_msg_id",
+    "original_msg_nm_id"
+  ],
+  "properties": {
+    "msg_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 35,
+      "description": "Message identification"
+    },
+    "creation_date_time": {
+      "type": "string",
+      "description": "Creation date and time"
+    },
+    "original_msg_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 35,
+      "description": "Original message identification"
+    },
+    "original_msg_nm_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 35,
+      "description": "Original message name identification"
+    },
+    "original_end_to_end_id": {
+      "type": "string",
+      "maxLength": 35,
+      "description": "Original end-to-end identification"
+    },
+    "original_tx_id": {
+      "type": "string",
+      "maxLength": 35,
+      "description": "Original transaction identification"
+    },
+    "tx_sts": {
+      "type": "string",
+      "enum": [
+        "ACCP",
+        "RJCT",
+        "PDNG",
+        "ACSC",
+        "ACSP",
+        "ACTC",
+        "ACWC",
+        "ACWP"
+      ],
+      "description": "Transaction status"
+    },
+    "sts_rsn_cd": {
+      "type": "string",
+      "maxLength": 4,
+      "description": "Status reason code"
+    },
+    "sts_rsn_addtl_inf": {
+      "type": "string",
+      "maxLength": 105,
+      "description": "Status reason additional information"
+    },
+    "grp_sts": {
+      "type": "string",
+      "enum": [
+        "ACCP",
+        "RJCT",
+        "PDNG",
+        "ACSC",
+        "ACSP",
+        "ACTC",
+        "ACWC",
+        "ACWP"
+      ],
+      "description": "Group status"
+    },
+    "nb_of_txs_per_sts": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of transactions per status"
+    },
+    "instg_agt_bic": {
+      "type": "string",
+      "pattern": "^[A-Z0-9]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
+      "description": "Instructing agent BIC"
+    },
+    "instd_agt_bic": {
+      "type": "string",
+      "pattern": "^[A-Z0-9]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
+      "description": "Instructed agent BIC"
+    }
+  },
+  "additionalProperties": true
+}
