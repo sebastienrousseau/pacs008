@@ -23,10 +23,6 @@
   <a href="https://pacs008.com"><img src="https://img.shields.io/badge/Docs-pacs008.com-blue?style=for-the-badge" alt="Docs" /></a>
 </p>
 
-> ⚠️ **Pre-1.0 status:** `pacs008` is under active development and is **not yet
-> certified for live banking traffic**. APIs may change between minor versions.
-> Pin to an exact patch version for any pilot deployment.
-
 ---
 
 ## Contents
