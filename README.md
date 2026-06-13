@@ -719,7 +719,7 @@ Quality gates (CI-enforced):
 
 Security issues should be reported **privately** via GitHub's [Security
 Advisories](https://github.com/sebastienrousseau/pacs008/security/advisories/new)
-or by email to `sebastian.rousseau@gmail.com`. See [`SECURITY.md`](./SECURITY.md)
+or by email to `contact@sebastienrousseau.com`. See [`SECURITY.md`](./SECURITY.md)
 for the full disclosure policy, SLA targets, and hardening guidance for
 production deployments.
 

@@ -20,7 +20,7 @@ Please report security issues privately by either:
 
 1. **Preferred:** GitHub's private vulnerability reporting — open a draft
    advisory at <https://github.com/sebastienrousseau/pacs008/security/advisories/new>.
-2. **Email:** `sebastian.rousseau@gmail.com` with the subject line
+2. **Email:** `contact@sebastienrousseau.com` with the subject line
    `[pacs008 security]`.
 
 Include, where possible:
