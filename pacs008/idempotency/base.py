@@ -145,11 +145,11 @@ def compute_payload_hash(payload: Any) -> str:
     Dicts are JSON-encoded with sorted keys for stability; bytes
     are hashed directly; everything else is stringified.
     """
-    if isinstance(payload, (bytes, bytearray)):
+    if isinstance(payload, bytes | bytearray):
         data = bytes(payload)
     elif isinstance(payload, str):
         data = payload.encode("utf-8")
-    elif isinstance(payload, (dict, list)):
+    elif isinstance(payload, dict | list):
         data = json.dumps(payload, sort_keys=True).encode("utf-8")
     else:
         data = str(payload).encode("utf-8")

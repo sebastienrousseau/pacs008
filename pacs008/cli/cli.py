@@ -21,7 +21,6 @@ import os
 import sys
 import traceback
 from collections.abc import Iterator
-from typing import Optional
 
 import click
 from rich import box
@@ -72,7 +71,7 @@ def _configure_logging(verbose: bool) -> logging.Logger:
 
 
 def _load_configuration(
-    config_file: Optional[str],
+    config_file: str | None,
     xml_template_file_path: str,
     xsd_schema_file_path: str,
     data_file_path: str,
@@ -217,7 +216,7 @@ def _generate_xml_files(
     xml_template_file_path: str,
     xsd_schema_file_path: str,
     data_file_path: str,
-    output_dir: Optional[str],
+    output_dir: str | None,
     verbose: bool,
 ) -> None:
     # pylint: disable=too-many-arguments, too-many-positional-arguments
@@ -361,8 +360,8 @@ def main(
     xml_template_file_path: str,
     xsd_schema_file_path: str,
     data_file_path: str,
-    config_file: Optional[str],
-    output_dir: Optional[str],
+    config_file: str | None,
+    output_dir: str | None,
     dry_run: bool,
     verbose: bool,
 ) -> None:

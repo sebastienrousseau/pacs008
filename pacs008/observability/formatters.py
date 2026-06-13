@@ -22,7 +22,7 @@ import os
 import sys
 import time
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any
 
 from pacs008.observability.fields import Fields
 from pacs008.observability.tracing import __version__, get_request_id
@@ -69,9 +69,9 @@ class JSONFormatter(logging.Formatter):
 
 
 def configure_json_logging(
-    logger: Optional[logging.Logger] = None,
-    level: Union[str, int] = logging.INFO,
-    log_file: Optional[str] = None,
+    logger: logging.Logger | None = None,
+    level: str | int = logging.INFO,
+    log_file: str | None = None,
     max_bytes: int = 10 * 1024 * 1024,  # 10 MB
     backup_count: int = 5,
     console_output: bool = True,

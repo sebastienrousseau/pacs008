@@ -5,6 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.4] - 2026-06-13
+
+### Removed
+
+- **Python 3.9 support dropped.** Python 3.9 reached end-of-life on
+  2025-10-04; v0.0.3 already shipped CVE fixes whose upstream
+  versions had themselves dropped 3.9 support, leaving 3.9 users in
+  a "transitional" tier with known vulnerabilities. v0.0.4 closes
+  that gap by raising the floor to Python 3.10. Existing 3.9
+  deployments should pin to `pacs008==0.0.3` and plan a 3.10+
+  upgrade.
+
+### Changed
+
+- `python = "^3.9.2"` → `python = "^3.10"` in `pyproject.toml`.
+- Tooling targets updated in lockstep:
+  - `[tool.black] target-version = ['py39']` → `['py310']`
+  - `[tool.ruff] target-version = "py39"` → `"py310"`
+  - `[tool.mypy] python_version = "3.9"` → `"3.10"`
+  - `black` dev dep no longer conditional on `python >= 3.10`.
+- CI matrix `python-version` reduced from `[3.9, 3.10, 3.11, 3.12]`
+  to `[3.10, 3.11, 3.12]` — 9 matrix entries (3 OS × 3 Python)
+  instead of 12.
+- Ruff modernised 113 type annotations to py310 idioms
+  (`X | Y` over `Optional[X] / Union[X, Y]`, `isinstance(x, X | Y)`
+  over `isinstance(x, (X, Y))`, etc.) via `--unsafe-fixes`. Pure
+  cosmetic — no behaviour change.
+
+### Security
+
+The 7 Dependabot alerts remaining open after v0.0.3 close
+automatically with this release: with Python 3.9 out of scope, the
+lockfile no longer needs dual-version entries, so every install
+resolves directly to the fixed transitive versions:
+
+  pyarrow 23.0.1, urllib3 2.7.0, starlette 1.3.1,
+  python-dotenv 1.2.2, pytest 9.1.0, requests 2.34.2.
+
+[0.0.4]: https://github.com/sebastienrousseau/pacs008/compare/v0.0.3...v0.0.4
+
 ## [0.0.3] - 2026-06-13
 
 ### Security

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pacs008"
-version = "0.0.3"
+version = "0.0.4"
 description = "Generate, validate, parse and audit ISO 20022 pacs.008 (FI-to-FI Customer Credit Transfer) messages with scheme-aware rules for CBPR+, HVPS+, Fedwire, CHAPS, T2 RTGS and SCT Inst."
 authors = ["Sebastien Rousseau <contact@sebastienrousseau.com>"]
 license = "Apache-2.0"
@@ -19,7 +19,7 @@ include = [
 pacs008 = "pacs008.__main__:cli"
 
 [tool.poetry.dependencies]
-python = "^3.9.2"
+python = "^3.10"
 anyascii = "^0.3"
 click = "^8.1"
 lxml = ">=5,<7"
@@ -36,23 +36,13 @@ fastapi = ">=0.95,<1.0"
 uvicorn = {version = ">=0.20,<1.0", extras = ["standard"]}
 httpx = ">=0.23,<1.0"
 pyarrow = ">=18.0.0,<24.0.0"
-# urllib3 / starlette / requests / python-dotenv CVE fixes (Dependabot
-# 2026-06) are not pinned here because:
-#   1) They are transitive deps (via uvicorn, httpx, twine, fastapi),
-#      and pinning them adds maintenance noise.
-#   2) The fix versions all dropped Python 3.9 support (3.9 EOL
-#      2025-10), so a hard pin would force a 3.9 drop.
-# `poetry update urllib3 starlette requests` pulls the latest
-# 3.9-compatible versions into the lockfile; 3.10+ users get the
-# fix; 3.9 users carry the CVE pending v0.1.0's 3.9-drop. Documented
-# in CHANGELOG and tracked via Dependabot alerts.
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.0,<10"
 pytest-cov = "^4.0.0"
 pytest-benchmark = "^4.0.0"
 pytest-xdist = "^3.0.0"
-black = {version = "^26.3.1", python = ">=3.10"}
+black = "^26.3.1"
 flake8 = "^7.0.0"
 isort = "^5.13.0"
 mypy = "^1.11.0"
@@ -106,7 +96,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 79
-target-version = ['py39']
+target-version = ['py310']
 
 [tool.isort]
 profile = "black"
@@ -150,7 +140,7 @@ timeout = 5
 
 [tool.ruff]
 line-length = 79
-target-version = "py39"
+target-version = "py310"
 extend-exclude = [".github/*.md", "*.md", "docs/**/*.md", "releases/**/*.md", "tmp_env", ".venv", ".eggs"]
 
 [tool.ruff.lint]
@@ -167,7 +157,7 @@ indent-style = "space"
 skip-magic-trailing-comma = false
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.10"
 strict = true
 warn_return_any = true
 warn_unused_configs = true

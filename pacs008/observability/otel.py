@@ -126,8 +126,8 @@ def add_attribute(key: str, value: Any) -> None:
 
 def _attr_value(value: Any) -> Any:
     """Coerce attribute values to types OTel accepts."""
-    if isinstance(value, (bool, int, float, str)):
+    if isinstance(value, bool | int | float | str):
         return value
-    if isinstance(value, (list, tuple)):
+    if isinstance(value, list | tuple):
         return [_attr_value(v) for v in value]
     return str(value)

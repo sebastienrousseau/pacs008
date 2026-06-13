@@ -25,7 +25,7 @@ JSON object per call.
 import json
 import logging
 import time
-from typing import Any, Optional
+from typing import Any
 
 from pacs008.observability.fields import Fields
 from pacs008.observability.redaction import _redact_pii_from_dict
@@ -168,7 +168,7 @@ def log_process_success(
 def log_process_error(
     logger: logging.Logger,
     error: Exception,
-    message_type: Optional[str] = None,
+    message_type: str | None = None,
     **extra_fields: Any,
 ) -> None:
     """Log a process-error event.
@@ -194,7 +194,7 @@ def log_validation_event(
     logger: logging.Logger,
     validation_type: str,
     success: bool,
-    error: Optional[Exception] = None,
+    error: Exception | None = None,
     **extra_fields: Any,
 ) -> None:
     """Log a validation event (success or error).
@@ -230,9 +230,9 @@ def log_data_load_event(
     logger: logging.Logger,
     data_source_type: str,
     success: bool,
-    record_count: Optional[int] = None,
-    error: Optional[Exception] = None,
-    duration_ms: Optional[int] = None,
+    record_count: int | None = None,
+    error: Exception | None = None,
+    duration_ms: int | None = None,
 ) -> None:
     """Log a data-loading event.
 
@@ -268,9 +268,9 @@ def log_xml_generation_event(
     logger: logging.Logger,
     message_type: str,
     success: bool,
-    record_count: Optional[int] = None,
-    error: Optional[Exception] = None,
-    duration_ms: Optional[int] = None,
+    record_count: int | None = None,
+    error: Exception | None = None,
+    duration_ms: int | None = None,
 ) -> None:
     """Log an XML-generation event.
 

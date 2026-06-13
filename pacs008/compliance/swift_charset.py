@@ -44,14 +44,15 @@ Example:
 
 import re
 import unicodedata
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
 
 from pacs008.exceptions import PaymentValidationError
 
 # anyascii is a ~150KB resident-memory hit at import time. Defer the
 # import to first use of the non-Latin transliteration fallback —
 # callers that only deal with Latin-script payments never pay the cost.
-_anyascii_impl: Optional[Callable[[str], str]] = None
+_anyascii_impl: Callable[[str], str] | None = None
 
 
 def _anyascii(char: str) -> str:
@@ -223,7 +224,7 @@ class ComplianceViolation:
         field: str,
         violation_type: str,
         original_value: str,
-        corrected_value: Optional[str] = None,
+        corrected_value: str | None = None,
         message: str = "",
     ) -> None:
         """Initialise a violation record with field/type/values."""
@@ -389,7 +390,7 @@ def cleanse_string(
 
 def enforce_field_lengths(
     row: dict[str, Any],
-    max_lengths: Optional[dict[str, int]] = None,
+    max_lengths: dict[str, int] | None = None,
 ) -> tuple[dict[str, Any], list[ComplianceViolation]]:
     """Truncate fields that exceed ISO 20022 maximum lengths.
 

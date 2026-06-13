@@ -24,7 +24,6 @@ logs across services in DORA-aligned audit trails.
 import uuid
 from contextvars import ContextVar
 from importlib.metadata import PackageNotFoundError, version
-from typing import Optional
 
 try:
     __version__ = version("pacs008")
@@ -32,7 +31,7 @@ except PackageNotFoundError:  # pragma: no cover
     __version__ = "0.0.0"
 
 
-_request_id_context: ContextVar[Optional[str]] = ContextVar(
+_request_id_context: ContextVar[str | None] = ContextVar(
     "request_id", default=None
 )
 
