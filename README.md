@@ -94,7 +94,7 @@ cd pacs008
 poetry install --extras otel   # full dev environment
 ```
 
-`pacs008` is tested on Python 3.9 — 3.12 across Ubuntu, macOS and Windows.
+`pacs008` is tested on Python 3.10 — 3.12 across Ubuntu, macOS and Windows.
 
 ---
 
@@ -711,7 +711,7 @@ Quality gates (CI-enforced):
 | Tests | `pytest --cov=pacs008` (90% branch-coverage floor) |
 | Security | `bandit -r pacs008/` |
 | Smoke | `pytest -m smoke` |
-| Cross-platform matrix | Python 3.9 — 3.12 × Ubuntu / macOS / Windows |
+| Cross-platform matrix | Python 3.10 — 3.12 × Ubuntu / macOS / Windows |
 
 ---
 

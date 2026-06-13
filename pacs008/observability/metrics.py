@@ -23,7 +23,7 @@ layer for richer observability.
 
 import logging
 import time
-from typing import Any, Optional
+from typing import Any
 
 from pacs008.observability.events import Events, log_event
 from pacs008.observability.fields import ExecutionStatus
@@ -51,7 +51,7 @@ class ExecutionSummaryTracker:
         self,
         logger: logging.Logger,
         dry_run: bool = False,
-        message_type: Optional[str] = None,
+        message_type: str | None = None,
     ):
         """Initialize the tracker.
 
@@ -64,10 +64,10 @@ class ExecutionSummaryTracker:
         self.dry_run = dry_run
         self.message_type = message_type
 
-        self.start_time: Optional[float] = None
-        self.end_time: Optional[float] = None
-        self.start_time_iso: Optional[str] = None
-        self.end_time_iso: Optional[str] = None
+        self.start_time: float | None = None
+        self.end_time: float | None = None
+        self.start_time_iso: str | None = None
+        self.end_time_iso: str | None = None
 
         self.counts = {
             "debug": 0,
@@ -79,8 +79,8 @@ class ExecutionSummaryTracker:
 
         self.total_records_processed = 0
         self.validation_metrics: dict[str, str] = {}
-        self.output_file: Optional[str] = None
-        self.log_file: Optional[str] = None
+        self.output_file: str | None = None
+        self.log_file: str | None = None
 
         self.has_errors = False
         self.has_warnings = False
@@ -121,7 +121,7 @@ class ExecutionSummaryTracker:
         """
         self.validation_metrics[validation_type] = result
 
-    def set_output_file(self, file_path: Optional[str]) -> None:
+    def set_output_file(self, file_path: str | None) -> None:
         """Record the output file path (or ``None`` for dry-run)."""
         self.output_file = file_path
 
@@ -211,8 +211,8 @@ class ExecutionMetrics:
         self,
         logger: logging.Logger,
         operation: str,
-        message_type: Optional[str] = None,
-        request_id: Optional[str] = None,
+        message_type: str | None = None,
+        request_id: str | None = None,
     ):
         """Initialize the metrics tracker.
 
@@ -228,8 +228,8 @@ class ExecutionMetrics:
         self.request_id = request_id or generate_request_id()
         set_request_id(self.request_id)
 
-        self.start_time: Optional[float] = None
-        self.end_time: Optional[float] = None
+        self.start_time: float | None = None
+        self.end_time: float | None = None
         self.phase_timings: dict[str, int] = {}
 
         self.validation_results: dict[str, str] = {}
@@ -238,7 +238,7 @@ class ExecutionMetrics:
         self.records_failed = 0
 
         self.status = ExecutionStatus.SUCCESS
-        self.error_message: Optional[str] = None
+        self.error_message: str | None = None
 
     def start(self) -> None:
         """Mark operation start and emit a process-start event."""

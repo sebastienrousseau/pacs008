@@ -194,7 +194,7 @@ def _resolve_output(
     output: str | Path | BinaryIO,
 ) -> tuple[BinaryIO, bool]:
     """Return (binary file-like, owns_handle) for the user's output param."""
-    if isinstance(output, (str, Path)):
+    if isinstance(output, str | Path):
         return open(str(output), "wb"), True
     return output, False
 

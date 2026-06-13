@@ -100,7 +100,7 @@ def load_parquet_data(file_path: str) -> list[dict[str, Any]]:
         return cast(list[dict[str, Any]], data)
 
     except Exception as e:
-        if isinstance(e, (FileNotFoundError, DataSourceError)):
+        if isinstance(e, FileNotFoundError | DataSourceError):
             raise
         raise DataSourceError(
             f"Error reading Parquet file {file_path}: {e}"
@@ -158,7 +158,7 @@ def load_parquet_data_streaming(
                 yield chunk_data
 
     except Exception as e:
-        if isinstance(e, (FileNotFoundError, DataSourceError)):
+        if isinstance(e, FileNotFoundError | DataSourceError):
             raise
         raise DataSourceError(
             f"Error reading Parquet file {file_path}: {e}"
