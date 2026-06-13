@@ -2,15 +2,15 @@
 
 ## Supported versions
 
-`pacs008` is pre-1.0 software under active development. Security fixes are
-applied to the latest released version on PyPI and the `main` branch only.
+Security fixes are applied to the latest released version on PyPI and the
+`main` branch. The table below tracks which series receive fixes.
 
 | Version | Supported |
 |---------|-----------|
 | `0.0.x` | Latest released `0.0.x` only |
 | < `0.0.1` | No |
 
-Once `1.0.0` is released, a longer-term support window will be announced here.
+A longer-term support window will be announced here once `1.0.0` ships.
 
 ## Reporting a vulnerability
 

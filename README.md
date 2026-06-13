@@ -50,6 +50,7 @@
 - [Detect duplicate submissions (idempotency)](#detect-duplicate-submissions-idempotency)
 - [Sign a generation event for audit (DORA)](#sign-a-generation-event-for-audit-dora)
 - [Emit OpenTelemetry spans](#emit-opentelemetry-spans)
+- [Run the bundled examples](#run-the-bundled-examples) — `examples/`
 
 **Interfaces**
 
@@ -516,6 +517,19 @@ with trace_span(
 ):
     process_files(..., scheme="cbpr_plus")
 ```
+
+### Run the bundled examples
+
+Two ready-to-run scripts ship in the repository — useful as smoke tests after
+install and as starting points for new integrations.
+
+```bash
+poetry run python examples/generate_xml.py       # generates output_pacs008.xml
+poetry run python examples/swift_compliance.py   # demonstrates charset cleansing + report
+```
+
+Both scripts execute in CI on every push and are the canonical reference for
+the "happy path" call sequence.
 
 ---
 

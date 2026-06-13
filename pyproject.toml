@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "pacs008"
 version = "0.0.1"
-description = "Pacs008 is a Python Library for Automating ISO 20022 pacs.008 FI-to-FI Customer Credit Transfer XML Messages."
+description = "Generate, validate, parse and audit ISO 20022 pacs.008 (FI-to-FI Customer Credit Transfer) messages with scheme-aware rules for CBPR+, HVPS+, Fedwire, CHAPS, T2 RTGS and SCT Inst."
 authors = ["Sebastien Rousseau <sebastian.rousseau@gmail.com>"]
 license = "Apache-2.0"
 readme = "README.md"

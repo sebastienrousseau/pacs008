@@ -6,8 +6,3 @@ contact_links:
       Please report security vulnerabilities privately through GitHub's
       security advisories, not as a public issue. See SECURITY.md for
       details.
-  - name: Question or discussion
-    url: https://github.com/sebastienrousseau/pacs008/discussions
-    about: |
-      For usage questions, "how do I…" and open-ended discussion, please
-      use Discussions rather than opening an issue.
