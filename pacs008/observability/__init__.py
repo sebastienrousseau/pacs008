@@ -57,6 +57,15 @@ from pacs008.observability.metrics import (
     ExecutionMetrics,
     ExecutionSummaryTracker,
 )
+from pacs008.observability.otel import (
+    add_attribute as otel_add_attribute,
+)
+from pacs008.observability.otel import (
+    is_enabled as otel_is_enabled,
+)
+from pacs008.observability.otel import (
+    trace_span as otel_trace_span,
+)
 from pacs008.observability.redaction import mask_sensitive_data
 from pacs008.observability.tracing import (
     generate_request_id,
@@ -83,5 +92,8 @@ __all__ = [
     "log_validation_event",
     "log_xml_generation_event",
     "mask_sensitive_data",
+    "otel_add_attribute",
+    "otel_is_enabled",
+    "otel_trace_span",
     "set_request_id",
 ]
