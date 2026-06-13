@@ -29,6 +29,7 @@ right default for compliance code.
 
 from __future__ import annotations
 
+import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import date
@@ -253,6 +254,7 @@ class SchemeProfile(ABC):
         # Cardinality is a per-batch rule, applied once per message.
         cap = self.max_transactions_per_msg
         if cap is not None and len(payment_data) > cap:
+            required_chunks = math.ceil(len(payment_data) / cap)
             violations.append(
                 BusinessRuleViolation(
                     row=-1,
@@ -262,7 +264,9 @@ class SchemeProfile(ABC):
                     message=(
                         f"scheme {self.name!r} permits at most {cap} "
                         f"transaction(s) per message; got "
-                        f"{len(payment_data)}"
+                        f"{len(payment_data)}. Split into "
+                        f"{required_chunks} chunks (see "
+                        f"pacs008.core.splitter.split_for_scheme)"
                     ),
                 )
             )
