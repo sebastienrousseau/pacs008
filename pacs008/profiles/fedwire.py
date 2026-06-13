@@ -44,6 +44,7 @@ from typing import Optional
 from pacs008.compliance.swift_charset import SWIFT_Z_CHARSET
 from pacs008.profiles.base import SchemeProfile, register_profile
 from pacs008.standards.address import AddressPolicy
+from pacs008.validation.calendar import Calendar, FedwireCalendar
 
 
 # Fedwire's address-structuring cutover is dated 16 November 2026,
@@ -90,6 +91,10 @@ class FedwireProfile(SchemeProfile):
         # supplements come through unchanged rather than being
         # transliterated.
         return SWIFT_Z_CHARSET
+
+    @property
+    def calendar(self) -> Calendar:
+        return FedwireCalendar()
 
     def address_policy(
         self, today: Optional[date] = None

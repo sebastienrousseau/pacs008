@@ -46,6 +46,7 @@ from typing import Optional
 
 from pacs008.profiles.base import SchemeProfile, register_profile
 from pacs008.standards.address import NOV_2026_CLIFF, AddressPolicy
+from pacs008.validation.calendar import Calendar, TARGETCalendar
 
 
 class CBPRPlusProfile(SchemeProfile):
@@ -94,6 +95,12 @@ class CBPRPlusProfile(SchemeProfile):
         # forward signal for ECB / Fed but CBPR+ itself remains
         # optional for v0.0.2.
         return ()
+
+    @property
+    def calendar(self) -> Calendar:
+        # Most CBPR+ EUR settlement routes through TARGET2; multi-CCY
+        # CBPR+ is a v0.1.0 concern.
+        return TARGETCalendar()
 
     def pinned_versions(self) -> dict[str, str]:
         # MR2019 pinning for the seven core messages (per ECB T2-0170).

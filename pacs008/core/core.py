@@ -40,6 +40,7 @@ from pacs008.profiles import (
 )
 from pacs008.security.path_validator import sanitize_for_log, validate_path
 from pacs008.standards.address import validate_addresses
+from pacs008.validation.calendar import validate_settlement_dates
 from pacs008.validation.lei_validator import validate_leis
 
 # CORRECTION: Circular import workaround. Imports moved to top-level.
@@ -269,6 +270,23 @@ def _run_scheme_validation(
                 field=f"{err.party}_address",
                 rule="address_policy",
                 message=err.message,
+            )
+        )
+
+    # Settlement-date calendar (TARGET/Fedwire/CHAPS holidays).
+    settlement_errors = validate_settlement_dates(
+        payment_data, calendar=profile.calendar
+    )
+    for sd_err in settlement_errors:
+        from pacs008.profiles.base import BusinessRuleViolation
+
+        violations.append(
+            BusinessRuleViolation(
+                row=sd_err.row,
+                party=None,
+                field=sd_err.field,
+                rule="settlement_date_closed",
+                message=sd_err.message,
             )
         )
 

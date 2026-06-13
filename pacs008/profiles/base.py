@@ -38,6 +38,7 @@ from typing import Optional, Sequence
 from pacs008.compliance.swift_charset import SWIFT_X_CHARSET
 from pacs008.exceptions import Pacs008Error
 from pacs008.standards.address import AddressPolicy
+from pacs008.validation.calendar import AlwaysOpenCalendar, Calendar
 
 
 @dataclass(frozen=True)
@@ -149,6 +150,21 @@ class SchemeProfile(ABC):
         as a parameter so callers can wire it in directly.
         """
         return SWIFT_X_CHARSET
+
+    @property
+    def calendar(self) -> Calendar:
+        """Settlement calendar in force on this scheme.
+
+        Defaults to :class:`~pacs008.validation.calendar.AlwaysOpenCalendar`
+        (24/7). Profiles tied to a specific RTGS rail override this:
+        CBPR+ and T2 RTGS use the TARGET calendar; Fedwire uses the
+        Federal Reserve calendar; CHAPS uses the BoE calendar; FedNow
+        and SCT Inst stay 24/7.
+
+        ``validate_settlement_dates`` consumes this to flag pacs.008
+        messages whose ``IntrBkSttlmDt`` falls on a closing day.
+        """
+        return AlwaysOpenCalendar()
 
     # ----- behaviour -----
 
