@@ -52,7 +52,11 @@ try:
 
     _OTEL_AVAILABLE = True
 except ImportError:  # pragma: no cover
-    _otel_trace = None  # type: ignore[assignment]
+    # Two ignore codes: [assignment] fires when opentelemetry IS
+    # installed (None vs ModuleType); [unused-ignore] silences mypy's
+    # warn_unused_ignores when opentelemetry is NOT installed and the
+    # import resolves to Any (where the None assignment is fine).
+    _otel_trace = None  # type: ignore[assignment, unused-ignore]
     _OTEL_AVAILABLE = False
 
 
