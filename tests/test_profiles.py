@@ -34,7 +34,6 @@ from pacs008.profiles import (
 )
 from pacs008.standards.address import AddressPolicy
 
-
 _PRE_CLIFF = date(2026, 11, 13)
 _POST_CLIFF = date(2026, 11, 14)
 _FEDWIRE_CLIFF_PRE = date(2026, 11, 15)

@@ -87,9 +87,7 @@ class TestValidateLEIFormat:
         assert not is_valid
 
     def test_lowercase_rejected(self):
-        is_valid, error = validate_lei_format(
-            "hwupkr0mpou8fgxbt394"
-        )
+        is_valid, error = validate_lei_format("hwupkr0mpou8fgxbt394")
         assert not is_valid
         assert "uppercase" in error
 
@@ -157,7 +155,9 @@ class TestValidateLEI:
         broken = "HWUPKR0MPOU8FGXBT395"
         with pytest.raises(InvalidLEIError) as excinfo:
             validate_lei(broken)
-        assert excinfo.value.reason == "Invalid LEI checksum (ISO 7064 mod-97-10)"
+        assert (
+            excinfo.value.reason == "Invalid LEI checksum (ISO 7064 mod-97-10)"
+        )
         assert excinfo.value.lei == broken
 
     def test_field_attached_to_exception(self):
@@ -183,9 +183,7 @@ class TestValidateLEISafe:
         assert not validate_lei_safe("HWUPKR0MPOU8FGXBT395")
 
     def test_safe_accepts_field_kwarg(self):
-        assert validate_lei_safe(
-            "HWUPKR0MPOU8FGXBT394", field="debtor_lei"
-        )
+        assert validate_lei_safe("HWUPKR0MPOU8FGXBT394", field="debtor_lei")
 
 
 # ---------------------------------------------------------------------------
@@ -252,9 +250,9 @@ class TestValidateLEIs:
     def test_multiple_rows_aggregated(self):
         rows = [
             {"debtor_lei": "HWUPKR0MPOU8FGXBT394"},  # ok
-            {"debtor_lei": "BAD"},                    # bad
+            {"debtor_lei": "BAD"},  # bad
             {"debtor_lei": "INR2EJN1ERAN0W5ZP974"},  # ok
-            {"debtor_lei": "ALSO_BAD"},              # bad
+            {"debtor_lei": "ALSO_BAD"},  # bad
         ]
         errors = validate_leis(rows)
         assert sorted(e.row for e in errors) == [1, 3]

@@ -44,7 +44,8 @@ from __future__ import annotations
 
 import contextlib
 import os
-from typing import Any, Iterator, Optional
+from collections.abc import Iterator
+from typing import Any
 
 try:
     from opentelemetry import trace as _otel_trace
@@ -76,7 +77,7 @@ def is_enabled() -> bool:
 def trace_span(
     name: str,
     *,
-    attributes: Optional[dict[str, Any]] = None,
+    attributes: dict[str, Any] | None = None,
 ) -> Iterator[Any]:
     """Open a tracing span, no-op when OTel is unavailable.
 

@@ -27,7 +27,6 @@ References:
 from __future__ import annotations
 
 from datetime import date
-from typing import Optional
 
 from pacs008.profiles.base import SchemeProfile, register_profile
 from pacs008.standards.address import NOV_2026_CLIFF, AddressPolicy
@@ -60,14 +59,12 @@ class T2RTGSProfile(SchemeProfile):
         return frozenset({"DEBT", "CRED", "SHAR", "SLEV"})
 
     @property
-    def max_transactions_per_msg(self) -> Optional[int]:
+    def max_transactions_per_msg(self) -> int | None:
         # T2 supports bulk pacs.008 up to 1000 transactions per file
         # for credit-transfer settlement.
         return 1000
 
-    def address_policy(
-        self, today: Optional[date] = None
-    ) -> AddressPolicy:
+    def address_policy(self, today: date | None = None) -> AddressPolicy:
         ref = today if today is not None else date.today()
         if ref >= NOV_2026_CLIFF:
             return AddressPolicy.HYBRID_OR_STRUCTURED

@@ -45,13 +45,13 @@ from pacs008.observability.metrics import (
     ExecutionSummaryTracker,
 )
 from pacs008.observability.redaction import (
-    _redact_pii_from_dict,
-    _sanitize_value,
+    _redact_pii_from_dict,  # noqa: F401  re-exported for backward-compat tests
+    _sanitize_value,  # noqa: F401  re-exported for backward-compat tests
     mask_sensitive_data,
 )
 from pacs008.observability.tracing import (
     __version__,
-    _request_id_context,
+    _request_id_context,  # noqa: F401  re-exported for backward-compat tests
     generate_request_id,
     get_request_id,
     set_request_id,

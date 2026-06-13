@@ -23,7 +23,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 from pacs008.exceptions import Pacs008Error
 
@@ -47,7 +47,7 @@ class IdempotencyViolation(Pacs008Error):
     Carries the previously-seen entry for diagnostics.
     """
 
-    def __init__(self, key: str, previous: "IdempotencyEntry") -> None:
+    def __init__(self, key: str, previous: IdempotencyEntry) -> None:
         self.key = key
         self.previous = previous
         super().__init__(
@@ -77,7 +77,7 @@ class IdempotencyStore(ABC):
     @abstractmethod
     def lookup(
         self, key: str, *, window: timedelta
-    ) -> Optional[IdempotencyEntry]:
+    ) -> IdempotencyEntry | None:
         """Return the most recent entry for ``key`` within ``window``, if any."""
 
     @abstractmethod
@@ -86,7 +86,7 @@ class IdempotencyStore(ABC):
         key: str,
         payload_hash: str,
         *,
-        recorded_at: Optional[datetime] = None,
+        recorded_at: datetime | None = None,
     ) -> IdempotencyEntry:
         """Record ``(key, payload_hash)`` and return the stored entry."""
 
@@ -103,7 +103,7 @@ class IdempotencyStore(ABC):
         *,
         window: timedelta = timedelta(hours=24),
         on_duplicate: OnDuplicate = OnDuplicate.ERROR,
-        recorded_at: Optional[datetime] = None,
+        recorded_at: datetime | None = None,
     ) -> bool:
         """Check and record a key in one atomic-ish step.
 

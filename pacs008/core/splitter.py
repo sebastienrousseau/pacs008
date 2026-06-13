@@ -51,8 +51,8 @@ Example::
 from __future__ import annotations
 
 import math
-from collections.abc import Iterator
-from typing import Any, Optional, Sequence
+from collections.abc import Iterator, Sequence
+from typing import Any
 
 from pacs008.profiles import get_profile
 
@@ -94,7 +94,7 @@ def split_for_scheme(
     scheme: str,
     *,
     msg_id_template: str = _DEFAULT_MSG_ID_TEMPLATE,
-    base_msg_id: Optional[str] = None,
+    base_msg_id: str | None = None,
 ) -> Iterator[list[dict[str, Any]]]:
     """Yield scheme-compliant chunks of ``payment_data``.
 
@@ -154,9 +154,7 @@ def split_for_scheme(
     )
 
     for index, start in enumerate(range(0, len(payment_data), cap), start=1):
-        new_msg_id = msg_id_template.format(
-            base=resolved_base, index=index
-        )
+        new_msg_id = msg_id_template.format(base=resolved_base, index=index)
         chunk = [
             {**row, "msg_id": new_msg_id}
             for row in payment_data[start : start + cap]

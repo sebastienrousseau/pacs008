@@ -36,7 +36,6 @@ from pacs008.validation.calendar import (
     TARGETCalendar,
 )
 
-
 _PRE_CLIFF = date(2026, 11, 13)
 _POST_CLIFF = date(2026, 11, 14)
 
@@ -239,8 +238,7 @@ class TestSchemeRuleEnforcement:
         with pytest.raises(SchemeViolationError) as excinfo:
             _run_scheme_validation(rows, "hvps_plus")
         assert any(
-            v.rule == "charge_bearer_invalid"
-            for v in excinfo.value.violations
+            v.rule == "charge_bearer_invalid" for v in excinfo.value.violations
         )
 
     def test_t2_blocks_christmas_settlement(self):

@@ -21,7 +21,6 @@ import sqlite3
 import threading
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Optional, Union
 
 from pacs008.idempotency.base import IdempotencyEntry, IdempotencyStore
 
@@ -51,7 +50,7 @@ class SQLiteStore(IdempotencyStore):
         "ON idempotency_entries(recorded_at)"
     )
 
-    def __init__(self, path: Union[str, Path]) -> None:
+    def __init__(self, path: str | Path) -> None:
         """Open or create the SQLite file at ``path``.
 
         ``path`` may be ``":memory:"`` for an in-process throwaway
@@ -75,7 +74,7 @@ class SQLiteStore(IdempotencyStore):
 
     def lookup(
         self, key: str, *, window: timedelta
-    ) -> Optional[IdempotencyEntry]:
+    ) -> IdempotencyEntry | None:
         cutoff = _utcnow() - window
         with self._lock:
             row = self._conn.execute(
@@ -105,7 +104,7 @@ class SQLiteStore(IdempotencyStore):
         key: str,
         payload_hash: str,
         *,
-        recorded_at: Optional[datetime] = None,
+        recorded_at: datetime | None = None,
     ) -> IdempotencyEntry:
         recorded_at = recorded_at or _utcnow()
         with self._lock:

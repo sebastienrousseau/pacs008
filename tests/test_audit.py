@@ -99,8 +99,7 @@ class TestEd25519SignerConstruction:
 
     def test_fingerprint_stable_per_signer(self, signer):
         assert (
-            signer.public_key_fingerprint()
-            == signer.public_key_fingerprint()
+            signer.public_key_fingerprint() == signer.public_key_fingerprint()
         )
 
     def test_distinct_signers_have_distinct_fingerprints(self):
@@ -121,9 +120,7 @@ class TestEd25519SignerConstruction:
 class TestSignVerify:
     def test_round_trip_valid(self, signer):
         rec = _record(signer)
-        assert verify_envelope(
-            rec, public_key_bytes=signer.public_key_bytes()
-        )
+        assert verify_envelope(rec, public_key_bytes=signer.public_key_bytes())
 
     def test_wrong_public_key_fails(self, signer):
         rec = _record(signer)
@@ -179,9 +176,7 @@ class TestSignVerify:
 
     def test_garbage_public_key_returns_false(self, signer):
         rec = _record(signer)
-        assert not verify_envelope(
-            rec, public_key_bytes=b"\x00" * 5
-        )
+        assert not verify_envelope(rec, public_key_bytes=b"\x00" * 5)
 
     def test_input_hash_is_sha256_hex(self, signer):
         rec = _record(signer, input_payload=b"abc")

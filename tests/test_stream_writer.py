@@ -60,9 +60,7 @@ class TestBasicEmission:
 
     def test_root_namespace_matches_version(self):
         buf = io.BytesIO()
-        write_stream(
-            [_row(1)], output=buf, msg_def_idr="pacs.008.001.13"
-        )
+        write_stream([_row(1)], output=buf, msg_def_idr="pacs.008.001.13")
         root = DET.fromstring(buf.getvalue())
         ns = root.tag.split("}")[0].lstrip("{")
         assert ns.endswith("pacs.008.001.13")
@@ -193,18 +191,14 @@ class TestSettlementMethodAndTotals:
 
     def test_settlement_method_override(self):
         buf = io.BytesIO()
-        write_stream(
-            [_row(1)], output=buf, settlement_method="INDA"
-        )
+        write_stream([_row(1)], output=buf, settlement_method="INDA")
         root = DET.fromstring(buf.getvalue())
         ns = "{" + root.tag.split("}")[0].lstrip("{") + "}"
         assert root.find(f".//{ns}SttlmMtd").text == "INDA"
 
     def test_auto_compute_off_emits_zero_totals(self):
         buf = io.BytesIO()
-        write_stream(
-            [_row(1)], output=buf, auto_compute_totals=False
-        )
+        write_stream([_row(1)], output=buf, auto_compute_totals=False)
         root = DET.fromstring(buf.getvalue())
         ns = "{" + root.tag.split("}")[0].lstrip("{") + "}"
         # auto_compute_totals=False emits "0" — caller fills in later.

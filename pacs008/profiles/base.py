@@ -31,9 +31,9 @@ from __future__ import annotations
 
 import math
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import date
-from typing import Optional, Sequence
 
 from pacs008.compliance.swift_charset import SWIFT_X_CHARSET
 from pacs008.exceptions import Pacs008Error
@@ -59,7 +59,7 @@ class BusinessRuleViolation:
     """
 
     row: int
-    party: Optional[str]
+    party: str | None
     field: str
     rule: str
     message: str
@@ -130,7 +130,7 @@ class SchemeProfile(ABC):
 
     @property
     @abstractmethod
-    def max_transactions_per_msg(self) -> Optional[int]:
+    def max_transactions_per_msg(self) -> int | None:
         """Maximum number of transactions per message file.
 
         ``None`` means unbounded. SCT Inst and Fedwire both cap this at
@@ -169,9 +169,7 @@ class SchemeProfile(ABC):
     # ----- behaviour -----
 
     @abstractmethod
-    def address_policy(
-        self, today: Optional[date] = None
-    ) -> AddressPolicy:
+    def address_policy(self, today: date | None = None) -> AddressPolicy:
         """Return the :class:`~pacs008.standards.address.AddressPolicy`
         in force for this scheme on ``today``.
 

@@ -227,10 +227,10 @@ class TestCardinalityMessagePointsAtSplitter:
     def test_message_includes_required_chunk_count(self):
         from pacs008.profiles import FedwireProfile
 
-        violations = FedwireProfile().validate_business_rules(
-            _rows(5)
-        )
-        msgs = [v.message for v in violations if v.rule == "cardinality_exceeded"]
+        violations = FedwireProfile().validate_business_rules(_rows(5))
+        msgs = [
+            v.message for v in violations if v.rule == "cardinality_exceeded"
+        ]
         assert msgs, "expected a cardinality_exceeded violation"
         assert "Split into 5 chunks" in msgs[0]
         assert "split_for_scheme" in msgs[0]

@@ -30,7 +30,6 @@ from pacs008.vop import (
     validate_vop_results,
 )
 
-
 _PRE_MANDATE = date(2025, 10, 8)
 _POST_MANDATE = date(2025, 10, 10)
 

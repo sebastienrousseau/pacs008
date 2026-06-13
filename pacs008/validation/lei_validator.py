@@ -71,8 +71,6 @@ References:
 
 from __future__ import annotations
 
-from typing import Optional
-
 from pacs008.exceptions import InvalidLEIError
 
 # Length and position constants from ISO 17442.
@@ -153,7 +151,7 @@ def validate_lei_checksum(lei: str) -> tuple[bool, str]:
 
 def validate_lei(
     lei: str,
-    field: Optional[str] = None,
+    field: str | None = None,
     strict: bool = True,
 ) -> tuple[bool, str]:
     """Validate LEI format and ISO 7064 mod-97-10 checksum.
@@ -210,7 +208,7 @@ def validate_lei(
     return True, ""
 
 
-def validate_lei_safe(lei: str, field: Optional[str] = None) -> bool:
+def validate_lei_safe(lei: str, field: str | None = None) -> bool:
     """Validate LEI returning ``True``/``False`` (never raises).
 
     Convenience wrapper for :func:`validate_lei` with ``strict=False``.
@@ -284,7 +282,7 @@ class LEIValidationError:
 
 def validate_leis(
     payment_data: list[dict[str, object]],
-    required_parties: Optional[tuple[str, ...]] = None,
+    required_parties: tuple[str, ...] | None = None,
 ) -> list[LEIValidationError]:
     """Validate LEI fields across a list of payment-row dicts.
 
@@ -355,7 +353,7 @@ def validate_leis(
 # ---------------------------------------------------------------------------
 
 
-def _lei_to_numeric(lei: str) -> Optional[str]:
+def _lei_to_numeric(lei: str) -> str | None:
     """Convert LEI alphanumerics to digits per ISO 7064 (A=10..Z=35).
 
     Returns ``None`` if any character is outside ``[A-Z0-9]``.

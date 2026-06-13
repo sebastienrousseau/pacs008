@@ -32,7 +32,6 @@ from pacs008.idempotency import (
     compute_payload_hash,
 )
 
-
 # ---------------------------------------------------------------------------
 # compute_payload_hash
 # ---------------------------------------------------------------------------
@@ -71,12 +70,7 @@ def store(request, tmp_path) -> IdempotencyStore:
 
 class TestStoreContract:
     def test_fresh_key_is_novel(self, store):
-        assert (
-            store.check(
-                "k1", "h1", window=timedelta(hours=1)
-            )
-            is False
-        )
+        assert store.check("k1", "h1", window=timedelta(hours=1)) is False
 
     def test_repeat_key_within_window_raises_by_default(self, store):
         store.check("k1", "h1", window=timedelta(hours=1))
@@ -112,12 +106,7 @@ class TestStoreContract:
     def test_expired_entry_treated_as_novel(self, store):
         old = datetime.now(timezone.utc) - timedelta(hours=48)
         store.record("k1", "h1", recorded_at=old)
-        assert (
-            store.check(
-                "k1", "h1", window=timedelta(hours=24)
-            )
-            is False
-        )
+        assert store.check("k1", "h1", window=timedelta(hours=24)) is False
 
     def test_distinct_keys_are_independent(self, store):
         assert store.check("k1", "h1", window=timedelta(hours=1)) is False

@@ -17,10 +17,10 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import date, datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 
 class VoPMatchResult(Enum):
@@ -77,9 +77,9 @@ class VoPResult:
     result: VoPMatchResult
     name_compared: str
     iban: str
-    reason_code: Optional[str] = None
-    suggested_name: Optional[str] = None
-    performed_at: Optional[str] = None
+    reason_code: str | None = None
+    suggested_name: str | None = None
+    performed_at: str | None = None
 
     def __post_init__(self) -> None:
         if self.performed_at is not None:
@@ -135,7 +135,7 @@ def embed_in_row(row: dict[str, Any], vop: VoPResult) -> dict[str, Any]:
     return out
 
 
-def extract_from_row(row: dict[str, Any]) -> Optional[VoPResult]:
+def extract_from_row(row: dict[str, Any]) -> VoPResult | None:
     """Reverse of :func:`embed_in_row` — extract a VoP result if present.
 
     Returns ``None`` if no ``vop_result`` column is present.
@@ -180,7 +180,7 @@ _VOP_EUROZONE_MANDATE_DATE = date(2025, 10, 9)
 
 def validate_vop_results(
     payment_data: list[dict[str, Any]],
-    today: Optional[date] = None,
+    today: date | None = None,
 ) -> list[VoPValidationError]:
     """Validate VoP coverage and outcomes across a payment batch.
 
@@ -245,7 +245,7 @@ def validate_vop_results(
     return errors
 
 
-def _optional_str(value: Any) -> Optional[str]:
+def _optional_str(value: Any) -> str | None:
     if value in (None, ""):
         return None
     return str(value)

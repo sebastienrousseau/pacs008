@@ -64,7 +64,7 @@ SWIFT_X_CHARSET = frozenset(
 # and a handful of legacy reporting (camt.053/054) profiles.
 SWIFT_Z_CHARSET: frozenset[str] = frozenset(SWIFT_X_CHARSET) | frozenset(
     # Additional ASCII printables permitted by Z.
-    "!\"#$%&*;<=>@[\\]^_`|~"
+    '!"#$%&*;<=>@[\\]^_`|~'
     # Latin-1 supplement: accented vowels and common diacritics.
     "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞß"
     "àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ"

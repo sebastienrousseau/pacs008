@@ -184,5 +184,24 @@ warn_unused_ignores = false
 disable_error_code = ["arg-type", "return-value", "attr-defined", "assignment"]
 
 [[tool.mypy.overrides]]
-module = "xmlschema.*"
+module = ["xmlschema", "xmlschema.*"]
 ignore_missing_imports = true
+follow_imports = "skip"
+
+[[tool.mypy.overrides]]
+module = ["lxml", "lxml.*", "defusedxml.*", "anyascii", "anyascii.*", "opentelemetry.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# Modern click ships pattern-matching in some helpers; we target py39 so
+# mypy chokes on the syntax. Skip its source — its public API surface is
+# stable and untyped imports from click are fine for our usage.
+module = ["click", "click.*"]
+follow_imports = "skip"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# Click decorators become untyped under follow_imports=skip; the CLI
+# is thin glue so we deliberately accept untyped-decorator at this seam.
+module = ["pacs008.cli.cli"]
+disable_error_code = ["untyped-decorator"]

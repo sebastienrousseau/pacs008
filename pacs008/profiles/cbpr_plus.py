@@ -42,7 +42,6 @@ References:
 from __future__ import annotations
 
 from datetime import date
-from typing import Optional
 
 from pacs008.profiles.base import SchemeProfile, register_profile
 from pacs008.standards.address import NOV_2026_CLIFF, AddressPolicy
@@ -77,14 +76,12 @@ class CBPRPlusProfile(SchemeProfile):
         return frozenset({"DEBT", "CRED", "SHAR", "SLEV"})
 
     @property
-    def max_transactions_per_msg(self) -> Optional[int]:
+    def max_transactions_per_msg(self) -> int | None:
         # CBPR+ permits large batches; the 10,000 cap is the MyStandards
         # documented maximum for FI-to-FI Credit Transfer.
         return 10_000
 
-    def address_policy(
-        self, today: Optional[date] = None
-    ) -> AddressPolicy:
+    def address_policy(self, today: date | None = None) -> AddressPolicy:
         ref = today if today is not None else date.today()
         if ref >= NOV_2026_CLIFF:
             return AddressPolicy.HYBRID_OR_STRUCTURED

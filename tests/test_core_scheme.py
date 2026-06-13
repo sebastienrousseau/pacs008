@@ -26,7 +26,6 @@ import pytest
 from pacs008.core.core import _run_scheme_validation
 from pacs008.profiles import SchemeViolationError
 
-
 # ---------------------------------------------------------------------------
 # Generic (default) — backward-compat
 # ---------------------------------------------------------------------------
@@ -72,8 +71,7 @@ class TestCBPRPlusViolations:
         with pytest.raises(SchemeViolationError) as excinfo:
             _run_scheme_validation(rows, "cbpr_plus")
         assert any(
-            v.rule == "charge_bearer_invalid"
-            for v in excinfo.value.violations
+            v.rule == "charge_bearer_invalid" for v in excinfo.value.violations
         )
 
     def test_well_formed_row_passes(self):
@@ -108,8 +106,7 @@ class TestFedwireViolations:
         with pytest.raises(SchemeViolationError) as excinfo:
             _run_scheme_validation(rows, "fedwire")
         assert any(
-            v.rule == "cardinality_exceeded"
-            for v in excinfo.value.violations
+            v.rule == "cardinality_exceeded" for v in excinfo.value.violations
         )
 
     def test_slev_charge_bearer_raises(self):
@@ -122,8 +119,7 @@ class TestFedwireViolations:
         with pytest.raises(SchemeViolationError) as excinfo:
             _run_scheme_validation(rows, "fedwire")
         assert any(
-            v.rule == "charge_bearer_invalid"
-            for v in excinfo.value.violations
+            v.rule == "charge_bearer_invalid" for v in excinfo.value.violations
         )
 
     def test_single_well_formed_tx_passes(self):

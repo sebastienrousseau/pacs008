@@ -34,7 +34,6 @@ from pacs008.validation.calendar import (
     validate_settlement_dates,
 )
 
-
 # ---------------------------------------------------------------------------
 # Easter — known dates from ECB calendar
 # ---------------------------------------------------------------------------
@@ -71,9 +70,8 @@ class TestAlwaysOpen:
             assert self.cal.is_open(d)
 
     def test_next_business_day_is_just_tomorrow(self):
-        assert (
-            self.cal.next_business_day(date(2026, 12, 25))
-            == date(2026, 12, 26)
+        assert self.cal.next_business_day(date(2026, 12, 25)) == date(
+            2026, 12, 26
         )
 
 
@@ -116,18 +114,14 @@ class TestTARGET:
         # 25 Dec 2026 = Fri (closed), 26 = Sat / St Stephen (closed),
         # 27 = Sun (closed), 28 = Mon → open. TARGET does NOT shift
         # holiday observance to Monday the way CHAPS does.
-        assert (
-            self.cal.next_business_day(date(2026, 12, 25))
-            == date(2026, 12, 28)
+        assert self.cal.next_business_day(date(2026, 12, 25)) == date(
+            2026, 12, 28
         )
 
     def test_next_business_day_skips_easter(self):
         # 3 Apr 2026 (Good Friday). Next: Tue 7 Apr 2026 (after Easter
         # Monday + weekend).
-        assert (
-            self.cal.next_business_day(date(2026, 4, 3))
-            == date(2026, 4, 7)
-        )
+        assert self.cal.next_business_day(date(2026, 4, 3)) == date(2026, 4, 7)
 
 
 # ---------------------------------------------------------------------------
@@ -225,7 +219,7 @@ class TestCHAPS:
         assert self.cal.is_closed(date(2027, 12, 26))  # Sun
         assert self.cal.is_closed(date(2027, 12, 27))  # Mon (xmas obs)
         assert self.cal.is_closed(date(2027, 12, 28))  # Tue (boxing obs)
-        assert self.cal.is_open(date(2027, 12, 29))   # Wed
+        assert self.cal.is_open(date(2027, 12, 29))  # Wed
 
     def test_new_year_substitution_2028(self):
         # 1 Jan 2028 = Saturday → observed Monday 3 Jan.
@@ -233,10 +227,7 @@ class TestCHAPS:
         assert self.cal.is_closed(date(2028, 1, 3))
 
     def test_next_business_day_skips_easter(self):
-        assert (
-            self.cal.next_business_day(date(2026, 4, 3))
-            == date(2026, 4, 7)
-        )
+        assert self.cal.next_business_day(date(2026, 4, 3)) == date(2026, 4, 7)
 
     def test_ordinary_weekday_open(self):
         # Mon 15 June 2026 — not a holiday
@@ -252,9 +243,8 @@ class TestPreviousBusinessDay:
     def test_target_previous_skips_christmas(self):
         cal = TARGETCalendar()
         # 27 Dec 2026 is a Sunday. Previous: Thu 24 Dec (25/26 closed).
-        assert (
-            cal.previous_business_day(date(2026, 12, 28))
-            == date(2026, 12, 24)
+        assert cal.previous_business_day(date(2026, 12, 28)) == date(
+            2026, 12, 24
         )
 
 
@@ -305,9 +295,7 @@ class TestProfileCalendar:
 
 class TestValidateSettlementDates:
     def test_empty_returns_empty(self):
-        assert (
-            validate_settlement_dates([], TARGETCalendar()) == []
-        )
+        assert validate_settlement_dates([], TARGETCalendar()) == []
 
     def test_open_date_passes(self):
         rows = [{"interbank_settlement_date": "2026-06-15"}]  # Mon

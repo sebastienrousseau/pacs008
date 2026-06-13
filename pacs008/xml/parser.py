@@ -56,7 +56,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Any
 
 from defusedxml import ElementTree as DET
 
@@ -97,13 +97,13 @@ class ParsedMessage:
     msg_def_idr: str
     msg_family: str
     version: str
-    bah: Optional[BusinessApplicationHeader]
+    bah: BusinessApplicationHeader | None
     root_local_name: str
     namespace_uri: str
     envelope_wrapped: bool
 
 
-def parse(xml: Union[str, bytes]) -> ParsedMessage:
+def parse(xml: str | bytes) -> ParsedMessage:
     """Parse and classify an inbound ISO 20022 XML message.
 
     Args:
@@ -130,7 +130,9 @@ def parse(xml: Union[str, bytes]) -> ParsedMessage:
     namespace_uri, local_name = _split_qname(root.tag)
 
     if namespace_uri == _NS_NVLP and local_name == "BizMsgEnvlp":
-        return _parse_envelope(xml.decode("utf-8") if isinstance(xml, bytes) else xml, root)
+        return _parse_envelope(
+            xml.decode("utf-8") if isinstance(xml, bytes) else xml, root
+        )
 
     return _parse_unwrapped(root, namespace_uri, local_name)
 
@@ -140,7 +142,7 @@ def parse(xml: Union[str, bytes]) -> ParsedMessage:
 # ---------------------------------------------------------------------------
 
 
-def _parse_envelope(envelope_xml: str, root) -> ParsedMessage:
+def _parse_envelope(envelope_xml: str, root: Any) -> ParsedMessage:
     """Classify a BAH-wrapped envelope."""
     bah = extract_bah_fields(envelope_xml)
     msg_def_idr = bah.msg_def_idr
@@ -164,7 +166,7 @@ def _parse_envelope(envelope_xml: str, root) -> ParsedMessage:
 
 
 def _parse_unwrapped(
-    root, namespace_uri: str, local_name: str
+    root: Any, namespace_uri: str, local_name: str
 ) -> ParsedMessage:
     """Classify an unwrapped Document element by namespace URI."""
     match = _NS_IDENTIFIER.search(namespace_uri)

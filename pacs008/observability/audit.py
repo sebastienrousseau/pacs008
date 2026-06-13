@@ -49,14 +49,13 @@ from __future__ import annotations
 import hashlib
 import json
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Optional, Sequence
 
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ed25519
-
 
 # ---------------------------------------------------------------------------
 # Signer ABC + Ed25519 impl
@@ -94,27 +93,21 @@ class Ed25519Signer(Signer):
       disk or a secret manager.
     """
 
-    def __init__(
-        self, private_key: ed25519.Ed25519PrivateKey
-    ) -> None:
+    def __init__(self, private_key: ed25519.Ed25519PrivateKey) -> None:
         self._private = private_key
         self._public = private_key.public_key()
 
     @classmethod
-    def generate(cls) -> "Ed25519Signer":
+    def generate(cls) -> Ed25519Signer:
         return cls(ed25519.Ed25519PrivateKey.generate())
 
     @classmethod
     def from_private_key_pem(
-        cls, pem: bytes, password: Optional[bytes] = None
-    ) -> "Ed25519Signer":
-        key = serialization.load_pem_private_key(
-            pem, password=password
-        )
+        cls, pem: bytes, password: bytes | None = None
+    ) -> Ed25519Signer:
+        key = serialization.load_pem_private_key(pem, password=password)
         if not isinstance(key, ed25519.Ed25519PrivateKey):
-            raise TypeError(
-                "PEM did not contain an Ed25519 private key"
-            )
+            raise TypeError("PEM did not contain an Ed25519 private key")
         return cls(key)
 
     def sign(self, message: bytes) -> bytes:
@@ -168,7 +161,7 @@ class AuditRecord:
     signature: bytes
     public_key_fingerprint: str
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         """Return a JSON-serialisable dict (signature is hex-encoded)."""
         return {
             "input_hash": self.input_hash,
@@ -188,7 +181,7 @@ def sign_envelope(
     validator_decisions: Sequence[str],
     scheme: str,
     signer: Signer,
-    recorded_at: Optional[datetime] = None,
+    recorded_at: datetime | None = None,
 ) -> AuditRecord:
     """Build and sign an :class:`AuditRecord`.
 
@@ -232,9 +225,7 @@ def sign_envelope(
     )
 
 
-def verify_envelope(
-    record: AuditRecord, *, public_key_bytes: bytes
-) -> bool:
+def verify_envelope(record: AuditRecord, *, public_key_bytes: bytes) -> bool:
     """Verify the signature on a record using a raw Ed25519 public key.
 
     Args:

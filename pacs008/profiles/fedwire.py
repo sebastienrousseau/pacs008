@@ -39,13 +39,11 @@ References:
 from __future__ import annotations
 
 from datetime import date
-from typing import Optional
 
 from pacs008.compliance.swift_charset import SWIFT_Z_CHARSET
 from pacs008.profiles.base import SchemeProfile, register_profile
 from pacs008.standards.address import AddressPolicy
 from pacs008.validation.calendar import Calendar, FedwireCalendar
-
 
 # Fedwire's address-structuring cutover is dated 16 November 2026,
 # whereas SWIFT CBPR+ uses 14 November 2026.
@@ -81,7 +79,7 @@ class FedwireProfile(SchemeProfile):
         return frozenset({"DEBT", "CRED", "SHAR"})
 
     @property
-    def max_transactions_per_msg(self) -> Optional[int]:
+    def max_transactions_per_msg(self) -> int | None:
         # Fedwire is strictly one transaction per message file.
         return 1
 
@@ -96,9 +94,7 @@ class FedwireProfile(SchemeProfile):
     def calendar(self) -> Calendar:
         return FedwireCalendar()
 
-    def address_policy(
-        self, today: Optional[date] = None
-    ) -> AddressPolicy:
+    def address_policy(self, today: date | None = None) -> AddressPolicy:
         ref = today if today is not None else date.today()
         if ref >= _FEDWIRE_ADDRESS_CLIFF:
             return AddressPolicy.HYBRID_OR_STRUCTURED

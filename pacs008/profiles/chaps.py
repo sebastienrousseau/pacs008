@@ -35,7 +35,6 @@ References:
 from __future__ import annotations
 
 from datetime import date
-from typing import Optional
 
 from pacs008.profiles.base import SchemeProfile, register_profile
 from pacs008.standards.address import NOV_2026_CLIFF, AddressPolicy
@@ -69,14 +68,12 @@ class CHAPSProfile(SchemeProfile):
         return frozenset({"DEBT", "CRED", "SHAR"})
 
     @property
-    def max_transactions_per_msg(self) -> Optional[int]:
+    def max_transactions_per_msg(self) -> int | None:
         # CHAPS uses payment-level (single-tx) routing for HVP via
         # pacs.008; multi-tx is allowed but capped per BoE rulebook.
         return 1000
 
-    def address_policy(
-        self, today: Optional[date] = None
-    ) -> AddressPolicy:
+    def address_policy(self, today: date | None = None) -> AddressPolicy:
         ref = today if today is not None else date.today()
         if ref >= NOV_2026_CLIFF:
             return AddressPolicy.HYBRID_OR_STRUCTURED

@@ -60,7 +60,7 @@ from collections.abc import Iterable
 from datetime import datetime, timezone
 from decimal import Decimal
 from pathlib import Path
-from typing import Any, BinaryIO, Optional, Union
+from typing import Any, BinaryIO
 
 from lxml import etree
 
@@ -73,9 +73,9 @@ _DEFAULT_MSG_DEF_IDR = "pacs.008.001.08"
 def write_stream(
     rows: Iterable[dict[str, Any]],
     *,
-    output: Union[str, Path, BinaryIO],
-    msg_id: Optional[str] = None,
-    creation_date_time: Optional[str] = None,
+    output: str | Path | BinaryIO,
+    msg_id: str | None = None,
+    creation_date_time: str | None = None,
     msg_def_idr: str = _DEFAULT_MSG_DEF_IDR,
     settlement_method: str = "CLRG",
     auto_compute_totals: bool = True,
@@ -120,13 +120,9 @@ def write_stream(
     try:
         first_row = next(rows_iter)
     except StopIteration:
-        raise ValueError("write_stream requires at least one row")
+        raise ValueError("write_stream requires at least one row") from None
 
-    resolved_msg_id = (
-        msg_id
-        or str(first_row.get("msg_id") or "")
-        or "PACS008"
-    )
+    resolved_msg_id = msg_id or str(first_row.get("msg_id") or "") or "PACS008"
     resolved_credt = (
         creation_date_time
         or str(first_row.get("creation_date_time") or "")
@@ -138,7 +134,7 @@ def write_stream(
 
     count = 0
     total = Decimal("0")
-    currency: Optional[str] = None
+    currency: str | None = None
 
     try:
         with etree.xmlfile(sink, encoding="UTF-8", buffered=True) as xf:
@@ -167,12 +163,8 @@ def write_stream(
                         # case; auto-compute-on callers should overwrite
                         # these after streaming (or use a two-pass
                         # writer in v0.1.0 codegen mode).
-                        _write_simple(
-                            xf, "NbOfTxs", nb_of_txs_placeholder
-                        )
-                        _write_simple(
-                            xf, "CtrlSum", ctrl_sum_placeholder
-                        )
+                        _write_simple(xf, "NbOfTxs", nb_of_txs_placeholder)
+                        _write_simple(xf, "CtrlSum", ctrl_sum_placeholder)
                         _write_simple(
                             xf,
                             "SttlmInf",
@@ -185,9 +177,7 @@ def write_stream(
                     total, currency = _aggregate(first_row, total, currency)
                     for row in rows_iter:
                         count = _write_transaction(xf, row, count)
-                        total, currency = _aggregate(
-                            row, total, currency
-                        )
+                        total, currency = _aggregate(row, total, currency)
     finally:
         if owns_sink:
             sink.close()
@@ -201,7 +191,7 @@ def write_stream(
 
 
 def _resolve_output(
-    output: Union[str, Path, BinaryIO],
+    output: str | Path | BinaryIO,
 ) -> tuple[BinaryIO, bool]:
     """Return (binary file-like, owns_handle) for the user's output param."""
     if isinstance(output, (str, Path)):
@@ -214,11 +204,11 @@ def _utcnow_iso() -> str:
 
 
 def _write_simple(
-    xf: "etree.xmlfile",
+    xf: etree.xmlfile,
     tag: str,
     text: str,
     *,
-    children: Optional[list[tuple[str, str]]] = None,
+    children: list[tuple[str, str]] | None = None,
 ) -> None:
     """Write ``<tag>text<child>...</child>...</tag>``."""
     with xf.element(tag):
@@ -232,7 +222,7 @@ def _write_simple(
 
 
 def _write_transaction(
-    xf: "etree.xmlfile",
+    xf: etree.xmlfile,
     row: dict[str, Any],
     current_count: int,
 ) -> int:
@@ -249,9 +239,7 @@ def _write_transaction(
         amount = row.get("interbank_settlement_amount")
         currency = row.get("interbank_settlement_currency") or "EUR"
         if amount is not None:
-            with xf.element(
-                "IntrBkSttlmAmt", attrib={"Ccy": str(currency)}
-            ):
+            with xf.element("IntrBkSttlmAmt", attrib={"Ccy": str(currency)}):
                 xf.write(str(amount))
 
         debtor_name = row.get("debtor_name")
@@ -270,8 +258,8 @@ def _write_transaction(
 def _aggregate(
     row: dict[str, Any],
     running_total: Decimal,
-    seen_currency: Optional[str],
-) -> tuple[Decimal, Optional[str]]:
+    seen_currency: str | None,
+) -> tuple[Decimal, str | None]:
     """Update ``running_total`` and remember the currency."""
     amount = row.get("interbank_settlement_amount")
     if amount is not None:

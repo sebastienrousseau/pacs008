@@ -57,10 +57,11 @@ References:
 from __future__ import annotations
 
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import date
 from enum import Enum
-from typing import Any, Optional, Sequence
+from typing import Any
 
 # Cliff date — 14 November 2026 across SWIFT CBPR+, HVPS+, T2 RTGS,
 # CHAPS, Fedwire, Lynx. Fedwire's specific cutover is 16 November 2026
@@ -160,20 +161,20 @@ class PostalAddress:
     ISO 20022 XML element names (``StrtNm`` → ``strt_nm``, etc.).
     """
 
-    dept: Optional[str] = None
-    sub_dept: Optional[str] = None
-    strt_nm: Optional[str] = None
-    bldg_nb: Optional[str] = None
-    bldg_nm: Optional[str] = None
-    flr: Optional[str] = None
-    pst_bx: Optional[str] = None
-    room: Optional[str] = None
-    pst_cd: Optional[str] = None
-    twn_nm: Optional[str] = None
-    twn_lctn_nm: Optional[str] = None
-    dstrct_nm: Optional[str] = None
-    ctry_sub_dvsn: Optional[str] = None
-    ctry: Optional[str] = None
+    dept: str | None = None
+    sub_dept: str | None = None
+    strt_nm: str | None = None
+    bldg_nb: str | None = None
+    bldg_nm: str | None = None
+    flr: str | None = None
+    pst_bx: str | None = None
+    room: str | None = None
+    pst_cd: str | None = None
+    twn_nm: str | None = None
+    twn_lctn_nm: str | None = None
+    dstrct_nm: str | None = None
+    ctry_sub_dvsn: str | None = None
+    ctry: str | None = None
     adr_line: tuple[str, ...] = field(default_factory=tuple)
 
     def __post_init__(self) -> None:
@@ -258,8 +259,8 @@ class PostalAddress:
     def validate(
         self,
         policy: AddressPolicy,
-        today: Optional[date] = None,
-    ) -> Optional[str]:
+        today: date | None = None,
+    ) -> str | None:
         """Validate against ``policy``.
 
         Returns ``None`` if the address is acceptable, otherwise a
@@ -320,11 +321,56 @@ _JP_POSTCODE = re.compile(r"(?:〒\s*)?(\d{3}-\d{4})\b")
 
 _US_STATES: frozenset[str] = frozenset(
     {
-        "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
-        "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
-        "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
-        "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
-        "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY",
+        "AL",
+        "AK",
+        "AZ",
+        "AR",
+        "CA",
+        "CO",
+        "CT",
+        "DE",
+        "FL",
+        "GA",
+        "HI",
+        "ID",
+        "IL",
+        "IN",
+        "IA",
+        "KS",
+        "KY",
+        "LA",
+        "ME",
+        "MD",
+        "MA",
+        "MI",
+        "MN",
+        "MS",
+        "MO",
+        "MT",
+        "NE",
+        "NV",
+        "NH",
+        "NJ",
+        "NM",
+        "NY",
+        "NC",
+        "ND",
+        "OH",
+        "OK",
+        "OR",
+        "PA",
+        "RI",
+        "SC",
+        "SD",
+        "TN",
+        "TX",
+        "UT",
+        "VT",
+        "VA",
+        "WA",
+        "WV",
+        "WI",
+        "WY",
         "DC",
     }
 )
@@ -378,12 +424,10 @@ def from_unstructured(
     return handler(cleaned, country_hint)
 
 
-def _from_unstructured_gb(
-    lines: list[str], country: str
-) -> PostalAddress:
+def _from_unstructured_gb(lines: list[str], country: str) -> PostalAddress:
     """UK heuristic: find UK postcode, take preceding/same-line text as town."""
-    pst_cd: Optional[str] = None
-    twn_nm: Optional[str] = None
+    pst_cd: str | None = None
+    twn_nm: str | None = None
     remaining: list[str] = []
 
     for i, line in enumerate(lines):
@@ -395,11 +439,11 @@ def _from_unstructured_gb(
             ).strip(" ,;")
             if same_line_rest:
                 twn_nm = same_line_rest
-                remaining = [l for j, l in enumerate(lines) if j != i]
+                remaining = [ln for j, ln in enumerate(lines) if j != i]
             elif i > 0:
                 twn_nm = lines[i - 1]
                 remaining = [
-                    l for j, l in enumerate(lines) if j != i and j != i - 1
+                    ln for j, ln in enumerate(lines) if j != i and j != i - 1
                 ]
             else:
                 remaining = lines[i + 1 :]
@@ -417,13 +461,11 @@ def _from_unstructured_gb(
     )
 
 
-def _from_unstructured_us(
-    lines: list[str], country: str
-) -> PostalAddress:
+def _from_unstructured_us(lines: list[str], country: str) -> PostalAddress:
     """US heuristic: find 'STATE ZIP' anchor, take preceding chunk as town."""
-    pst_cd: Optional[str] = None
-    twn_nm: Optional[str] = None
-    ctry_sub_dvsn: Optional[str] = None
+    pst_cd: str | None = None
+    twn_nm: str | None = None
+    ctry_sub_dvsn: str | None = None
     remaining: list[str] = []
 
     for i, line in enumerate(lines):
@@ -438,18 +480,16 @@ def _from_unstructured_us(
                 if town_candidate:
                     twn_nm = town_candidate
                     rest_of_line = ",".join(before.split(",")[:-1]).strip()
-                    line_remainder = (
-                        [rest_of_line] if rest_of_line else []
-                    )
+                    line_remainder = [rest_of_line] if rest_of_line else []
                     remaining = [
-                        l for j, l in enumerate(lines) if j != i
+                        ln for j, ln in enumerate(lines) if j != i
                     ] + line_remainder
                 else:
-                    remaining = [l for j, l in enumerate(lines) if j != i]
+                    remaining = [ln for j, ln in enumerate(lines) if j != i]
             elif i > 0:
                 twn_nm = lines[i - 1]
                 remaining = [
-                    l for j, l in enumerate(lines) if j != i and j != i - 1
+                    ln for j, ln in enumerate(lines) if j != i and j != i - 1
                 ]
             else:
                 remaining = lines[i + 1 :]
@@ -468,16 +508,12 @@ def _from_unstructured_us(
     )
 
 
-def _from_unstructured_de(
-    lines: list[str], country: str
-) -> PostalAddress:
+def _from_unstructured_de(lines: list[str], country: str) -> PostalAddress:
     """DE heuristic: 5-digit PLZ followed by Ort on the same line."""
     return _from_unstructured_continental(lines, country, _DE_POSTCODE)
 
 
-def _from_unstructured_fr(
-    lines: list[str], country: str
-) -> PostalAddress:
+def _from_unstructured_fr(lines: list[str], country: str) -> PostalAddress:
     """FR heuristic: 5-digit code postal followed by Ville on the same line."""
     return _from_unstructured_continental(lines, country, _FR_POSTCODE)
 
@@ -485,11 +521,11 @@ def _from_unstructured_fr(
 def _from_unstructured_continental(
     lines: list[str],
     country: str,
-    pattern: "re.Pattern[str]",
+    pattern: re.Pattern[str],
 ) -> PostalAddress:
     """Shared DE/FR heuristic (and friends): '<5 digits> <town name>'."""
-    pst_cd: Optional[str] = None
-    twn_nm: Optional[str] = None
+    pst_cd: str | None = None
+    twn_nm: str | None = None
     remaining: list[str] = []
 
     for i, line in enumerate(lines):
@@ -497,7 +533,7 @@ def _from_unstructured_continental(
         if match:
             pst_cd = match.group(1)
             twn_nm = match.group(2).strip()
-            remaining = [l for j, l in enumerate(lines) if j != i]
+            remaining = [ln for j, ln in enumerate(lines) if j != i]
             break
 
     if pst_cd is None:
@@ -512,12 +548,10 @@ def _from_unstructured_continental(
     )
 
 
-def _from_unstructured_jp(
-    lines: list[str], country: str
-) -> PostalAddress:
+def _from_unstructured_jp(lines: list[str], country: str) -> PostalAddress:
     """JP heuristic: '〒NNN-NNNN' postcode anchor; rest treated as town."""
-    pst_cd: Optional[str] = None
-    twn_nm: Optional[str] = None
+    pst_cd: str | None = None
+    twn_nm: str | None = None
     remaining: list[str] = []
 
     for i, line in enumerate(lines):
@@ -529,11 +563,11 @@ def _from_unstructured_jp(
             ).strip(" ,;")
             if same_line_rest:
                 twn_nm = same_line_rest
-                remaining = [l for j, l in enumerate(lines) if j != i]
+                remaining = [ln for j, ln in enumerate(lines) if j != i]
             elif i + 1 < len(lines):
                 twn_nm = lines[i + 1]
                 remaining = [
-                    l for j, l in enumerate(lines) if j != i and j != i + 1
+                    ln for j, ln in enumerate(lines) if j != i and j != i + 1
                 ]
             else:
                 remaining = lines[:i]
@@ -623,7 +657,7 @@ class AddressValidationError:
 def validate_addresses(
     payment_data: Sequence[dict[str, Any]],
     policy: AddressPolicy,
-    today: Optional[date] = None,
+    today: date | None = None,
 ) -> list[AddressValidationError]:
     """Validate addresses across a list of payment-row dicts.
 
@@ -672,7 +706,7 @@ def validate_addresses(
 
 def _extract_party_address(
     row: dict[str, Any], party_prefix: str
-) -> Optional[PostalAddress]:
+) -> PostalAddress | None:
     """Extract a PostalAddress for ``party_prefix`` from a row dict.
 
     Returns ``None`` if no recognised address columns are present for
@@ -713,36 +747,260 @@ def _is_iso_3166_1_alpha_2(value: str) -> bool:
 # user-assigned exceptions excluded). Source: ISO 3166 Maintenance Agency.
 _ISO_3166_1_ALPHA_2: frozenset[str] = frozenset(
     {
-        "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AO", "AQ", "AR",
-        "AS", "AT", "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE",
-        "BF", "BG", "BH", "BI", "BJ", "BL", "BM", "BN", "BO", "BQ",
-        "BR", "BS", "BT", "BV", "BW", "BY", "BZ", "CA", "CC", "CD",
-        "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO", "CR",
-        "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DJ", "DK", "DM",
-        "DO", "DZ", "EC", "EE", "EG", "EH", "ER", "ES", "ET", "FI",
-        "FJ", "FK", "FM", "FO", "FR", "GA", "GB", "GD", "GE", "GF",
-        "GG", "GH", "GI", "GL", "GM", "GN", "GP", "GQ", "GR", "GS",
-        "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU",
-        "ID", "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT",
-        "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN",
-        "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK",
-        "LR", "LS", "LT", "LU", "LV", "LY", "MA", "MC", "MD", "ME",
-        "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ",
-        "MR", "MS", "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA",
-        "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NU",
-        "NZ", "OM", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM",
-        "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO", "RS",
-        "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SG", "SH", "SI",
-        "SJ", "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SV",
-        "SX", "SY", "SZ", "TC", "TD", "TF", "TG", "TH", "TJ", "TK",
-        "TL", "TM", "TN", "TO", "TR", "TT", "TV", "TW", "TZ", "UA",
-        "UG", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI",
-        "VN", "VU", "WF", "WS", "YE", "YT", "ZA", "ZM", "ZW",
+        "AD",
+        "AE",
+        "AF",
+        "AG",
+        "AI",
+        "AL",
+        "AM",
+        "AO",
+        "AQ",
+        "AR",
+        "AS",
+        "AT",
+        "AU",
+        "AW",
+        "AX",
+        "AZ",
+        "BA",
+        "BB",
+        "BD",
+        "BE",
+        "BF",
+        "BG",
+        "BH",
+        "BI",
+        "BJ",
+        "BL",
+        "BM",
+        "BN",
+        "BO",
+        "BQ",
+        "BR",
+        "BS",
+        "BT",
+        "BV",
+        "BW",
+        "BY",
+        "BZ",
+        "CA",
+        "CC",
+        "CD",
+        "CF",
+        "CG",
+        "CH",
+        "CI",
+        "CK",
+        "CL",
+        "CM",
+        "CN",
+        "CO",
+        "CR",
+        "CU",
+        "CV",
+        "CW",
+        "CX",
+        "CY",
+        "CZ",
+        "DE",
+        "DJ",
+        "DK",
+        "DM",
+        "DO",
+        "DZ",
+        "EC",
+        "EE",
+        "EG",
+        "EH",
+        "ER",
+        "ES",
+        "ET",
+        "FI",
+        "FJ",
+        "FK",
+        "FM",
+        "FO",
+        "FR",
+        "GA",
+        "GB",
+        "GD",
+        "GE",
+        "GF",
+        "GG",
+        "GH",
+        "GI",
+        "GL",
+        "GM",
+        "GN",
+        "GP",
+        "GQ",
+        "GR",
+        "GS",
+        "GT",
+        "GU",
+        "GW",
+        "GY",
+        "HK",
+        "HM",
+        "HN",
+        "HR",
+        "HT",
+        "HU",
+        "ID",
+        "IE",
+        "IL",
+        "IM",
+        "IN",
+        "IO",
+        "IQ",
+        "IR",
+        "IS",
+        "IT",
+        "JE",
+        "JM",
+        "JO",
+        "JP",
+        "KE",
+        "KG",
+        "KH",
+        "KI",
+        "KM",
+        "KN",
+        "KP",
+        "KR",
+        "KW",
+        "KY",
+        "KZ",
+        "LA",
+        "LB",
+        "LC",
+        "LI",
+        "LK",
+        "LR",
+        "LS",
+        "LT",
+        "LU",
+        "LV",
+        "LY",
+        "MA",
+        "MC",
+        "MD",
+        "ME",
+        "MF",
+        "MG",
+        "MH",
+        "MK",
+        "ML",
+        "MM",
+        "MN",
+        "MO",
+        "MP",
+        "MQ",
+        "MR",
+        "MS",
+        "MT",
+        "MU",
+        "MV",
+        "MW",
+        "MX",
+        "MY",
+        "MZ",
+        "NA",
+        "NC",
+        "NE",
+        "NF",
+        "NG",
+        "NI",
+        "NL",
+        "NO",
+        "NP",
+        "NR",
+        "NU",
+        "NZ",
+        "OM",
+        "PA",
+        "PE",
+        "PF",
+        "PG",
+        "PH",
+        "PK",
+        "PL",
+        "PM",
+        "PN",
+        "PR",
+        "PS",
+        "PT",
+        "PW",
+        "PY",
+        "QA",
+        "RE",
+        "RO",
+        "RS",
+        "RU",
+        "RW",
+        "SA",
+        "SB",
+        "SC",
+        "SD",
+        "SE",
+        "SG",
+        "SH",
+        "SI",
+        "SJ",
+        "SK",
+        "SL",
+        "SM",
+        "SN",
+        "SO",
+        "SR",
+        "SS",
+        "ST",
+        "SV",
+        "SX",
+        "SY",
+        "SZ",
+        "TC",
+        "TD",
+        "TF",
+        "TG",
+        "TH",
+        "TJ",
+        "TK",
+        "TL",
+        "TM",
+        "TN",
+        "TO",
+        "TR",
+        "TT",
+        "TV",
+        "TW",
+        "TZ",
+        "UA",
+        "UG",
+        "UM",
+        "US",
+        "UY",
+        "UZ",
+        "VA",
+        "VC",
+        "VE",
+        "VG",
+        "VI",
+        "VN",
+        "VU",
+        "WF",
+        "WS",
+        "YE",
+        "YT",
+        "ZA",
+        "ZM",
+        "ZW",
     }
 )
 
 
-def _check_max(value: Optional[str], maximum: int, name: str) -> None:
+def _check_max(value: str | None, maximum: int, name: str) -> None:
     if value is not None and len(value) > maximum:
         raise ValueError(
             f"{name} exceeds {maximum}-char ISO 20022 max "
@@ -750,7 +1008,7 @@ def _check_max(value: Optional[str], maximum: int, name: str) -> None:
         )
 
 
-def _clip(value: Optional[str], maximum: int) -> Optional[str]:
+def _clip(value: str | None, maximum: int) -> str | None:
     if value is None:
         return None
     return value[:maximum]
@@ -760,6 +1018,5 @@ def _pack_adr_lines(remaining: Sequence[str]) -> tuple[str, ...]:
     """Pack remaining lines into the hybrid ``AdrLine`` cap (≤2 lines)."""
     cleaned = [line.strip() for line in remaining if line and line.strip()]
     return tuple(
-        line[:_MAX_ADR_LINE]
-        for line in cleaned[:_MAX_HYBRID_ADR_LINE_COUNT]
+        line[:_MAX_ADR_LINE] for line in cleaned[:_MAX_HYBRID_ADR_LINE_COUNT]
     )

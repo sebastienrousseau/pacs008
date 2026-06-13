@@ -56,15 +56,11 @@ class TestHeaderValidation:
 
     def test_invalid_sender_bic_rejected(self):
         with pytest.raises(ValueError, match="sender_bic"):
-            BusinessApplicationHeader(
-                **{**_KW, "sender_bic": "NOTABIC"}
-            )
+            BusinessApplicationHeader(**{**_KW, "sender_bic": "NOTABIC"})
 
     def test_invalid_receiver_bic_rejected(self):
         with pytest.raises(ValueError, match="receiver_bic"):
-            BusinessApplicationHeader(
-                **{**_KW, "receiver_bic": "12345"}
-            )
+            BusinessApplicationHeader(**{**_KW, "receiver_bic": "12345"})
 
     def test_biz_msg_idr_empty_rejected(self):
         with pytest.raises(ValueError, match="biz_msg_idr"):
@@ -72,21 +68,15 @@ class TestHeaderValidation:
 
     def test_biz_msg_idr_too_long_rejected(self):
         with pytest.raises(ValueError, match="biz_msg_idr"):
-            BusinessApplicationHeader(
-                **{**_KW, "biz_msg_idr": "X" * 36}
-            )
+            BusinessApplicationHeader(**{**_KW, "biz_msg_idr": "X" * 36})
 
     def test_msg_def_idr_malformed_rejected(self):
         with pytest.raises(ValueError, match="msg_def_idr"):
-            BusinessApplicationHeader(
-                **{**_KW, "msg_def_idr": "pacs.008"}
-            )
+            BusinessApplicationHeader(**{**_KW, "msg_def_idr": "pacs.008"})
 
     def test_creation_dt_malformed_rejected(self):
         with pytest.raises(ValueError, match="ISO 8601"):
-            BusinessApplicationHeader(
-                **{**_KW, "creation_dt": "yesterday"}
-            )
+            BusinessApplicationHeader(**{**_KW, "creation_dt": "yesterday"})
 
     @pytest.mark.parametrize("p", ["HIGH", "NORM", "URGT"])
     def test_priority_accepts_valid_codes(self, p):
@@ -99,9 +89,7 @@ class TestHeaderValidation:
 
     def test_three_digit_version_accepted(self):
         # Some schemas use three-digit subversion (e.g. pacs.002.001.012)
-        BusinessApplicationHeader(
-            **{**_KW, "msg_def_idr": "pacs.002.001.012"}
-        )
+        BusinessApplicationHeader(**{**_KW, "msg_def_idr": "pacs.002.001.012"})
 
 
 # ---------------------------------------------------------------------------
@@ -225,9 +213,7 @@ class TestExtractionFailures:
 
 class TestRoundTrip:
     def test_extract_matches_input(self):
-        envelope = wrap_in_bah(
-            _PAYLOAD, **{**_KW, "priority": "NORM"}
-        )
+        envelope = wrap_in_bah(_PAYLOAD, **{**_KW, "priority": "NORM"})
         bah = extract_bah_fields(envelope)
         assert bah.sender_bic == _KW["sender_bic"]
         assert bah.receiver_bic == _KW["receiver_bic"]

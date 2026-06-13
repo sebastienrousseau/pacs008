@@ -260,16 +260,16 @@ def _run_scheme_validation(
     address_errors = validate_addresses(
         payment_data, policy=profile.address_policy()
     )
-    for err in address_errors:
+    for addr_err in address_errors:
         from pacs008.profiles.base import BusinessRuleViolation
 
         violations.append(
             BusinessRuleViolation(
-                row=err.row,
-                party=err.party,
-                field=f"{err.party}_address",
+                row=addr_err.row,
+                party=addr_err.party,
+                field=f"{addr_err.party}_address",
                 rule="address_policy",
-                message=err.message,
+                message=addr_err.message,
             )
         )
 
@@ -296,16 +296,16 @@ def _run_scheme_validation(
         lei_errors = validate_leis(
             payment_data, required_parties=required_lei_parties
         )
-        for err in lei_errors:
+        for lei_err in lei_errors:
             from pacs008.profiles.base import BusinessRuleViolation
 
             violations.append(
                 BusinessRuleViolation(
-                    row=err.row,
-                    party=err.party,
-                    field=err.field,
+                    row=lei_err.row,
+                    party=lei_err.party,
+                    field=lei_err.field,
                     rule="lei",
-                    message=err.reason,
+                    message=lei_err.reason,
                 )
             )
 

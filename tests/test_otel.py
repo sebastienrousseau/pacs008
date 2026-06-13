@@ -92,10 +92,7 @@ class TestTraceSpan:
         spans = exporter.get_finished_spans()
         attrs = dict(spans[0].attributes)
         assert attrs["pacs008.scheme"] == "cbpr_plus"
-        assert (
-            attrs["payment.uetr"]
-            == "f47ac10b-58cc-4372-a567-0e02b2c3d479"
-        )
+        assert attrs["payment.uetr"] == "f47ac10b-58cc-4372-a567-0e02b2c3d479"
 
     def test_none_attributes_skipped(self, exporter):
         with trace_span(

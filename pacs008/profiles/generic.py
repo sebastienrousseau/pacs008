@@ -24,7 +24,6 @@ change relative to the pre-block-D pipeline.
 from __future__ import annotations
 
 from datetime import date
-from typing import Optional
 
 from pacs008.profiles.base import SchemeProfile, register_profile
 from pacs008.standards.address import AddressPolicy
@@ -56,12 +55,10 @@ class GenericProfile(SchemeProfile):
         return frozenset({"DEBT", "CRED", "SHAR", "SLEV"})
 
     @property
-    def max_transactions_per_msg(self) -> Optional[int]:
+    def max_transactions_per_msg(self) -> int | None:
         return None
 
-    def address_policy(
-        self, today: Optional[date] = None
-    ) -> AddressPolicy:
+    def address_policy(self, today: date | None = None) -> AddressPolicy:
         return AddressPolicy.UNSTRUCTURED_OK
 
     def lei_required_for(self) -> tuple[str, ...]:

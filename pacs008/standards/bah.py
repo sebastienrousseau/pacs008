@@ -46,7 +46,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Any
 
 from defusedxml import ElementTree as DET
 from lxml import etree
@@ -89,8 +89,8 @@ class BusinessApplicationHeader:
     biz_msg_idr: str
     msg_def_idr: str
     creation_dt: str
-    priority: Optional[str] = None
-    signature: Optional[str] = None
+    priority: str | None = None
+    signature: str | None = None
 
     def __post_init__(self) -> None:
         for label, bic in (
@@ -139,9 +139,9 @@ def wrap_in_bah(
     receiver_bic: str,
     biz_msg_idr: str,
     msg_def_idr: str,
-    creation_dt: Optional[str] = None,
-    priority: Optional[str] = None,
-    signature: Optional[str] = None,
+    creation_dt: str | None = None,
+    priority: str | None = None,
+    signature: str | None = None,
 ) -> str:
     """Wrap a payload XML string in a BizMsgEnvlp envelope.
 
@@ -195,12 +195,13 @@ def wrap_in_bah(
     payload_root = _parse_payload(payload_xml)
     doc.append(payload_root)
 
-    return etree.tostring(
+    serialised: bytes = etree.tostring(
         envelope,
         encoding="UTF-8",
         xml_declaration=True,
         pretty_print=False,
-    ).decode("utf-8")
+    )
+    return serialised.decode("utf-8")
 
 
 def extract_bah_fields(
@@ -235,9 +236,7 @@ def extract_bah_fields(
     biz_msg_idr = _find_text(app_hdr, f"{{{_NS_BAH}}}BizMsgIdr")
     msg_def_idr = _find_text(app_hdr, f"{{{_NS_BAH}}}MsgDefIdr")
     creation_dt = _find_text(app_hdr, f"{{{_NS_BAH}}}CreDt")
-    priority = _find_text(
-        app_hdr, f"{{{_NS_BAH}}}Prty", required=False
-    )
+    priority = _find_text(app_hdr, f"{{{_NS_BAH}}}Prty", required=False)
 
     return BusinessApplicationHeader(
         sender_bic=sender_bic,
@@ -255,7 +254,7 @@ def extract_bah_fields(
 
 
 def _populate_app_hdr(
-    app_hdr: "etree._Element",
+    app_hdr: etree._Element,
     header: BusinessApplicationHeader,
     bah_ns: str,
 ) -> None:
@@ -283,7 +282,7 @@ def _populate_app_hdr(
         app_hdr.append(sig_root)
 
 
-def _parse_payload(payload_xml: str) -> "etree._Element":
+def _parse_payload(payload_xml: str) -> etree._Element:
     """Parse the inner Document element, stripping any XML declaration."""
     # lxml.etree.fromstring rejects XML declarations on bytes, so encode.
     return etree.fromstring(payload_xml.encode("utf-8"))
@@ -293,14 +292,14 @@ def _utcnow_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def _find(root, path):
+def _find(root: Any, path: str) -> Any:
     return root.find(path)
 
 
-def _find_text(root, path: str, *, required: bool = True) -> str:
+def _find_text(root: Any, path: str, *, required: bool = True) -> str:
     el = root.find(path)
     if el is None or el.text is None:
         if required:
             raise ValueError(f"envelope missing {path}")
         return None  # type: ignore[return-value]
-    return el.text
+    return str(el.text)

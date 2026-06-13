@@ -20,7 +20,6 @@ from __future__ import annotations
 import threading
 from collections import OrderedDict
 from datetime import datetime, timedelta, timezone
-from typing import Optional
 
 from pacs008.idempotency.base import IdempotencyEntry, IdempotencyStore
 
@@ -49,7 +48,7 @@ class MemoryStore(IdempotencyStore):
 
     def lookup(
         self, key: str, *, window: timedelta
-    ) -> Optional[IdempotencyEntry]:
+    ) -> IdempotencyEntry | None:
         cutoff = _utcnow() - window
         with self._lock:
             entry = self._entries.get(key)
@@ -68,7 +67,7 @@ class MemoryStore(IdempotencyStore):
         key: str,
         payload_hash: str,
         *,
-        recorded_at: Optional[datetime] = None,
+        recorded_at: datetime | None = None,
     ) -> IdempotencyEntry:
         recorded_at = recorded_at or _utcnow()
         entry = IdempotencyEntry(
@@ -85,9 +84,7 @@ class MemoryStore(IdempotencyStore):
         purged = 0
         with self._lock:
             keys = [
-                k
-                for k, e in self._entries.items()
-                if e.recorded_at < cutoff
+                k for k, e in self._entries.items() if e.recorded_at < cutoff
             ]
             for k in keys:
                 self._entries.pop(k, None)

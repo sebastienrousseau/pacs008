@@ -51,7 +51,6 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from datetime import date, timedelta
-from typing import Optional
 
 __all__ = [
     "AlwaysOpenCalendar",
@@ -114,9 +113,7 @@ def compute_easter(year: int) -> date:
 # ---------------------------------------------------------------------------
 
 
-def _nth_weekday_of_month(
-    year: int, month: int, weekday: int, n: int
-) -> date:
+def _nth_weekday_of_month(year: int, month: int, weekday: int, n: int) -> date:
     """Return the n-th ``weekday`` (Mon=0..Sun=6) of ``month`` in ``year``."""
     first = date(year, month, 1)
     delta = (weekday - first.weekday()) % 7
@@ -253,9 +250,9 @@ class FedwireCalendar(Calendar):
     name = "Fedwire"
 
     _FIXED_HOLIDAYS: tuple[tuple[int, int], ...] = (
-        (1, 1),    # New Year's Day
-        (6, 19),   # Juneteenth (from 2021)
-        (7, 4),    # Independence Day
+        (1, 1),  # New Year's Day
+        (6, 19),  # Juneteenth (from 2021)
+        (7, 4),  # Independence Day
         (11, 11),  # Veterans Day
         (12, 25),  # Christmas Day
     )
@@ -278,10 +275,7 @@ class FedwireCalendar(Calendar):
             if day == holiday and holiday.weekday() < 5:
                 return False
             # Substitute: when holiday falls on Sunday, observe Monday.
-            if (
-                holiday.weekday() == 6
-                and day == holiday + timedelta(days=1)
-            ):
+            if holiday.weekday() == 6 and day == holiday + timedelta(days=1):
                 return False
 
         # Floating holidays.
@@ -367,10 +361,7 @@ class CHAPSCalendar(Calendar):
         observed: list[date] = []
         for month, dom in self._FIXED_HOLIDAYS:
             candidate = date(year, month, dom)
-            while (
-                candidate.weekday() >= 5
-                or candidate in observed
-            ):
+            while candidate.weekday() >= 5 or candidate in observed:
                 candidate += timedelta(days=1)
             observed.append(candidate)
         return set(observed)
@@ -398,8 +389,7 @@ def get_calendar(name: str) -> Calendar:
     key = name.lower()
     if key not in _CALENDARS:
         raise ValueError(
-            f"Unknown calendar {name!r}; available: "
-            f"{sorted(_CALENDARS)}"
+            f"Unknown calendar {name!r}; available: " f"{sorted(_CALENDARS)}"
         )
     return _CALENDARS[key]()
 
@@ -514,7 +504,7 @@ def validate_settlement_dates(
     return errors
 
 
-def _coerce_date(value: object) -> Optional[date]:
+def _coerce_date(value: object) -> date | None:
     """Best-effort conversion to ``date`` — returns ``None`` if unparseable."""
     if isinstance(value, date):
         return value

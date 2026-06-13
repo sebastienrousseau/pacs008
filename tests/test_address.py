@@ -32,7 +32,6 @@ from pacs008.standards.address import (
     validate_addresses,
 )
 
-
 # ---------------------------------------------------------------------------
 # PostalAddress construction & basic invariants
 # ---------------------------------------------------------------------------
@@ -194,15 +193,11 @@ class TestAddressPolicy:
         assert "unstructured" in reason
 
     def test_structured_only_accepts_structured(self):
-        addr = PostalAddress(
-            strt_nm="High Street", twn_nm="London", ctry="GB"
-        )
+        addr = PostalAddress(strt_nm="High Street", twn_nm="London", ctry="GB")
         assert addr.validate(AddressPolicy.STRUCTURED_ONLY) is None
 
     def test_hybrid_or_structured_accepts_structured(self):
-        addr = PostalAddress(
-            strt_nm="High Street", twn_nm="London", ctry="GB"
-        )
+        addr = PostalAddress(strt_nm="High Street", twn_nm="London", ctry="GB")
         assert addr.validate(AddressPolicy.HYBRID_OR_STRUCTURED) is None
 
     def test_hybrid_or_structured_accepts_hybrid(self):
@@ -232,9 +227,7 @@ class TestAddressPolicy:
     def test_validate_uses_today_when_no_date_provided(self):
         # Just ensure the no-arg path doesn't crash and follows policy.
         addr = PostalAddress(adr_line=("foo",))
-        assert (
-            addr.validate(AddressPolicy.HYBRID_OR_STRUCTURED) is not None
-        )
+        assert addr.validate(AddressPolicy.HYBRID_OR_STRUCTURED) is not None
 
 
 # ---------------------------------------------------------------------------
@@ -253,9 +246,7 @@ class TestFromUnstructuredGB:
         assert addr.is_hybrid()
 
     def test_town_and_postcode_on_same_line(self):
-        addr = from_unstructured(
-            ["42 High Street", "London SW1A 1AA"], "GB"
-        )
+        addr = from_unstructured(["42 High Street", "London SW1A 1AA"], "GB")
         assert addr.pst_cd == "SW1A 1AA"
         assert addr.twn_nm == "London"
 
@@ -297,9 +288,7 @@ class TestFromUnstructuredUS:
 
 class TestFromUnstructuredDE:
     def test_plz_ort_pattern(self):
-        addr = from_unstructured(
-            ["Friedrichstraße 100", "10117 Berlin"], "DE"
-        )
+        addr = from_unstructured(["Friedrichstraße 100", "10117 Berlin"], "DE")
         assert addr.pst_cd == "10117"
         assert addr.twn_nm == "Berlin"
         assert addr.ctry == "DE"
@@ -307,9 +296,7 @@ class TestFromUnstructuredDE:
 
 class TestFromUnstructuredFR:
     def test_code_postal_ville(self):
-        addr = from_unstructured(
-            ["1 Rue de la Paix", "75001 Paris"], "FR"
-        )
+        addr = from_unstructured(["1 Rue de la Paix", "75001 Paris"], "FR")
         assert addr.pst_cd == "75001"
         assert addr.twn_nm == "Paris"
         assert addr.ctry == "FR"
@@ -317,9 +304,7 @@ class TestFromUnstructuredFR:
 
 class TestFromUnstructuredJP:
     def test_japanese_postcode_with_marker(self):
-        addr = from_unstructured(
-            ["1-1 Chiyoda", "〒100-0001 Tokyo"], "JP"
-        )
+        addr = from_unstructured(["1-1 Chiyoda", "〒100-0001 Tokyo"], "JP")
         assert addr.pst_cd == "100-0001"
         assert addr.twn_nm == "Tokyo"
         assert addr.ctry == "JP"
