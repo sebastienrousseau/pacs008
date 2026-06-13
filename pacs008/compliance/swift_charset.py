@@ -44,11 +44,25 @@ Example:
 
 import re
 import unicodedata
-from typing import Any, Optional
-
-from anyascii import anyascii
+from typing import Any, Callable, Optional
 
 from pacs008.exceptions import PaymentValidationError
+
+# anyascii is a ~150KB resident-memory hit at import time. Defer the
+# import to first use of the non-Latin transliteration fallback —
+# callers that only deal with Latin-script payments never pay the cost.
+_anyascii_impl: Optional[Callable[[str], str]] = None
+
+
+def _anyascii(char: str) -> str:
+    """Lazy proxy for :func:`anyascii.anyascii` — imported on first use."""
+    global _anyascii_impl
+    if _anyascii_impl is None:
+        from anyascii import anyascii as _impl
+
+        _anyascii_impl = _impl
+    return _anyascii_impl(char)
+
 
 # SWIFT X Character Set (ISO 15022 / MT standard, CBPR+, SEPA-EPC).
 # Characters allowed in SWIFT FIN messages.
@@ -296,8 +310,9 @@ def _transliterate(
         return nfkd
 
     # 3) anyascii covers non-Latin scripts robustly. "Москва" -> "Moskva",
-    #    "東京" -> "DongJing", etc.
-    ascii_form = anyascii(char)
+    #    "東京" -> "DongJing", etc. Lazily imported so Latin-only callers
+    #    never pay the import cost.
+    ascii_form = _anyascii(char)
     filtered = "".join(c for c in ascii_form if c in charset)
     if filtered:
         return filtered

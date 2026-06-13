@@ -1,6 +1,7 @@
 """XML generator for ISO 20022 pacs payment messages."""
 
 import os
+from functools import lru_cache
 from typing import Any
 
 from jinja2 import Environment, FileSystemLoader
@@ -10,6 +11,20 @@ from pacs008.xml.generate_updated_xml_file_path import (
     generate_updated_xml_file_path,
 )
 from pacs008.xml.validate_via_xsd import validate_xml_string_via_xsd
+
+
+@lru_cache(maxsize=32)
+def _get_jinja_environment(loader_path: str) -> Environment:
+    """Return a cached :class:`jinja2.Environment` for ``loader_path``.
+
+    Building a fresh ``Environment`` + ``FileSystemLoader`` on every
+    ``generate_xml_string`` call dominates the per-call cost on small
+    batches (10 ms on a 1-row generation per BENCHMARKS.md). Caching
+    one environment per template directory drops that floor by ~95%
+    on the second and subsequent calls against the same template.
+    """
+    return Environment(loader=FileSystemLoader(loader_path), autoescape=True)
+
 
 # ── Optional field names common to all versions ──────────────────────
 
@@ -435,7 +450,7 @@ def generate_xml_string(
     template_file = os.path.basename(xml_template_path)
     loader_path = template_dir if template_dir else "."
 
-    env = Environment(loader=FileSystemLoader(loader_path), autoescape=True)
+    env = _get_jinja_environment(loader_path)
     template = env.get_template(template_file)
 
     xml_content = template.render(**xml_data)
