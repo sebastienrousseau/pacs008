@@ -22,6 +22,7 @@ pacs008 = "pacs008.__main__:cli"
 python = "^3.9.2"
 anyascii = "^0.3"
 click = "^8.1"
+lxml = "^5.0"
 colorama = "^0.4"
 defusedxml = "^0.7"
 jinja2 = "^3.1"
@@ -73,6 +74,20 @@ pydata-sphinx-theme = "^0.15.0"
 sphinx-autodoc-typehints = "^1.0.0"
 sphinx-design = "^0.6.0"
 myst-parser = "^2.0.0"
+
+[tool.poetry.extras]
+# Optional OpenTelemetry tracing. `pip install pacs008[otel]` activates
+# the spans in pacs008.observability.otel; without these the helpers
+# silently no-op so callers can leave instrumentation in place.
+otel = ["opentelemetry-api", "opentelemetry-sdk"]
+
+[tool.poetry.dependencies.opentelemetry-api]
+version = ">=1.20,<2"
+optional = true
+
+[tool.poetry.dependencies.opentelemetry-sdk]
+version = ">=1.20,<2"
+optional = true
 
 [build-system]
 requires = ["poetry-core"]
