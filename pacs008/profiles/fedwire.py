@@ -41,6 +41,7 @@ from __future__ import annotations
 from datetime import date
 from typing import Optional
 
+from pacs008.compliance.swift_charset import SWIFT_Z_CHARSET
 from pacs008.profiles.base import SchemeProfile, register_profile
 from pacs008.standards.address import AddressPolicy
 
@@ -82,6 +83,13 @@ class FedwireProfile(SchemeProfile):
     def max_transactions_per_msg(self) -> Optional[int]:
         # Fedwire is strictly one transaction per message file.
         return 1
+
+    @property
+    def charset(self) -> frozenset[str]:
+        # Fedwire accepts the broader Z character set — accented Latin
+        # supplements come through unchanged rather than being
+        # transliterated.
+        return SWIFT_Z_CHARSET
 
     def address_policy(
         self, today: Optional[date] = None

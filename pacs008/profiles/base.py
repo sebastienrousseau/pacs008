@@ -34,6 +34,7 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Optional, Sequence
 
+from pacs008.compliance.swift_charset import SWIFT_X_CHARSET
 from pacs008.exceptions import Pacs008Error
 from pacs008.standards.address import AddressPolicy
 
@@ -133,6 +134,20 @@ class SchemeProfile(ABC):
         ``None`` means unbounded. SCT Inst and Fedwire both cap this at
         1; CBPR+ allows large batches.
         """
+
+    @property
+    def charset(self) -> frozenset[str]:
+        """Character set permitted by this scheme.
+
+        Defaults to :data:`~pacs008.compliance.swift_charset.SWIFT_X_CHARSET`
+        (used by CBPR+, SEPA-EPC, generic). Profiles like Fedwire that
+        accept a broader set override this with
+        :data:`~pacs008.compliance.swift_charset.SWIFT_Z_CHARSET`.
+
+        ``cleanse_data`` and ``cleanse_data_with_report`` accept this
+        as a parameter so callers can wire it in directly.
+        """
+        return SWIFT_X_CHARSET
 
     # ----- behaviour -----
 

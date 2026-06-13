@@ -4,8 +4,25 @@ Banks reject messages not because they fail XSD validation, but because
 they violate SWIFT Usage Guidelines (CBPR+, Target2). This module
 prevents "silent rejections" by cleansing data before XML generation.
 
-The SWIFT X Character Set (ISO 15022) allows:
+The SWIFT X Character Set (ISO 15022, used by CBPR+ and SEPA-EPC) allows:
   a-z A-Z 0-9 / - ? : ( ) . , ' + { } CR LF Space
+
+The broader SWIFT Z Character Set (used by some Fedwire profiles) extends
+X with the Latin-1 supplement (accented Latin characters, common symbols).
+
+This module supports both via the ``charset`` parameter. Scheme profiles
+expose a :attr:`~pacs008.profiles.base.SchemeProfile.charset` property
+that picks the right one automatically.
+
+Cleansing modes:
+
+- ``policy="cleanse"`` (default) — transliterate non-charset characters,
+  falling through explicit map → NFKD decomposition → ``anyascii`` for
+  non-Latin scripts → single space as last resort. Whitespace runs are
+  collapsed.
+- ``policy="reject"`` — raise :class:`PaymentValidationError` on the
+  first non-charset character. For institutions that prefer hard
+  failure over silent cleansing.
 
 Field length limits follow ISO 20022 pacs.008 element definitions:
   - Nm (Name): max 140 characters
@@ -20,21 +37,37 @@ Example:
     >>> raw = [{"debtor_name": "Müller & Söhne™", "msg_id": "X" * 50}]
     >>> clean = cleanse_data(raw)
     >>> clean[0]["debtor_name"]  # non-SWIFT chars replaced
-    'Mueller . Soehne.'
+    'Mueller . Soehne TM'
     >>> len(clean[0]["msg_id"])  # truncated to 35
     35
 """
 
+import re
 import unicodedata
 from typing import Any, Optional
 
-# SWIFT X Character Set (ISO 15022 / MT standard)
-# Characters allowed in SWIFT FIN messages
-SWIFT_X_CHARSET = set(
+from anyascii import anyascii
+
+from pacs008.exceptions import PaymentValidationError
+
+# SWIFT X Character Set (ISO 15022 / MT standard, CBPR+, SEPA-EPC).
+# Characters allowed in SWIFT FIN messages.
+SWIFT_X_CHARSET = frozenset(
     "abcdefghijklmnopqrstuvwxyz"
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     "0123456789"
     "/-?:().,'+{} \r\n"
+)
+
+# SWIFT Z Character Set — extends X with Latin-1 supplement and the
+# additional ASCII printables commonly accepted by Fedwire ISO 20022
+# and a handful of legacy reporting (camt.053/054) profiles.
+SWIFT_Z_CHARSET: frozenset[str] = frozenset(SWIFT_X_CHARSET) | frozenset(
+    # Additional ASCII printables permitted by Z.
+    "!\"#$%&*;<=>@[\\]^_`|~"
+    # Latin-1 supplement: accented vowels and common diacritics.
+    "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞß"
+    "àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ"
 )
 
 # ISO 20022 pacs.008 field length limits
@@ -223,55 +256,117 @@ class ComplianceReport:
         )
 
 
-def _transliterate(char: str) -> str:
-    """Transliterate a single character to SWIFT-safe equivalent."""
-    if char in SWIFT_X_CHARSET:
+def _transliterate(
+    char: str,
+    charset: frozenset[str] = SWIFT_X_CHARSET,
+) -> str:
+    """Transliterate a single character to a charset-safe equivalent.
+
+    Resolution order:
+
+    1. Pass-through if ``char`` is already in ``charset``.
+    2. Explicit map (German/Romance accented letters).
+    3. Unicode NFKD decomposition (strips combining marks).
+    4. ``anyascii`` for non-Latin scripts (Cyrillic, Greek, CJK,
+       Arabic, Hebrew, Devanagari, …).
+    5. Single space as last resort.
+
+    Step 4 was added in v0.0.2 — previously, characters outside the
+    German/Romance explicit map fell straight through to ``"."``,
+    silently destroying e.g. Cyrillic or Japanese names.
+    """
+    if char in charset:
         return char
 
-    # Check explicit map first
+    # 1) Explicit map covers the common German/Romance accented letters
+    #    and a handful of symbol substitutions.
     if char in _TRANSLITERATION:
-        return _TRANSLITERATION[char]
+        mapped = _TRANSLITERATION[char]
+        if all(c in charset for c in mapped):
+            return mapped
 
-    # Try Unicode NFKD decomposition (strips accents)
+    # 2) NFKD decomposition strips combining marks (good for stray
+    #    accented characters that aren't in the explicit map).
     decomposed = unicodedata.normalize("NFKD", char)
-    ascii_chars = "".join(c for c in decomposed if c in SWIFT_X_CHARSET)
-    if ascii_chars:
-        return ascii_chars
+    nfkd = "".join(c for c in decomposed if c in charset)
+    if nfkd:
+        return nfkd
 
-    # Last resort: replace with period
-    return "."
+    # 3) anyascii covers non-Latin scripts robustly. "Москва" -> "Moskva",
+    #    "東京" -> "DongJing", etc.
+    ascii_form = anyascii(char)
+    filtered = "".join(c for c in ascii_form if c in charset)
+    if filtered:
+        return filtered
+
+    # 4) Last resort: single space. Period was a bad choice because it's
+    #    a valid SWIFT-X character and pollutes downstream parsing of
+    #    sentinel-suffixed names like "Smith Jr.".
+    return " "
 
 
-def validate_swift_charset(value: str) -> list[tuple[int, str]]:
-    """Check a string for non-SWIFT characters.
+def validate_swift_charset(
+    value: str,
+    charset: frozenset[str] = SWIFT_X_CHARSET,
+) -> list[tuple[int, str]]:
+    """Check a string for characters outside ``charset``.
 
     Args:
         value: String to validate.
+        charset: Target character set (default :data:`SWIFT_X_CHARSET`;
+            pass :data:`SWIFT_Z_CHARSET` for Fedwire-style profiles).
 
     Returns:
-        List of (position, character) tuples for invalid characters.
-        Empty list means the string is SWIFT-compliant.
+        List of ``(position, character)`` tuples for invalid characters.
+        Empty list means the string is compliant.
     """
-    violations = []
-    for i, char in enumerate(value):
-        if char not in SWIFT_X_CHARSET:
-            violations.append((i, char))
-    return violations
+    return [(i, c) for i, c in enumerate(value) if c not in charset]
 
 
-def cleanse_string(value: str) -> str:
-    """Transliterate a string to the SWIFT X Character Set.
-
-    Replaces non-SWIFT characters with their closest ASCII equivalents.
-    Characters with no reasonable mapping are replaced with '.'.
+def cleanse_string(
+    value: str,
+    charset: frozenset[str] = SWIFT_X_CHARSET,
+    policy: str = "cleanse",
+) -> str:
+    """Transliterate a string to ``charset``.
 
     Args:
         value: Input string (may contain Unicode).
+        charset: Target character set (default :data:`SWIFT_X_CHARSET`).
+        policy: ``"cleanse"`` (default) transliterates non-charset
+            characters following the resolution order in
+            :func:`_transliterate`. ``"reject"`` raises
+            :class:`pacs008.exceptions.PaymentValidationError` on the
+            first non-charset character — for institutions that prefer
+            hard failure over silent cleansing.
 
     Returns:
-        SWIFT-safe string with only X charset characters.
+        Charset-safe string. Whitespace runs of two or more spaces are
+        collapsed to a single space.
+
+    Raises:
+        PaymentValidationError: If ``policy="reject"`` and any
+            character is outside ``charset``.
+        ValueError: If ``policy`` is not ``"cleanse"`` or ``"reject"``.
     """
-    return "".join(_transliterate(c) for c in value)
+    if policy not in ("cleanse", "reject"):
+        raise ValueError(
+            f"policy must be 'cleanse' or 'reject'; got {policy!r}"
+        )
+
+    if policy == "reject":
+        for i, char in enumerate(value):
+            if char not in charset:
+                raise PaymentValidationError(
+                    f"Position {i}: character {char!r} "
+                    f"(U+{ord(char):04X}) is outside the target "
+                    f"character set"
+                )
+        return value
+
+    cleansed = "".join(_transliterate(c, charset) for c in value)
+    # Collapse runs of horizontal whitespace (don't touch CR/LF).
+    return re.sub(r"  +", " ", cleansed)
 
 
 def enforce_field_lengths(
@@ -333,17 +428,28 @@ def cleanse_data(
     data: list[dict[str, Any]],
     enforce_lengths: bool = True,
     cleanse_charset: bool = True,
+    charset: frozenset[str] = SWIFT_X_CHARSET,
+    policy: str = "cleanse",
 ) -> list[dict[str, Any]]:
     """Cleanse payment data for SWIFT compliance.
 
     Applies two passes:
-    1. Character set cleansing (transliterate non-SWIFT chars in text fields)
-    2. Field length enforcement (truncate to ISO 20022 limits)
+
+    1. Character-set cleansing (transliterate non-charset chars in text
+       fields).
+    2. Field-length enforcement (truncate to ISO 20022 limits).
 
     Args:
         data: List of payment data dictionaries.
         enforce_lengths: Whether to truncate oversized fields.
-        cleanse_charset: Whether to transliterate non-SWIFT characters.
+        cleanse_charset: Whether to transliterate non-charset characters.
+        charset: Target character set. Defaults to :data:`SWIFT_X_CHARSET`
+            (used by CBPR+ and SEPA-EPC). Pass :data:`SWIFT_Z_CHARSET`
+            for Fedwire-style profiles. Scheme profiles expose the
+            right charset via their ``charset`` property.
+        policy: ``"cleanse"`` to transliterate (default); ``"reject"``
+            to raise :class:`PaymentValidationError` on any non-charset
+            character.
 
     Returns:
         Cleansed data ready for XML generation.
@@ -358,7 +464,9 @@ def cleanse_data(
             for field in _TEXT_FIELDS:
                 value = corrected.get(field)
                 if value and isinstance(value, str):
-                    corrected[field] = cleanse_string(value)
+                    corrected[field] = cleanse_string(
+                        value, charset=charset, policy=policy
+                    )
 
         # Pass 2: Field length enforcement
         if enforce_lengths:
@@ -373,19 +481,24 @@ def cleanse_data_with_report(
     data: list[dict[str, Any]],
     enforce_lengths: bool = True,
     cleanse_charset: bool = True,
+    charset: frozenset[str] = SWIFT_X_CHARSET,
+    policy: str = "cleanse",
 ) -> tuple[list[dict[str, Any]], ComplianceReport]:
     """Cleanse payment data and return a detailed compliance report.
 
-    Same as cleanse_data() but also returns a ComplianceReport with
-    every violation found and corrected.
+    Same as :func:`cleanse_data` but also returns a
+    :class:`ComplianceReport` capturing every violation found and
+    corrected.
 
     Args:
         data: List of payment data dictionaries.
         enforce_lengths: Whether to truncate oversized fields.
-        cleanse_charset: Whether to transliterate non-SWIFT characters.
+        cleanse_charset: Whether to transliterate non-charset characters.
+        charset: Target character set.
+        policy: ``"cleanse"`` or ``"reject"`` (see :func:`cleanse_string`).
 
     Returns:
-        Tuple of (cleansed_data, compliance_report).
+        Tuple of ``(cleansed_data, compliance_report)``.
     """
     report = ComplianceReport()
     report.rows_processed = len(data)
@@ -400,7 +513,9 @@ def cleanse_data_with_report(
             for field in _TEXT_FIELDS:
                 value = corrected.get(field)
                 if value and isinstance(value, str):
-                    cleaned = cleanse_string(value)
+                    cleaned = cleanse_string(
+                        value, charset=charset, policy=policy
+                    )
                     if cleaned != value:
                         report.add(
                             ComplianceViolation(
