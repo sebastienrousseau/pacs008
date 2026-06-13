@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.3] - 2026-06-13
+
+### Security
+
+Patch release closing 8 Dependabot security advisories flagged after
+v0.0.2 shipped. All fixes are applied via lock-file updates;
+Python 3.10+ users get the fixed versions automatically, Python 3.9
+users keep the latest 3.9-compatible versions (the upstream fixes
+all dropped Python 3.9 support, since 3.9 EOL was October 2025).
+
+| Package | py3.9 (transitional) | py3.10+ (fixed) | CVE summary |
+|---|---|---|---|
+| `pyarrow` | 21.0.0 | **23.0.1** | Use-after-free reading IPC files with pre-buffering (×2 advisory channels, HIGH) |
+| `urllib3` | 2.6.3 | **2.7.0** | Decompression-bomb safeguard bypass + sensitive-header forwarding across proxied redirects (HIGH) |
+| `starlette` | 0.49.3 | **1.3.1** | Missing Host header validation enables path-based security bypass (MEDIUM) |
+| `python-dotenv` | 1.2.1 | **1.2.2** | Symlink-follow in `set_key` allows arbitrary file overwrite (MEDIUM) |
+| `pytest` | 8.4.2 | **9.1.0** | Vulnerable `tmpdir` handling (MEDIUM, dev-only) |
+| `requests` | 2.32.5 | **2.34.2** | Insecure temp-file reuse in `extract_zipped_paths` (MEDIUM) |
+
+### Changed
+
+- `pyarrow` constraint widened from `>=18.0.0,<22.0.0` to
+  `>=18.0.0,<24.0.0` to admit the 23.x fix.
+- `pytest` constraint widened from `^8.0.0` to `>=8.0,<10` to admit
+  9.1.0 in dev environments.
+- No code changes — pure dep bumps.
+
+### Known limitations
+
+Python 3.9 environments still carry the CVEs above because their fix
+versions dropped 3.9 support. A 3.9 drop is planned for v0.0.4 /
+v0.1.0; until then Python 3.9 users on production-sensitive paths
+should upgrade to Python 3.10+ to get the fixed transitive
+dependencies.
+
+[0.0.3]: https://github.com/sebastienrousseau/pacs008/compare/v0.0.2...v0.0.3
+
 ## [0.0.2] - 2026-06-13
 
 ### Added
