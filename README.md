@@ -1,1262 +1,740 @@
-# Pacs008: Automate ISO 20022-Compliant Interbank Payment File Creation
+<!-- SPDX-License-Identifier: Apache-2.0 -->
 
-![Pacs008 banner][banner]
+<p align="center">
+  <img src="https://kura.pro/pacs008/images/banners/banner-pacs008.svg" alt="pacs008 logo" width="640" />
+</p>
 
-## Enterprise-Grade ISO 20022 Interbank Payment File Generation
+<h1 align="center">pacs008</h1>
 
-[![PyPI Version][pypi-badge]][03]
-[![Python Versions][python-versions-badge]][03]
-[![PyPI Downloads][pypi-downloads-badge]][07]
-[![Licence][licence-badge]][01]
-[![Codecov][codecov-badge]][06]
-[![Tests][tests-badge]][tests-url]
-[![Quality][quality-badge]][quality-url]
-[![Documentation][docs-badge]][docs-url]
+<p align="center">
+  A Python library for generating, validating, parsing and auditing
+  ISO 20022 <code>pacs.008</code> FI-to-FI Customer Credit Transfer
+  messages — with scheme-aware rules for CBPR+, HVPS+, Fedwire, CHAPS,
+  T2 RTGS and SCT Inst.
+</p>
 
-> **Latest Release: v0.0.2** — FI-to-FI credit transfer XML generation, SWIFT compliance, FastAPI REST API, and 13 pacs.008 versions.
->
-> ⚠️ **Pre-1.0 status:** `pacs008` is under active development and is **not yet recommended for live banking traffic**. APIs may change between minor versions. See the [roadmap][release-001] for the path to 1.0.
+<p align="center">
+  <a href="https://github.com/sebastienrousseau/pacs008/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/sebastienrousseau/pacs008/ci.yml?branch=main&label=CI&style=for-the-badge" alt="CI" /></a>
+  <a href="https://pypi.org/project/pacs008/"><img src="https://img.shields.io/pypi/v/pacs008?style=for-the-badge&logo=pypi&logoColor=white" alt="PyPI" /></a>
+  <a href="https://pypi.org/project/pacs008/"><img src="https://img.shields.io/pypi/pyversions/pacs008.svg?style=for-the-badge&logo=python&logoColor=white" alt="Python versions" /></a>
+  <a href="https://pypi.org/project/pacs008/"><img src="https://img.shields.io/pypi/dm/pacs008.svg?style=for-the-badge" alt="PyPI Downloads" /></a>
+  <a href="https://codecov.io/github/sebastienrousseau/pacs008?branch=main"><img src="https://img.shields.io/codecov/c/github/sebastienrousseau/pacs008?style=for-the-badge&logo=codecov" alt="Codecov" /></a>
+  <a href="https://opensource.org/license/apache-2-0/"><img src="https://img.shields.io/pypi/l/pacs008?style=for-the-badge" alt="Licence" /></a>
+  <a href="https://pacs008.com"><img src="https://img.shields.io/badge/Docs-pacs008.com-blue?style=for-the-badge" alt="Docs" /></a>
+</p>
 
-## Overview
+> ⚠️ **Pre-1.0 status:** `pacs008` is under active development and is **not yet
+> certified for live banking traffic**. APIs may change between minor versions.
+> Pin to an exact patch version for any pilot deployment.
 
-**Pacs008** is an open-source Python library that you can use to create **ISO
-20022-compliant pacs.008 FI-to-FI Customer Credit Transfer XML messages** from
-your **CSV files**, **JSON files**, **JSONL files**, **SQLite databases**, or
-**Apache Parquet files**.
+---
 
-- **Website:** <https://pacs008.com>
-- **Source code:** <https://github.com/sebastienrousseau/pacs008>
-- **Bug reports:** <https://github.com/sebastienrousseau/pacs008/issues>
+## Contents
 
-The library focuses specifically on **Payments Clearing and Settlement Messages**,
-commonly known as **Pacs**. In a simplified way, a **pacs.008** is a message
-that carries credit transfer instructions between financial institutions — the
-interbank counterpart to pain.001. It powers settlement across TARGET2, SWIFT gpi,
-and SEPA networks.
+**Getting started**
 
-**Key Features:**
+- [Install](#install) — pip, optional extras, from source
+- [Quick Start](#quick-start) — generate a pacs.008 message in ten lines
+- [Supported message types](#supported-message-types) — pacs/camt/head families
+- [The pacs008 ecosystem](#the-pacs008-ecosystem) — library, CLI, REST API, scheme profiles, observability
 
-- **Mandatory Data Validation:** Ensures all payment files are
-  ISO 20022-compliant before creation
-- **Multi-source Support:** Works with CSV, JSON, JSONL, SQLite, and
-  Parquet data sources
-- **Automatic XSD Validation:** Validates generated XML against
-  ISO 20022 schemas
-- **Comprehensive Testing:** 1,300+ behaviour-driven tests with a 90%
-  branch-coverage floor across Python 3.9–3.12
-- **Secure by Design:** Uses `defusedxml` to prevent XXE attacks
-  and implements path traversal protection
-- **Type-Safe:** Full type hints for better IDE support and type
-  checking with mypy (strict mode)
-- **SWIFT Compliance:** Charset cleansing, field length enforcement,
-  and silent rejection prevention
-- **13 ISO 20022 Versions Supported:** Supports all 13 FI-to-FI
-  Customer Credit Transfer versions: pacs.008.001.01 through
-  pacs.008.001.13
-- **Production-grade target:** Modelled on SWIFT gpi, TARGET2, and SEPA
-  interbank settlement requirements. **Not yet certified for live
-  traffic** — see the [roadmap to 1.0][release-001].
+**Usage**
 
-As of today, the library is designed to be compatible with the:
+- [Generate from a data source](#generate-from-a-data-source) — CSV / JSON / JSONL / SQLite / Parquet / Python objects
+- [Apply a scheme profile](#apply-a-scheme-profile) — CBPR+, Fedwire, CHAPS, HVPS+, T2 RTGS, SCT Inst
+- [Validate postal addresses (Nov 2026 cliff)](#validate-postal-addresses-nov-2026-cliff)
+- [Validate LEI, IBAN and BIC](#validate-lei-iban-and-bic)
+- [Check settlement dates against rail calendars](#check-settlement-dates-against-rail-calendars)
+- [Cleanse text for the SWIFT character set](#cleanse-text-for-the-swift-character-set)
+- [Wrap a message in a Business Application Header (BAH)](#wrap-a-message-in-a-business-application-header-bah)
+- [Parse inbound messages by `MsgDefIdr`](#parse-inbound-messages-by-msgdefidr)
+- [Stream large batches with constant memory](#stream-large-batches-with-constant-memory)
+- [Split a batch to fit scheme cardinality](#split-a-batch-to-fit-scheme-cardinality)
+- [Track Verification of Payee (VoP) results](#track-verification-of-payee-vop-results)
+- [Detect duplicate submissions (idempotency)](#detect-duplicate-submissions-idempotency)
+- [Sign a generation event for audit (DORA)](#sign-a-generation-event-for-audit-dora)
+- [Emit OpenTelemetry spans](#emit-opentelemetry-spans)
 
-- **FI-to-FI Credit Transfer V01 (pacs.008.001.01):** Basic interbank
-  credit transfer with BIC identification
-- **FI-to-FI Credit Transfer V02 (pacs.008.001.02):** Enhanced with
-  additional optional fields for settlement details
-- **FI-to-FI Credit Transfer V03 (pacs.008.001.03):** Migrated to BICFI
-  identification for financial institutions
-- **FI-to-FI Credit Transfer V04 (pacs.008.001.04):** BICFI standard with
-  improved data structures
-- **FI-to-FI Credit Transfer V05 (pacs.008.001.05):** Further refinements
-  to the BICFI standard schema
-- **FI-to-FI Credit Transfer V06 (pacs.008.001.06):** Extended schema
-  with additional optional elements
-- **FI-to-FI Credit Transfer V07 (pacs.008.001.07):** Focused on
-  supporting enhanced settlement information
-- **FI-to-FI Credit Transfer V08 (pacs.008.001.08):** Introduces UETR
-  (Unique End-to-End Transaction Reference) support
-- **FI-to-FI Credit Transfer V09 (pacs.008.001.09):** Extended UETR
-  support with enhanced validation rules
-- **FI-to-FI Credit Transfer V10 (pacs.008.001.10):** Adds mandate
-  identification support
-- **FI-to-FI Credit Transfer V11 (pacs.008.001.11):** Enhanced mandate
-  support with improved compliance
-- **FI-to-FI Credit Transfer V12 (pacs.008.001.12):** Full mandate
-  support with additional data structures
-- **FI-to-FI Credit Transfer V13 (pacs.008.001.13):** The latest version
-  with message expiry and advanced payment features
+**Interfaces**
 
-### Version Comparison
+- [Command-line interface](#command-line-interface) — flags, exit codes
+- [REST API (FastAPI)](#rest-api-fastapi) — endpoints
+- [Docker](#docker)
 
-| Version | Status | BIC Tag | UETR | Mandate | Expiry | Key Features |
-|---------|--------|---------|:----:|:-------:|:------:|--------------|
-| pacs.008.001.01 | ✅ Stable | `<BIC>` | — | — | — | Basic interbank transfers |
-| pacs.008.001.02 | ✅ Stable | `<BIC>` | — | — | — | Enhanced settlement details |
-| pacs.008.001.03 | ✅ Stable | `<BICFI>` | — | — | — | BICFI migration |
-| pacs.008.001.04 | ✅ Stable | `<BICFI>` | — | — | — | BICFI standard |
-| pacs.008.001.05 | ✅ Stable | `<BICFI>` | — | — | — | Schema refinements |
-| pacs.008.001.06 | ✅ Stable | `<BICFI>` | — | — | — | Extended elements |
-| pacs.008.001.07 | ✅ Stable | `<BICFI>` | — | — | — | Enhanced settlement |
-| pacs.008.001.08 | ✅ Stable | `<BICFI>` | ✓ | — | — | UETR support |
-| pacs.008.001.09 | ✅ Stable | `<BICFI>` | ✓ | — | — | Extended UETR |
-| pacs.008.001.10 | ✅ Stable | `<BICFI>` | ✓ | ✓ | — | Mandate support |
-| pacs.008.001.11 | ✅ Stable | `<BICFI>` | ✓ | ✓ | — | Enhanced mandates |
-| pacs.008.001.12 | ✅ Stable | `<BICFI>` | ✓ | ✓ | — | Full mandates |
-| pacs.008.001.13 | ✅ Latest | `<BICFI>` | ✓ | ✓ | ✓ | Message expiry |
+**Reference**
 
-Interbank payments typically start with a **pacs.008 credit transfer message**.
-A financial institution sends it to another financial institution via a secure
-network. This network could be **SWIFT**, **TARGET2**, **SEPA**, or other
-clearing and settlement systems such as **CHAPS**, **Fedwire**, **CHIPS**, etc.
-The message contains the debtor and creditor financial institution details,
-settlement amounts, and other information required to process the interbank
-credit transfer.
+- [Input data format](#input-data-format) — required and optional columns
+- [Architecture](#architecture) — package layout
+- [Development](#development) — running the tests, quality gates
+- [Security](#security)
+- [Licence](#licence)
 
-The **Pacs008** library reduces interbank payment processing complexity and costs
-by generating ISO 20022-compliant payment files with **mandatory validation**.
-These files are automatically validated before creation, eliminating the need to
-create and validate them manually. This makes the payment process more efficient
-and cost-effective whilst saving you time and resources and minimising the risk
-of errors, ensuring accurate and seamless interbank payment processing.
+---
 
-**Use the Pacs008 library to simplify, accelerate, and automate your interbank
-payment processing with confidence that every file is ISO 20022-compliant.**
+## Install
 
-## How It Works
+### From PyPI
 
-### Payment Processing Flow
-
-```mermaid
-flowchart LR
-    A["CSV / JSON / JSONL /
-    SQLite / Parquet
-    Data Source"] -->|Load & Validate| B["Pacs008
-    Library"]
-    B -->|Generate XML| C["ISO 20022
-    pacs.008 Message"]
-    C -->|XSD Validation| D{Valid?}
-    D -->|Yes| E["Submit via
-    SWIFT / TARGET2 / SEPA"]
-    D -->|No| F["Error Report
-    & Fix Data"]
-    F -->|Retry| A
-    E --> G["Interbank Payment
-    Settled"]
+```bash
+pip install pacs008
 ```
 
-## Table of Contents
+The default install pulls in everything needed to generate and validate
+pacs.008 messages from CSV / JSON / JSONL / SQLite / Parquet sources,
+serve the FastAPI REST API, and run the CLI.
 
-- [Pacs008: Automate ISO 20022-Compliant Interbank Payment File Creation](#pacs008-automate-iso-20022-compliant-interbank-payment-file-creation)
-  - [Overview](#overview)
-  - [Table of Contents](#table-of-contents)
-  - [Features](#features)
-  - [Requirements](#requirements)
-  - [Installation](#installation)
-    - [Install `virtualenv`](#install-virtualenv)
-    - [Create a Virtual Environment](#create-a-virtual-environment)
-    - [Activate environment](#activate-environment)
-    - [Getting Started](#getting-started)
-  - [Quick Start](#quick-start)
-    - [Arguments](#arguments)
-  - [Input Data Format](#input-data-format)
-    - [Required Fields](#required-fields)
-    - [Version-Specific Fields](#version-specific-fields)
-  - [Examples](#examples)
-    - [Using a CSV Data File as the source](#using-a-csv-data-file-as-the-source)
-    - [Using a JSON Data File as the source](#using-a-json-data-file-as-the-source)
-    - [Using a JSONL Data File as the source](#using-a-jsonl-data-file-as-the-source)
-    - [Using a SQLite Data File as the source](#using-a-sqlite-data-file-as-the-source)
-    - [Using a Parquet Data File as the source](#using-a-parquet-data-file-as-the-source)
-    - [Using Python Data Structures (Programmatic API)](#using-python-data-structures-programmatic-api)
-    - [Using the Source code](#using-the-source-code)
-      - [Pacs.008.001.01](#pacs00800101)
-      - [Pacs.008.001.02](#pacs00800102)
-      - [Pacs.008.001.03](#pacs00800103)
-      - [Pacs.008.001.04](#pacs00800104)
-      - [Pacs.008.001.05](#pacs00800105)
-      - [Pacs.008.001.06](#pacs00800106)
-      - [Pacs.008.001.07](#pacs00800107)
-      - [Pacs.008.001.08](#pacs00800108)
-      - [Pacs.008.001.09](#pacs00800109)
-      - [Pacs.008.001.10](#pacs00800110)
-      - [Pacs.008.001.11](#pacs00800111)
-      - [Pacs.008.001.12](#pacs00800112)
-      - [Pacs.008.001.13](#pacs00800113)
-  - [REST API (FastAPI)](#rest-api-fastapi)
-  - [SWIFT Compliance](#swift-compliance)
-  - [Validation](#validation)
-  - [Output Files](#output-files)
-  - [Architecture](#architecture)
-  - [Development](#development)
-  - [Troubleshooting](#troubleshooting)
-  - [Documentation](#documentation)
-  - [Licence](#licence)
-  - [Contribution](#contribution)
-  - [Acknowledgements](#acknowledgements)
+### Optional extras
 
-## Features
+| Extra | Activates | Install |
+|---|---|---|
+| `otel` | OpenTelemetry tracing spans around `process_files` | `pip install "pacs008[otel]"` |
 
-### Core Functionality
+### From source
 
-- **Easy to Use:** Both developers and non-developers can easily use the library, as it requires minimal coding knowledge
-- **Open Source:** The library is open source and free to use, making it accessible to everyone
-- **Mandatory Data Validation:** Ensures payment file integrity and ISO 20022 compliance
-  - All data sources (CSV, JSON, JSONL, SQLite, Parquet) are automatically validated
-  - Invalid data raises clear `ValueError` messages indicating what needs to be fixed
-  - Validates required fields, data types, and field formats
-  - Prevents creation of non-compliant payment files
-  - No manual validation needed—it's built into every data load operation
-
-### Security & Quality
-
-- **Secure:** The library prioritises security with multiple layers of protection
-  - Uses `defusedxml` for secure XML parsing to prevent XXE attacks
-  - Implements path traversal protection in file operations
-  - Regular security audits with Bandit
-  - All dependencies kept up to date to address known vulnerabilities
-  - No sensitive data storage—all information remains confidential
-  - OWASP Top 10 security best practices implemented
-- **SWIFT Compliance:**
-  - Charset validation and transliteration for SWIFT-safe characters
-  - Automatic field length enforcement (msg_id max 35, names max 140)
-  - Silent rejection prevention through proactive data cleansing
-  - Full compliance report generation for audit trails
-- **Robust Development:** Comprehensive quality assurance with
-  - 1,300+ behaviour-driven tests with a 90% branch-coverage floor across Python 3.9–3.12
-  - Code formatting with Black and Ruff
-  - Static type checking with mypy (strict mode)
-  - Security scanning with Bandit
-  - Performance benchmarks for XML generation
-
-### Business Benefits
-
-- **Customisable:** The library allows developers to customise the output, making it adaptable to specific business requirements and preferences
-- **Scalable Solution:** The **Pacs008** library can handle varying volumes of interbank payment files, making it suitable for financial institutions of different sizes and transaction volumes
-- **Time-Saving:** The automated file creation process reduces the time spent on manual data entry and file generation, increasing overall productivity
-- **Seamless Integration:** As a Python package, the Pacs008 library is compatible with various Python-based applications and easily integrates into any existing projects or workflows
-- **Cross-Border Compatibility:** The library supports SWIFT gpi, TARGET2, SEPA, and other clearing and settlement systems, making it versatile for use across different networks and regions
-- **Improved Accuracy:** By providing precise data validation, the library reduces errors in payment file creation and processing
-- **Enhanced Efficiency:** Automates the creation of interbank payment message files
-- **Accelerated Processing:** Automates the process and reduces the time required to create payment files
-- **Guaranteed Compliance:** Validates all payment files to meet the ISO 20022 standards
-- **Simplified Workflow:** Provides a standardised payment file format for ISO 20022-compliant interbank payment messages
-- **Reduced Costs:** Removes manual data entry and file generation, reducing payment processing time and errors
-
-## Requirements
-
-**Pacs008** works with macOS, Linux, and Windows and requires:
-
-- **Python 3.9.2 or higher**
-- **pip** (Python package installer)
-
-### Key Dependencies
-
-| Package | Purpose |
-|---------|---------|
-| `click` | Command-line interface creation |
-| `defusedxml` | Secure XML parsing (protection against XXE attacks) |
-| `xmlschema` | XML Schema validation |
-| `rich` | Terminal output formatting |
-| `jinja2` | XML template rendering |
-
-All dependencies are automatically installed when you install Pacs008.
-
-## Installation
-
-We recommend creating a virtual environment to install **Pacs008**. This will
-ensure that the package is installed in an isolated environment and will not
-affect other projects. To install **Pacs008** in a virtual environment, follow
-these steps:
-
-### Install `virtualenv`
-
-```sh
-python -m pip install virtualenv
+```bash
+git clone https://github.com/sebastienrousseau/pacs008.git
+cd pacs008
+poetry install --extras otel   # full dev environment
 ```
 
-### Create a Virtual Environment
+`pacs008` is tested on Python 3.9 — 3.12 across Ubuntu, macOS and Windows.
 
-```sh
-python -m venv venv
-```
-
-| Code  | Explanation                     |
-| ----- | ------------------------------- |
-| `-m`  | executes module `venv`          |
-| `env` | name of the virtual environment |
-
-### Activate environment
-
-**On macOS/Linux:**
-```sh
-source venv/bin/activate
-```
-
-**On Windows:**
-```cmd
-venv\Scripts\activate
-```
-
-You'll see `(venv)` appear at the start of your command line prompt, indicating the virtual environment is active.
-
-### Getting Started
-
-It takes just a few seconds to get up and running with **Pacs008**. You can
-install Pacs008 from PyPI with pip or your favourite package manager.
-
-**Step 1:** Open your terminal and run the following command to install the latest version:
-
-```sh
-python -m pip install pacs008
-```
-
-**Step 2:** Verify the installation:
-
-```sh
-python -c "from pacs008 import generate_xml_string; print('Pacs008 is installed and ready to use')"
-```
-
-You should see a confirmation message indicating Pacs008 is ready to use.
-
-**Updating Pacs008:**
-
-If `pacs008` is already installed and you want to upgrade to the latest version:
-
-```sh
-python -m pip install -U pacs008
-```
+---
 
 ## Quick Start
 
-After installation, you can run **Pacs008** directly from the command line. Follow these simple steps:
-
-**Step 1:** Prepare your files
-
-You'll need:
-- **XML template file** - Contains the structure for your payment message
-- **XSD schema file** - Used to validate the generated XML file
-- **Data source** - Your payment instructions from:
-  - CSV file (.csv)
-  - JSON file (.json)
-  - JSONL file (.jsonl)
-  - SQLite database (.db)
-  - Parquet file (.parquet)
-  - Python list of dictionaries
-  - Python dictionary (single transaction)
-
-**Step 2:** Run Pacs008
-
-```sh
-pacs008 -t <xml_message_type> \
-    -m <xml_template_file_path> \
-    -s <xsd_schema_file_path> \
-    -d <data_file_path>
-```
-
-**Real Example:**
-
-```sh
-pacs008 -t pacs.008.001.05 \
-    -m pacs008/templates/pacs.008.001.05/template.xml \
-    -s pacs008/templates/pacs.008.001.05/pacs.008.001.05.xsd \
-    -d payments.csv
-```
-
-**Step 3:** Check the output
-
-If successful, you'll see:
-- Validation messages in your terminal
-- A new ISO 20022-compliant XML file at your specified location
-
-### Safe Validation (Dry-Run Mode)
-
-You can validate your data against the ISO 20022 schema **without
-generating an output file** using the `--dry-run` flag. This is ideal for:
-
-- **CI/CD Pipelines:** Pre-flight validation in automated builds
-- **Data Quality Checks:** Verify payment data before batch processing
-- **Template Development:** Test XML templates and schemas without file clutter
-- **Pre-Commit Hooks:** Validate data before committing to version control
-
-**Command:**
-
-```sh
-pacs008 -t pacs.008.001.05 \
-    -m pacs008/templates/pacs.008.001.05/template.xml \
-    -s pacs008/templates/pacs.008.001.05/pacs.008.001.05.xsd \
-    -d payments.csv \
-    --dry-run
-```
-
-**Output:**
-
-```plaintext
-All validations passed (--dry-run: no XML generated)
-```
-
-**Exit Codes:**
-
-- `0` - Validation succeeded (safe to proceed)
-- `1` - Validation failed (data or schema errors detected)
-
-### Arguments
-
-When running **Pacs008**, you will need to specify four arguments:
-
-- An `xml_message_type`: This is the type of XML message you want to generate.
-
-  The currently supported types are:
-
-  - pacs.008.001.01
-  - pacs.008.001.02
-  - pacs.008.001.03
-  - pacs.008.001.04
-  - pacs.008.001.05
-  - pacs.008.001.06
-  - pacs.008.001.07
-  - pacs.008.001.08
-  - pacs.008.001.09
-  - pacs.008.001.10
-  - pacs.008.001.11
-  - pacs.008.001.12
-  - pacs.008.001.13
-
-- An `xml_template_file_path`: This is the path to the XML template file you are
-  using that contains variables that will be replaced by the values in your data
-  file.
-
-- An `xsd_schema_file_path`: This is the path to the XSD schema file you are
-  using to validate the generated XML file.
-
-- A `data_file_path`: This is the path to the CSV, JSON, JSONL, SQLite, or
-  Parquet data file you want to convert to XML format.
-
-Options: `--dry-run` (validate only), `--verbose` (detailed output).
-
-## Input Data Format
-
-Before using **Pacs008**, prepare your data file with the payment data. The data
-file must include specific fields that map to ISO 20022 pacs.008 elements.
-
-### Required Fields
-
-| Field | Description | Example |
-|-------|-------------|---------|
-| `msg_id` | Message identifier (max 35) | `MSG-2026-001` |
-| `creation_date_time` | ISO 8601 datetime | `2026-01-15T10:30:00` |
-| `nb_of_txs` | Number of transactions | `1` |
-| `settlement_method` | CLRG, INDA, COVE, or INGA | `CLRG` |
-| `interbank_settlement_date` | Settlement date | `2026-01-15` |
-| `end_to_end_id` | End-to-end identifier (max 35) | `E2E-INV-001` |
-| `tx_id` | Transaction identifier | `TX-001` |
-| `interbank_settlement_amount` | Amount | `25000.00` |
-| `interbank_settlement_currency` | ISO 4217 currency code | `EUR` |
-| `charge_bearer` | DEBT, CRED, SHAR, or SLEV | `SHAR` |
-| `debtor_name` | Debtor name (max 140) | `Acme Corp` |
-| `debtor_agent_bic` | Debtor bank BIC (8 or 11 chars) | `DEUTDEFF` |
-| `creditor_agent_bic` | Creditor bank BIC (8 or 11 chars) | `COBADEFF` |
-| `creditor_name` | Creditor name (max 140) | `Widget SA` |
-
-### Version-Specific Fields
-
-| Field | Available From | Description |
-|-------|----------------|-------------|
-| `uetr` | v08+ | UUID v4 (36 chars) |
-| `mandate_id` | v10+ | Mandate identifier (max 35) |
-| `expiry_date_time` | v13 | Message expiry datetime |
-
-**Sample CSV File:**
-
-```csv
-msg_id,creation_date_time,nb_of_txs,settlement_method,interbank_settlement_date,end_to_end_id,tx_id,interbank_settlement_amount,interbank_settlement_currency,charge_bearer,debtor_name,debtor_account_iban,debtor_agent_bic,creditor_agent_bic,creditor_name,creditor_account_iban,remittance_information
-MSG-2026-001,2026-01-15T10:30:00,1,CLRG,2026-01-15,E2E-INV-001,TX-001,25000.00,EUR,SHAR,Acme Corp GmbH,DE89370400440532013000,DEUTDEFF,COBADEFF,Widget Industries SA,FR7630006000011234567890189,Invoice INV-2026-001
-```
-
-**Finding Template Files:**
-
-Template files for each supported pacs.008 message type are available in the `pacs008/templates/` directory:
-
-```sh
-# If you installed via pip, find the templates with:
-python -c "import pacs008; import os; print(os.path.dirname(pacs008.__file__))"
-
-# Navigate to the templates directory:
-cd <path_from_above>/templates/
-```
-
-Each template directory contains:
-- `template.xml` - XML template file
-- `pacs.008.001.XX.xsd` - XSD schema file for validation
-
-## Examples
-
-The following examples demonstrate how to use **Pacs008** to generate interbank
-payment messages from different data sources.
-
-### Using a CSV Data File as the source
-
-```sh
-pacs008 -t pacs.008.001.05 \
-    -m pacs008/templates/pacs.008.001.05/template.xml \
-    -s pacs008/templates/pacs.008.001.05/pacs.008.001.05.xsd \
-    -d /path/to/your/payments.csv
-```
-
-### Using a JSON Data File as the source
-
-```sh
-pacs008 -t pacs.008.001.05 \
-    -m pacs008/templates/pacs.008.001.05/template.xml \
-    -s pacs008/templates/pacs.008.001.05/pacs.008.001.05.xsd \
-    -d /path/to/your/payments.json
-```
-
-### Using a JSONL Data File as the source
-
-```sh
-pacs008 -t pacs.008.001.05 \
-    -m pacs008/templates/pacs.008.001.05/template.xml \
-    -s pacs008/templates/pacs.008.001.05/pacs.008.001.05.xsd \
-    -d /path/to/your/payments.jsonl
-```
-
-### Using a SQLite Data File as the source
-
-```sh
-pacs008 -t pacs.008.001.05 \
-    -m pacs008/templates/pacs.008.001.05/template.xml \
-    -s pacs008/templates/pacs.008.001.05/pacs.008.001.05.xsd \
-    -d /path/to/your/payments.db
-```
-
-### Using a Parquet Data File as the source
-
-```sh
-pacs008 -t pacs.008.001.05 \
-    -m pacs008/templates/pacs.008.001.05/template.xml \
-    -s pacs008/templates/pacs.008.001.05/pacs.008.001.05.xsd \
-    -d /path/to/your/payments.parquet
-```
-
-### Using Python Data Structures (Programmatic API)
-
-You can use the library directly in Python with lists or dictionaries:
+Generate a pacs.008.001.08 message from a single Python dictionary:
 
 ```python
 from pacs008 import generate_xml_string
 
-# Using a list of payment dictionaries
-payments = [
-    {
-        "msg_id": "MSG-2026-001",
-        "creation_date_time": "2026-01-15T10:30:00",
-        "nb_of_txs": "1",
-        "settlement_method": "CLRG",
-        "interbank_settlement_date": "2026-01-15",
-        "end_to_end_id": "E2E-INV-2026-001",
-        "tx_id": "TX-001",
-        "interbank_settlement_amount": "25000.00",
-        "interbank_settlement_currency": "EUR",
-        "charge_bearer": "SHAR",
-        "debtor_name": "Acme Corp GmbH",
-        "debtor_account_iban": "DE89370400440532013000",
-        "debtor_agent_bic": "DEUTDEFF",
-        "creditor_agent_bic": "COBADEFF",
-        "creditor_name": "Widget Industries SA",
-        "creditor_account_iban": "FR7630006000011234567890189",
-        "remittance_information": "Invoice INV-2026-001",
-    }
-]
+payment = {
+    "msg_id": "MSG-2026-001",
+    "creation_date_time": "2026-06-13T10:30:00",
+    "nb_of_txs": "1",
+    "settlement_method": "CLRG",
+    "interbank_settlement_date": "2026-06-15",
+    "end_to_end_id": "E2E-INV-001",
+    "tx_id": "TX-001",
+    "uetr": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+    "interbank_settlement_amount": "25000.00",
+    "interbank_settlement_currency": "EUR",
+    "charge_bearer": "SHAR",
+    "debtor_name": "Acme Corp GmbH",
+    "debtor_account_iban": "DE89370400440532013000",
+    "debtor_agent_bic": "DEUTDEFF",
+    "creditor_agent_bic": "BNPAFRPP",
+    "creditor_name": "Widget Industries SA",
+    "creditor_account_iban": "FR7630006000011234567890189",
+    "remittance_information": "Invoice INV-2026-001",
+}
 
 xml = generate_xml_string(
-    payments,
-    "pacs.008.001.05",
-    "pacs008/templates/pacs.008.001.05/template.xml",
-    "pacs008/templates/pacs.008.001.05/pacs.008.001.05.xsd",
+    [payment],
+    "pacs.008.001.08",
+    "pacs008/templates/pacs.008.001.08/template.xml",
+    "pacs008/templates/pacs.008.001.08/pacs.008.001.08.xsd",
+)
+# xml now contains an XSD-validated <Document>…</Document> ready to send.
+```
+
+Or from the command line:
+
+```bash
+pacs008 \
+    -t pacs.008.001.08 \
+    -m pacs008/templates/pacs.008.001.08/template.xml \
+    -s pacs008/templates/pacs.008.001.08/pacs.008.001.08.xsd \
+    -d payments.csv
+```
+
+Add `--dry-run` to validate without writing the output file (ideal for CI
+pre-flight checks).
+
+---
+
+## Supported message types
+
+Every shipped message family has a JSON Schema for input validation, a Jinja2
+template for XML generation, and an XSD for output validation.
+
+| Family | Versions shipped | Notes |
+|---|---|---|
+| `pacs.008` | `001.01` → `001.13` (13 versions) | FI-to-FI Customer Credit Transfer. `001.08+` adds UETR; `001.10+` adds mandate; `001.13` adds message expiry. |
+| `pacs.002` | `001.12` | FI-to-FI Payment Status Report. |
+| `pacs.003` | `001.09` | FI-to-FI Customer Direct Debit. |
+| `pacs.004` | `001.11` | Payment Return. |
+| `pacs.007` | `001.11` | FI-to-FI Payment Reversal. |
+| `pacs.009` | `001.10` | Financial Institution Credit Transfer. |
+| `pacs.010` | `001.05` | Financial Institution Direct Debit. |
+| `pacs.028` | `001.05` | FI-to-FI Payment Status Request. |
+| `head.001` | `001.02` | Business Application Header — used by [`pacs008.standards.bah`](#wrap-a-message-in-a-business-application-header-bah). |
+
+---
+
+## The pacs008 ecosystem
+
+`pacs008` is a single Python package with a clear separation between
+delivery surfaces and the typed business logic underneath. Every
+sub-package can be used independently.
+
+| Sub-package | Purpose |
+|---|---|
+| **`pacs008`** _(top-level)_ | `process_files`, `generate_xml_string` — the high-level generation entry points. |
+| **`pacs008.cli`** | Click-based CLI (`pacs008 …`) — batch processing. |
+| **`pacs008.api`** | FastAPI REST API with sync + async job endpoints. |
+| **`pacs008.core`** | The generation pipeline plus the scheme-aware batch `splitter`. |
+| **`pacs008.profiles`** | `SchemeProfile` ABC + 7 concrete profiles: `generic`, `cbpr_plus`, `fedwire`, `chaps`, `hvps_plus`, `t2_rtgs`, `sct_inst`. |
+| **`pacs008.standards`** | Standards primitives — `PostalAddress` (Nov 2026 cliff), `wrap_in_bah` (head.001). |
+| **`pacs008.validation`** | `IBAN`, `BIC`, `LEI` validators (ISO 13616 / 9362 / 17442); JSON Schema + XSD validators; rail holiday calendars. |
+| **`pacs008.compliance`** | SWIFT-X / SWIFT-Z charset cleansing with `anyascii` fallback for non-Latin scripts. |
+| **`pacs008.vop`** | EPC Verification of Payee result model (mandatory across SEPA since 9 Oct 2025). |
+| **`pacs008.idempotency`** | Pluggable duplicate-detection (`MemoryStore`, `SQLiteStore`). |
+| **`pacs008.observability`** | Structured JSON logging, request-id tracing, signed audit envelopes (Ed25519, DORA), optional OpenTelemetry. |
+| **`pacs008.xml`** | Generation (`generate_xml`), constant-memory writer (`stream_writer`), inbound parser (`parser`). |
+| **`pacs008.{csv,json,db,parquet}`** | Format-specific loaders + validators. |
+
+---
+
+## Usage
+
+### Generate from a data source
+
+`process_files` is the high-level entry point that loads, validates and
+serialises a batch end-to-end.
+
+```python
+from pacs008 import process_files
+
+process_files(
+    xml_message_type="pacs.008.001.08",
+    xml_template_file_path="pacs008/templates/pacs.008.001.08/template.xml",
+    xsd_schema_file_path="pacs008/templates/pacs.008.001.08/pacs.008.001.08.xsd",
+    data_file_path="payments.csv",
+    # Optional: enforce a scheme rulebook (see below). Default: "generic".
+    scheme="generic",
 )
 ```
 
-### Using the Source code
-
-You can clone the source code and run the example code in your
-terminal/command-line. To check out the source code, clone the repository from
-GitHub:
-
-```sh
-git clone https://github.com/sebastienrousseau/pacs008.git
-```
-
-#### Pacs.008.001.01
-
-This will generate an interbank credit transfer message in the format of
-Pacs.008.001.01.
-
-```sh
-pacs008 -t pacs.008.001.01 \
-    -m pacs008/templates/pacs.008.001.01/template.xml \
-    -s pacs008/templates/pacs.008.001.01/pacs.008.001.01.xsd \
-    -d pacs008/templates/pacs.008.001.01/template.csv
-```
-
-#### Pacs.008.001.02
-
-This will generate an interbank credit transfer message in the format of
-Pacs.008.001.02.
-
-```sh
-pacs008 -t pacs.008.001.02 \
-    -m pacs008/templates/pacs.008.001.02/template.xml \
-    -s pacs008/templates/pacs.008.001.02/pacs.008.001.02.xsd \
-    -d pacs008/templates/pacs.008.001.02/template.csv
-```
-
-#### Pacs.008.001.03
-
-This will generate an interbank credit transfer message in the format of
-Pacs.008.001.03.
-
-```sh
-pacs008 -t pacs.008.001.03 \
-    -m pacs008/templates/pacs.008.001.03/template.xml \
-    -s pacs008/templates/pacs.008.001.03/pacs.008.001.03.xsd \
-    -d pacs008/templates/pacs.008.001.03/template.csv
-```
-
-#### Pacs.008.001.04
-
-This will generate an interbank credit transfer message in the format of
-Pacs.008.001.04.
-
-```sh
-pacs008 -t pacs.008.001.04 \
-    -m pacs008/templates/pacs.008.001.04/template.xml \
-    -s pacs008/templates/pacs.008.001.04/pacs.008.001.04.xsd \
-    -d pacs008/templates/pacs.008.001.04/template.csv
-```
-
-#### Pacs.008.001.05
-
-This will generate an interbank credit transfer message in the format of
-Pacs.008.001.05.
-
-```sh
-pacs008 -t pacs.008.001.05 \
-    -m pacs008/templates/pacs.008.001.05/template.xml \
-    -s pacs008/templates/pacs.008.001.05/pacs.008.001.05.xsd \
-    -d pacs008/templates/pacs.008.001.05/template.csv
-```
-
-#### Pacs.008.001.06
-
-This will generate an interbank credit transfer message in the format of
-Pacs.008.001.06.
-
-```sh
-pacs008 -t pacs.008.001.06 \
-    -m pacs008/templates/pacs.008.001.06/template.xml \
-    -s pacs008/templates/pacs.008.001.06/pacs.008.001.06.xsd \
-    -d pacs008/templates/pacs.008.001.06/template.csv
-```
-
-#### Pacs.008.001.07
-
-This will generate an interbank credit transfer message in the format of
-Pacs.008.001.07.
-
-```sh
-pacs008 -t pacs.008.001.07 \
-    -m pacs008/templates/pacs.008.001.07/template.xml \
-    -s pacs008/templates/pacs.008.001.07/pacs.008.001.07.xsd \
-    -d pacs008/templates/pacs.008.001.07/template.csv
-```
-
-#### Pacs.008.001.08
-
-This will generate an interbank credit transfer message in the format of
-Pacs.008.001.08, with UETR support.
-
-```sh
-pacs008 -t pacs.008.001.08 \
-    -m pacs008/templates/pacs.008.001.08/template.xml \
-    -s pacs008/templates/pacs.008.001.08/pacs.008.001.08.xsd \
-    -d pacs008/templates/pacs.008.001.08/template.csv
-```
-
-#### Pacs.008.001.09
-
-This will generate an interbank credit transfer message in the format of
-Pacs.008.001.09, with extended UETR support.
-
-```sh
-pacs008 -t pacs.008.001.09 \
-    -m pacs008/templates/pacs.008.001.09/template.xml \
-    -s pacs008/templates/pacs.008.001.09/pacs.008.001.09.xsd \
-    -d pacs008/templates/pacs.008.001.09/template.csv
-```
-
-#### Pacs.008.001.10
-
-This will generate an interbank credit transfer message in the format of
-Pacs.008.001.10, with mandate support.
-
-```sh
-pacs008 -t pacs.008.001.10 \
-    -m pacs008/templates/pacs.008.001.10/template.xml \
-    -s pacs008/templates/pacs.008.001.10/pacs.008.001.10.xsd \
-    -d pacs008/templates/pacs.008.001.10/template.csv
-```
-
-#### Pacs.008.001.11
-
-This will generate an interbank credit transfer message in the format of
-Pacs.008.001.11, with enhanced mandate support.
-
-```sh
-pacs008 -t pacs.008.001.11 \
-    -m pacs008/templates/pacs.008.001.11/template.xml \
-    -s pacs008/templates/pacs.008.001.11/pacs.008.001.11.xsd \
-    -d pacs008/templates/pacs.008.001.11/template.csv
-```
-
-#### Pacs.008.001.12
-
-This will generate an interbank credit transfer message in the format of
-Pacs.008.001.12, with full mandate support.
-
-```sh
-pacs008 -t pacs.008.001.12 \
-    -m pacs008/templates/pacs.008.001.12/template.xml \
-    -s pacs008/templates/pacs.008.001.12/pacs.008.001.12.xsd \
-    -d pacs008/templates/pacs.008.001.12/template.csv
-```
-
-#### Pacs.008.001.13
-
-This will generate an interbank credit transfer message in the format of
-Pacs.008.001.13, the latest ISO 20022 version with message expiry and advanced
-features.
-
-```sh
-pacs008 -t pacs.008.001.13 \
-    -m pacs008/templates/pacs.008.001.13/template.xml \
-    -s pacs008/templates/pacs.008.001.13/pacs.008.001.13.xsd \
-    -d pacs008/templates/pacs.008.001.13/template.csv
-```
-
-You can do the same with the sample SQLite data file:
-
-```sh
-pacs008 -t pacs.008.001.05 \
-    -m pacs008/templates/pacs.008.001.05/template.xml \
-    -s pacs008/templates/pacs.008.001.05/pacs.008.001.05.xsd \
-    -d pacs008/templates/pacs.008.001.05/template.db
-```
-
-> **Note:** The XML file that **Pacs008** generates will automatically be
-> validated against the XSD schema file before the new XML file is saved. If
-> the validation fails, **Pacs008** will stop running and display an error
-> message in your terminal.
-
-## REST API (FastAPI)
-
-Pacs008 ships a REST API (FastAPI) for integration with web services and
-microservices architectures. The API surface is stable enough for
-development and CI use; pin to an exact patch version for production
-pilots while we stabilise toward 1.0.
-
-### Starting the API Server
-
-```sh
-# Install with FastAPI support
-pip install pacs008
-
-# Start the development server
-uvicorn pacs008.api.app:app --reload --host 0.0.0.0 --port 8000
-
-# Or use production server (gunicorn + uvicorn)
-pip install gunicorn
-gunicorn --workers 4 --worker-class uvicorn.workers.UvicornWorker \
-  --bind 0.0.0.0:8000 pacs008.api.app:app
-```
-
-### API Endpoints
-
-**Health Check:**
-
-```bash
-curl -X GET http://localhost:8000/health
-```
-
-Response:
-```json
-{
-  "status": "healthy",
-  "version": "0.0.1",
-  "message": "Pacs008 API is running"
-}
-```
-
-**Validate Payment Data:**
-
-```bash
-curl -X POST http://localhost:8000/validate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "file_path": "/path/to/payments.csv",
-    "data_source": "csv",
-    "message_type": "pacs.008.001.05"
-  }'
-```
-
-**Generate XML (Synchronous):**
-
-```bash
-curl -X POST http://localhost:8000/generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "file_path": "/path/to/payments.csv",
-    "data_source": "csv",
-    "message_type": "pacs.008.001.05",
-    "output_dir": "/tmp/output",
-    "validate_only": false
-  }'
-```
-
-**Generate XML (Asynchronous):**
-
-```bash
-# Submit job
-curl -X POST http://localhost:8000/generate/async \
-  -H "Content-Type: application/json" \
-  -d '{
-    "file_path": "/path/to/payments.csv",
-    "data_source": "csv",
-    "message_type": "pacs.008.001.05"
-  }'
-```
-
-**Poll Job Status:**
-
-```bash
-curl -X GET http://localhost:8000/status/550e8400-e29b-41d4-a716-446655440000
-```
-
-**Download Generated XML:**
-
-```bash
-curl -X GET http://localhost:8000/download/550e8400-e29b-41d4-a716-446655440000 \
-  --output payment.xml
-```
-
-**Interactive API Documentation:**
-
-Once the server is running, visit `http://localhost:8000/docs` for
-interactive Swagger UI or `http://localhost:8000/redoc` for ReDoc.
-
-## SWIFT Compliance
-
-Pacs008 includes a built-in SWIFT compliance module for charset validation and
-transliteration, ensuring your interbank messages are not silently rejected by
-SWIFT gateways.
+The `data_file_path` parameter accepts any of:
+
+| Type | Extension or shape |
+|---|---|
+| CSV | `.csv` |
+| JSON | `.json` (array of objects) |
+| JSON Lines | `.jsonl` |
+| SQLite | `.db` (table named `pacs008`) |
+| Apache Parquet | `.parquet` |
+| Python list | `list[dict[str, Any]]` |
+| Python dict | single transaction as `dict[str, Any]` |
+
+### Apply a scheme profile
+
+A scheme profile encodes one rail's usage guideline: charge bearers,
+UETR requirement, address policy, cardinality cap, version pinning,
+character set and settlement calendar.
 
 ```python
-from pacs008.compliance import cleanse_data, cleanse_data_with_report
+from pacs008.profiles import get_profile
 
-raw = [{"debtor_name": "Müller & Söhne™", "msg_id": "X" * 50}]
-
-# Simple cleanse
-clean = cleanse_data(raw)
-# clean[0]["debtor_name"] == "Mueller . Soehne."
-# len(clean[0]["msg_id"]) == 35  (truncated)
-
-# Cleanse with report
-clean, report = cleanse_data_with_report(raw)
-print(report.summary())
+profile = get_profile("cbpr_plus")    # also: fedwire, chaps, hvps_plus, t2_rtgs, sct_inst, generic
+print(profile.allowed_charge_bearers)  # frozenset({'CRED', 'DEBT', 'SHAR', 'SLEV'})
+print(profile.max_transactions_per_msg)  # 10000
+print(profile.pinned_versions()["pacs.008"])  # '001.08'  (MR2019 hold)
 ```
 
-**What Gets Cleansed:**
+Apply it through `process_files` — `SchemeViolationError` carries every
+finding in one batch so callers can surface them all at once.
 
-- Non-SWIFT characters transliterated to closest ASCII equivalents
-- Field lengths enforced per ISO 20022 maximums
-- Full audit report of all transformations applied
+```python
+from pacs008 import process_files
+from pacs008.profiles import SchemeViolationError
 
-## Validation
+try:
+    process_files(..., scheme="fedwire")
+except SchemeViolationError as exc:
+    for v in exc.violations:
+        print(f"row {v.row}: {v.rule} — {v.message}")
+```
 
-**Pacs008** implements **mandatory data validation** to ensure all payment files
-are ISO 20022-compliant.
+### Validate postal addresses (Nov 2026 cliff)
 
-### How Validation Works
+On **14 November 2026** SWIFT CBPR+, HVPS+, T2 RTGS, CHAPS, Fedwire and Lynx
+decommission fully unstructured postal addresses. `pacs008.standards.address`
+classifies and remediates addresses ahead of the cliff.
 
-**Pacs008** performs validation in two stages:
+```python
+from datetime import date
+from pacs008.standards.address import (
+    AddressPolicy,
+    PostalAddress,
+    from_unstructured,
+)
 
-**Stage 1: Data Validation (Automatic)**
+# Classify an address already in structured form.
+addr = PostalAddress(
+    strt_nm="High Street", bldg_nb="42",
+    pst_cd="SW1A 1AA", twn_nm="London", ctry="GB",
+)
+addr.classify()       # AddressClassification.STRUCTURED
+addr.is_structured()  # True
 
-Every time you load data (from CSV, JSON, JSONL, SQLite, Parquet, or Python
-objects), **Pacs008** automatically validates:
-- All required fields are present
-- Data types are correct (strings, numbers)
-- Field formats meet ISO 20022 standards
-- BIC codes are valid (8 or 11 characters)
-- Settlement method codes are recognised
+# Upgrade legacy unstructured lines to hybrid form (GB/US/DE/FR/JP heuristics).
+hybrid = from_unstructured(
+    ["42 High Street", "London SW1A 1AA"], country_hint="GB",
+)
+# hybrid.twn_nm == "London", hybrid.pst_cd == "SW1A 1AA", hybrid.ctry == "GB"
 
-**Stage 2: XSD Schema Validation (Automatic)**
+# Enforce a policy. After the cliff, HYBRID_OR_STRUCTURED rejects unstructured.
+error = PostalAddress(adr_line=("42 High Street, London SW1A 1AA",)).validate(
+    AddressPolicy.HYBRID_OR_STRUCTURED, today=date(2026, 11, 15),
+)
+# error contains a rejection reason citing the cliff date.
+```
 
-After generating the XML file, **Pacs008** validates it against the XSD schema
-to ensure:
-- XML structure is correct
-- All elements are properly formatted
-- File is ready for submission via SWIFT/TARGET2/SEPA
+### Validate LEI, IBAN and BIC
 
-### Handling Validation Errors
+ISO 17442 LEI (with ISO 7064 mod-97-10 checksum), ISO 13616 IBAN, ISO 9362 BIC:
 
-If validation fails, you'll get a clear error message:
+```python
+from pacs008.validation.lei_validator import validate_lei_safe
+from pacs008.validation.iban_validator import validate_iban_safe
+from pacs008.validation.bic_validator import validate_bic_safe
+
+validate_lei_safe("HWUPKR0MPOU8FGXBT394")   # True   (Apple Inc.)
+validate_iban_safe("DE89370400440532013000")  # True
+validate_bic_safe("DEUTDEFF")                 # True
+```
+
+### Check settlement dates against rail calendars
+
+Four calendars ship out of the box and compute holidays algorithmically — no
+hard-coded date lists to keep up to date.
+
+```python
+from datetime import date
+from pacs008.validation.calendar import (
+    AlwaysOpenCalendar,  # FedNow, SCT Inst — 24/7
+    CHAPSCalendar,       # Bank of England rules with weekend substitution
+    FedwireCalendar,     # 11 US federal holidays incl. Juneteenth
+    TARGETCalendar,      # ECB TARGET2 — 1 Jan, Good Friday, Easter Mon, 1 May, 25/26 Dec
+)
+
+cal = TARGETCalendar()
+cal.is_open(date(2026, 12, 25))         # False (Christmas Day)
+cal.next_business_day(date(2026, 12, 25))  # date(2026, 12, 28) — Mon
+```
+
+### Cleanse text for the SWIFT character set
+
+Transliterates accented Latin and non-Latin scripts (Cyrillic, CJK, Arabic,
+Greek, Hebrew, Devanagari) to the SWIFT-X or SWIFT-Z character set so SWIFT
+gateways do not silently reject the message.
+
+```python
+from pacs008.compliance import cleanse_data_with_report
+
+raw = [{"debtor_name": "Москва Müller", "msg_id": "X" * 50}]
+clean, report = cleanse_data_with_report(raw)
+
+# clean[0]["debtor_name"] == "Moskva Mueller"   (Cyrillic via anyascii; ü via map)
+# len(clean[0]["msg_id"]) == 35                 (truncated to ISO 20022 max)
+print(report.summary())
+# "1 violations found across 1/1 rows. All auto-corrected."
+```
+
+Pass `policy="reject"` to raise `PaymentValidationError` instead of cleansing.
+
+### Wrap a message in a Business Application Header (BAH)
+
+CBPR+ and HVPS+ require every business message to be enveloped in a
+`head.001.001.02` BAH.
 
 ```python
 from pacs008 import generate_xml_string
+from pacs008.standards.bah import wrap_in_bah
+
+payload = generate_xml_string([payment], "pacs.008.001.08", template, xsd)
+
+envelope = wrap_in_bah(
+    payload,
+    sender_bic="HSBCGB2L",
+    receiver_bic="DEUTDEFF",
+    biz_msg_idr="BIZMSG-2026-001",
+    msg_def_idr="pacs.008.001.08",
+    creation_dt="2026-06-13T10:30:00Z",
+    priority="HIGH",       # optional: HIGH / NORM / URGT
+)
+# envelope is a BizMsgEnvlp/Hdr+Doc XML document ready to send.
+```
+
+### Parse inbound messages by `MsgDefIdr`
+
+The inbound parser classifies any pacs/pain/camt/head/admi message — including
+BAH-wrapped envelopes — by reading `AppHdr.MsgDefIdr` (or the root namespace
+URI if no BAH is present).
+
+```python
+from pacs008.xml.parser import parse
+
+msg = parse(open("inbound.xml", "rb").read())
+msg.msg_family       # 'pacs.002'
+msg.version          # '001.10'
+msg.msg_def_idr      # 'pacs.002.001.10'
+msg.envelope_wrapped # True
+msg.bah.sender_bic   # 'DEUTDEFF'  (None if envelope_wrapped is False)
+```
+
+### Stream large batches with constant memory
+
+For 100k-row batches the Jinja path would exhaust container memory; the
+streaming writer keeps peak RSS bounded by one `<CdtTrfTxInf>` block.
+
+```python
+from pacs008.xml.stream_writer import write_stream
+
+def rows():
+    for i in range(100_000):
+        yield {"msg_id": "BATCH001", "uetr": f"u{i}", ...}
+
+with open("big.xml", "wb") as f:
+    n = write_stream(rows(), output=f, msg_id="BATCH001")
+# n == 100_000 — peak memory stays low because rows() is a generator.
+```
+
+### Split a batch to fit scheme cardinality
+
+SCT Inst and Fedwire mandate exactly one transaction per file. Split a wide
+batch lazily — `split_for_scheme` is a generator so a 1 M-row input does not
+materialise all chunks at once.
+
+```python
+from pacs008.core.splitter import required_chunks, split_for_scheme
+
+required_chunks(rows, "fedwire")     # math.ceil(len(rows) / 1)
+
+for chunk in split_for_scheme(rows, "fedwire"):
+    # Each chunk: list[dict] with a rewritten msg_id "BATCH001-0001", "-0002", …
+    process_files(..., data_file_path=chunk, scheme="fedwire")
+```
+
+### Track Verification of Payee (VoP) results
+
+EPC VoP is mandatory for eurozone PSPs since **9 October 2025**.
+
+```python
+from pacs008.vop import (
+    VoPMatchResult,
+    VoPResult,
+    embed_in_row,
+    validate_vop_results,
+)
+
+row = embed_in_row(
+    {"msg_id": "M1"},
+    VoPResult(
+        result=VoPMatchResult.MATCH,
+        name_compared="Alice Smith",
+        iban="DE89370400440532013000",
+    ),
+)
+
+# Audit a list of payment rows for VoP coverage and outcomes.
+errors = validate_vop_results([row])  # [] — MATCH passes.
+```
+
+### Detect duplicate submissions (idempotency)
+
+A pluggable store with in-memory (LRU + TTL) and persistent SQLite back-ends.
+Default policy is `OnDuplicate.ERROR` — silent dedup is opt-in.
+
+```python
+from datetime import timedelta
+from pacs008.idempotency import (
+    IdempotencyViolation,
+    MemoryStore,
+    OnDuplicate,
+    compute_payload_hash,
+)
+
+store = MemoryStore()
+key = "MSG-2026-001"
+payload_hash = compute_payload_hash({"msg_id": key, "amount": "25000.00"})
+
+store.check(key, payload_hash, window=timedelta(hours=24))     # False — novel.
 
 try:
-    xml = generate_xml_string(
-        invalid_data,
-        "pacs.008.001.05",
-        "pacs008/templates/pacs.008.001.05/template.xml",
-        "pacs008/templates/pacs.008.001.05/pacs.008.001.05.xsd",
-    )
-except ValueError as e:
-    print(f"Data validation failed: {e}")
+    store.check(key, payload_hash, window=timedelta(hours=24))  # raises
+except IdempotencyViolation as exc:
+    print(f"Duplicate of {exc.previous.recorded_at.isoformat()}")
 ```
 
-### Complete Validation Workflow
+For persistence across process restarts:
 
-```mermaid
-%%{init: {'theme':'default'}}%%
-flowchart TD
-    Start([1. Load Data Source]) --> DataType{Data Type?}
-
-    DataType -->|CSV| LoadCSV[Load CSV File]
-    DataType -->|JSON| LoadJSON[Load JSON File]
-    DataType -->|JSONL| LoadJSONL[Load JSONL File]
-    DataType -->|SQLite| LoadDB[Load SQLite Database]
-    DataType -->|Parquet| LoadParquet[Load Parquet File]
-    DataType -->|Python| LoadPython[Load Python Dict/List]
-
-    LoadCSV --> Stage1[2. Automatic Data Validation]
-    LoadJSON --> Stage1
-    LoadJSONL --> Stage1
-    LoadDB --> Stage1
-    LoadParquet --> Stage1
-    LoadPython --> Stage1
-
-    Stage1 --> CheckReq[Check Required Fields]
-    CheckReq --> CheckTypes[Validate Data Types]
-    CheckTypes --> CheckFormats[Check ISO 20022 Formats]
-    CheckFormats --> CheckBIC[Validate BIC Codes]
-
-    CheckBIC --> Valid1{All Checks<br/>Passed?}
-
-    Valid1 -->|No| ErrorData[ValueError Raised<br/>Fix Your Data]
-    Valid1 -->|Yes| ValidData[Valid Data]
-
-    ErrorData --> Start
-
-    ValidData --> SWIFT[3. SWIFT Compliance Cleansing]
-    SWIFT --> Stage3[4. Generate XML File]
-    Stage3 --> Stage4[5. XSD Schema Validation]
-
-    Stage4 --> CheckStruct[Validate XML Structure]
-    CheckStruct --> CheckElem[Check Element Formatting]
-    CheckElem --> CheckComp[Verify ISO 20022 Compliance]
-
-    CheckComp --> Valid2{XML Schema<br/>Valid?}
-
-    Valid2 -->|No| ErrorXML[Validation Failed<br/>Check Error Message]
-    Valid2 -->|Yes| ValidXML[Valid XML]
-
-    ErrorXML --> Start
-
-    ValidXML --> Success([6. Interbank Payment File Ready<br/>for SWIFT/TARGET2/SEPA Submission])
+```python
+from pacs008.idempotency import SQLiteStore
+store = SQLiteStore("/var/lib/pacs008/idempotency.db")
 ```
 
-## Output Files
+### Sign a generation event for audit (DORA)
 
-When you run **Pacs008**, it generates the following:
+A tamper-evident, Ed25519-signed summary suitable for DORA-aligned audit
+trails — the validator decisions are stable strings that survive in your
+SIEM long after the run.
 
-1. **XML Payment File**: A fully compliant ISO 20022 pacs.008 message file
-   - Generated in the same directory as your XML template
-   - Validated against the XSD schema before being saved
-   - Ready for submission to your bank or payment processor via SWIFT/TARGET2/SEPA
+```python
+from pacs008.observability.audit import (
+    Ed25519Signer,
+    sign_envelope,
+    verify_envelope,
+)
 
-2. **Log Output**: Detailed logging information displayed in your terminal
-   - Shows validation progress and any errors
-   - Confirms successful file generation
+signer = Ed25519Signer.generate()   # or .from_private_key_pem(pem_bytes)
+record = sign_envelope(
+    input_payload=open("payments.csv", "rb").read(),
+    output_xml=xml.encode("utf-8"),
+    validator_decisions=("swift_charset:cleansed", "scheme:cbpr_plus:ok"),
+    scheme="cbpr_plus",
+    signer=signer,
+)
 
-### Output Location
-
-The generated XML file will be created at the path you specified in the
-`xml_template_file_path` argument. For example:
-
-```sh
-pacs008 -t pacs.008.001.05 \
-    -m /output/payment_2026-01-15.xml \
-    -s pacs008/templates/pacs.008.001.05/pacs.008.001.05.xsd \
-    -d payments.csv
+verify_envelope(record, public_key_bytes=signer.public_key_bytes())  # True
+# record.to_dict() is JSON-serialisable and ready to ship to a SIEM.
 ```
 
-Will create `/output/payment_2026-01-15.xml`
+### Emit OpenTelemetry spans
+
+Install the optional extra (`pip install "pacs008[otel]"`); enable with the
+`PACS008_OTEL_ENABLED` environment variable. When OTel is not installed the
+helpers silently no-op so instrumentation can stay in production code.
+
+```python
+from pacs008.observability.otel import trace_span
+
+with trace_span(
+    "pacs008.generate",
+    attributes={
+        "pacs008.scheme": "cbpr_plus",
+        "payment.uetr": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+    },
+):
+    process_files(..., scheme="cbpr_plus")
+```
+
+---
+
+## Command-line interface
+
+```bash
+pacs008 \
+    -t pacs.008.001.08 \
+    -m pacs008/templates/pacs.008.001.08/template.xml \
+    -s pacs008/templates/pacs.008.001.08/pacs.008.001.08.xsd \
+    -d payments.csv \
+    -o ./output \
+    --verbose
+```
+
+| Flag | Description |
+|---|---|
+| `-t / --xml-message-type` | One of `pacs.008.001.01` … `pacs.008.001.13`. Required. |
+| `-m / --template` | Path to the Jinja2 XML template. Required. |
+| `-s / --schema` | Path to the XSD schema for output validation. Required. |
+| `-d / --data` | Path to a CSV / JSON / JSONL / SQLite / Parquet file. Required. |
+| `-o / --output-dir` | Output directory (default: current working directory). |
+| `--dry-run` (alias `--validate-only`) | Validate inputs without writing XML. |
+| `-v / --verbose` | Enable DEBUG-level logs. |
+| `-h / --help` | Full help text. |
+
+**Exit codes:** `0` success · `1` validation or processing error · `2` invalid
+arguments.
+
+---
+
+## REST API (FastAPI)
+
+```bash
+uvicorn pacs008.api.app:app --host 0.0.0.0 --port 8000
+# Interactive docs: http://localhost:8000/api/docs  (or /api/redoc)
+```
+
+| Method | Path | Purpose |
+|---|---|---|
+| `GET` | `/api/health` | Liveness check + library version. |
+| `POST` | `/api/validate` | Validate a data file against the schema. |
+| `POST` | `/api/generate` | Synchronous XML generation. |
+| `POST` | `/api/generate/async` | Submit an async generation job, returns `job_id`. |
+| `GET` | `/api/status/{job_id}` | Poll an async job. |
+| `DELETE` | `/api/jobs/{job_id}` | Cancel an async job. |
+| `GET` | `/api/download/{job_id}` | Download the generated XML for a completed job. |
+
+Example:
+
+```bash
+curl -X POST http://localhost:8000/api/generate \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "file_path": "/data/payments.csv",
+    "data_source": "csv",
+    "message_type": "pacs.008.001.08",
+    "output_dir": "/data/out"
+  }'
+```
+
+---
+
+## Docker
+
+```bash
+docker build -t pacs008:local .
+docker run --rm -p 8000:8000 pacs008:local
+# The container starts uvicorn on :8000 with the API mounted at /api/*.
+```
+
+The image runs as a non-root `appuser`, ships a `/api/health` healthcheck, and
+contains the production dependency set only (no dev tooling).
+
+---
+
+## Input data format
+
+### Required columns
+
+| Field | Description | Example |
+|---|---|---|
+| `msg_id` | Message identifier (max 35 chars) | `MSG-2026-001` |
+| `creation_date_time` | ISO 8601 timestamp | `2026-06-13T10:30:00` |
+| `nb_of_txs` | Number of transactions | `1` |
+| `settlement_method` | `CLRG`, `INDA`, `COVE` or `INGA` | `CLRG` |
+| `interbank_settlement_date` | Settlement date (ISO 8601) | `2026-06-15` |
+| `end_to_end_id` | End-to-end identifier (max 35 chars) | `E2E-INV-001` |
+| `tx_id` | Transaction identifier | `TX-001` |
+| `interbank_settlement_amount` | Decimal amount | `25000.00` |
+| `interbank_settlement_currency` | ISO 4217 code | `EUR` |
+| `charge_bearer` | `DEBT`, `CRED`, `SHAR` or `SLEV` | `SHAR` |
+| `debtor_name` | Debtor name (max 140 chars) | `Acme Corp GmbH` |
+| `debtor_agent_bic` | Debtor bank BIC (8 or 11 chars) | `DEUTDEFF` |
+| `creditor_agent_bic` | Creditor bank BIC (8 or 11 chars) | `BNPAFRPP` |
+| `creditor_name` | Creditor name (max 140 chars) | `Widget Industries SA` |
+
+### Version-specific columns
+
+| Field | Available from | Description |
+|---|---|---|
+| `uetr` | `001.08+` | UUID v4 (36 chars) — UETR for SWIFT gpi tracking. |
+| `mandate_id` | `001.10+` | Mandate identifier (max 35 chars). |
+| `expiry_date_time` | `001.13` | ISO 8601 timestamp — message expiry. |
+
+### Optional scheme-aware columns
+
+| Prefix | Used by |
+|---|---|
+| `{party}_lei` | `validate_leis` and `CHAPSProfile` (FI fields required). `{party}` ∈ {`debtor`, `creditor`, `debtor_agent`, `creditor_agent`, `ultimate_debtor`, `ultimate_creditor`}. |
+| `{party}_address_{field}` | `validate_addresses` — `{field}` ∈ {`strt_nm`, `bldg_nb`, `pst_cd`, `twn_nm`, `ctry`, …} or `adr_line_0` … `adr_line_6`. |
+| `vop_result`, `vop_iban`, `vop_name_compared`, `vop_reason_code`, `vop_performed_at` | `pacs008.vop` — EPC Verification of Payee. |
+
+---
 
 ## Architecture
 
 ```
 pacs008/
-├── api/              # FastAPI REST endpoints, async job manager
-├── cli/              # Click CLI for batch processing
-├── compliance/       # SWIFT charset validation, field length enforcement
-├── core/             # Processing pipeline: data → XML
-├── csv/              # CSV loader and column validator
-├── data/             # Universal data loader with format detection
-├── db/               # SQLite loader (standard + streaming)
-├── json/             # JSON and JSONL loader
-├── parquet/          # Apache Parquet loader
-├── schemas/          # 13 JSON schemas for input validation
+├── api/              # FastAPI REST app, async job manager
+├── cli/              # Click CLI
+├── compliance/       # SWIFT X / Z charset cleansing (anyascii fallback)
+├── core/             # process_files pipeline + scheme-aware batch splitter
+├── csv/  json/  db/  parquet/   # Format-specific loaders + validators
+├── data/             # Universal data loader
+├── idempotency/      # IdempotencyStore ABC + MemoryStore + SQLiteStore
+├── observability/    # Structured JSON logs, request-id tracing,
+│                       Ed25519 audit envelope, optional OpenTelemetry
+├── profiles/         # SchemeProfile ABC + Generic, CBPR+, Fedwire,
+│                       CHAPS, HVPS+, T2 RTGS, SCT Inst profiles
+├── schemas/          # 20 JSON schemas for input validation
 ├── security/         # Path traversal prevention
-├── templates/        # 13 Jinja2 templates + XSD schemas
-├── validation/       # BIC, IBAN, and schema validators
-└── xml/              # XML generation, XSD validation, file I/O
+├── standards/        # PostalAddress (Nov 2026 cliff), wrap_in_bah (head.001)
+├── templates/        # 20 Jinja2 templates + XSD schemas
+├── validation/       # IBAN, BIC, LEI, JSON Schema, XSD, holiday calendars
+├── vop/              # EPC Verification of Payee result model
+└── xml/              # generate_xml, stream_writer, inbound parser
 ```
 
-### Data Flow
+### Generation pipeline
 
 ```mermaid
 flowchart LR
-    A[CSV / JSON / JSONL / SQLite / Parquet] --> B[Data Loader]
+    A["CSV / JSON / JSONL /
+       SQLite / Parquet"] --> B[Data Loader]
     B --> C[Schema Validation]
-    C --> D[SWIFT Compliance]
-    D --> E[Jinja2 Template]
-    E --> F[XSD Validation]
-    F --> G[pacs.008 XML]
+    C --> D["Scheme Profile
+             (optional)"]
+    D --> E[SWIFT Charset Cleansing]
+    E --> F[Jinja2 Template]
+    F --> G[XSD Validation]
+    G --> H[pacs.008 XML]
 ```
+
+---
 
 ## Development
 
-### Setting Up Development Environment
-
-Pacs008 uses [Poetry](https://python-poetry.org/) for dependency management and [mise](https://mise.jdx.dev/) for Python version management.
-
 ```bash
-# Install Python version via mise
-mise install
-
-# Clone and install
 git clone https://github.com/sebastienrousseau/pacs008.git
 cd pacs008
-poetry install
-
-# Activate the virtual environment
+poetry install --extras otel
 poetry shell
+
+make check       # ruff + black + mypy + bandit + pytest + example scripts
+make test        # pytest with coverage
+make test-fast   # pytest without coverage
+make lint        # ruff + black --check
+make type-check  # mypy --strict
 ```
 
-### Development Workflow (Zero-Trust Quality Model)
+Quality gates (CI-enforced):
 
-We enforce a **Zero-Trust Quality Model** with mandatory quality gates. Before submitting a PR, you **must** run the local quality gates to ensure your changes meet our standards.
+| Gate | Tool |
+|---|---|
+| Lint | `ruff check pacs008/` |
+| Format | `black --check pacs008/ tests/` |
+| Types | `mypy pacs008/` (strict mode) |
+| Tests | `pytest --cov=pacs008` (90% branch-coverage floor) |
+| Security | `bandit -r pacs008/` |
+| Smoke | `pytest -m smoke` |
+| Cross-platform matrix | Python 3.9 — 3.12 × Ubuntu / macOS / Windows |
 
-#### Quality Gates (Makefile)
+---
 
-We use a `Makefile` to orchestrate all quality checks. This ensures consistency between local development and CI/CD pipelines.
+## Security
 
-```bash
-# Run all checks (REQUIRED before commit)
-make check
+Security issues should be reported **privately** via GitHub's [Security
+Advisories](https://github.com/sebastienrousseau/pacs008/security/advisories/new)
+or by email to `sebastian.rousseau@gmail.com`. See [`SECURITY.md`](./SECURITY.md)
+for the full disclosure policy, SLA targets, and hardening guidance for
+production deployments.
 
-# Run tests with coverage
-make test
+Highlights:
 
-# Run tests without coverage (fast)
-make test-fast
+- XXE protection via `defusedxml` on every parse path.
+- Path-traversal protection in `pacs008.security.path_validator`.
+- Automatic PII redaction (IBAN / BIC / name / account) in structured logs.
+- Tamper-evident Ed25519-signed audit records for every generation event.
 
-# Run linters (Ruff + Black)
-make lint
-
-# Run type checking (mypy)
-make type-check
-
-# Cleanup build artifacts
-make clean
-```
-
-**Quality Gate Requirements:**
-
-| Gate | Command | What It Checks | Exit Code Required |
-|------|---------|----------------|--------------------|
-| **Tests** | `make test` | pytest with coverage | 0 (PASS) |
-| **Lint** | `make lint` | Ruff check, Black format | 0 (PASS) |
-| **Types** | `make type-check` | mypy strict mode | 0 (PASS) |
-| **Full Gate** | `make check` | All of the above | 0 (PASS) |
-
-**Note:** All PRs must pass the `check` target (exit code 0) and maintain the coverage threshold. No exceptions.
-
-### Manual Quality Tools (Advanced)
-
-If you need to run individual tools:
-
-```bash
-# Linting
-poetry run ruff check pacs008/
-
-# Formatting
-poetry run black pacs008/ tests/
-
-# Type checking
-poetry run mypy pacs008/
-
-# Security scanning
-poetry run bandit -r pacs008/
-
-# Testing
-poetry run pytest tests/ --cov=pacs008 --cov-report=html
-```
-
-**However, we strongly recommend using `make check` instead of individual commands to ensure nothing is missed.**
-
-## Troubleshooting
-
-### Common Issues and Solutions
-
-**Issue: "ModuleNotFoundError: No module named 'pacs008'"**
-
-Solution: Ensure you have installed pacs008 and are using the correct Python environment:
-```sh
-python -m pip install pacs008
-# Or if you're using a virtual environment:
-source venv/bin/activate
-python -m pip install pacs008
-```
-
-**Issue: "Error: Invalid XML message type"**
-
-Solution: Ensure you're using one of the supported message types:
-- pacs.008.001.01 through pacs.008.001.13
-
-**Issue: "Error: XML template file does not exist"**
-
-Solution: Verify the file path is correct and the file exists:
-```sh
-ls -la /path/to/your/template.xml
-```
-
-**Issue: "Error: Invalid data"**
-
-Solution: Check that your data file:
-- Contains all required fields
-- Has valid data in each field
-- Uses proper formatting (CSV: commas as delimiters; JSON: valid syntax)
-- Has correct BIC codes (8 or 11 characters)
-- Has valid settlement method codes (CLRG, INDA, COVE, INGA)
-
-**Issue: "Validation failed"**
-
-Solution: This means the generated XML doesn't match the XSD schema:
-- Ensure your data values match ISO 20022 format requirements
-- Check that IBANs, BICs, and currency codes are valid
-- Verify date/time formats are correct (ISO 8601: YYYY-MM-DDTHH:MM:SS)
-- Review the error message for specific field issues
-
-**Issue: Permission denied when writing output file**
-
-Solution: Ensure you have write permissions for the output directory:
-```sh
-chmod u+w /path/to/output/directory
-```
-
-### Getting Help
-
-If you encounter issues not covered here:
-1. Check the [GitHub Issues](https://github.com/sebastienrousseau/pacs008/issues) for similar problems
-2. Review the [Documentation](https://pacs008.com) for detailed guides
-3. Create a new issue with:
-   - Your Python version (`python --version`)
-   - Pacs008 version (`python -m pip show pacs008`)
-   - Full error message
-   - Minimal example to reproduce the issue
-
-## Documentation
-
-> **Info:** Do check out our [website][00] for comprehensive documentation.
-
-### Supported messages
-
-This section gives access to the documentation related to the ISO 20022 message
-definitions supported by **Pacs008**.
-
-#### Payments Clearing and Settlement
-
-Set of messages used between financial institutions for the clearing and
-settlement of payment transactions.
-
-| Status | Message type    | Name                                    |
-| ------ | --------------- | --------------------------------------- |
-| ✅      | pacs.008.001.01 | FI-to-FI Customer Credit Transfer V01   |
-| ✅      | pacs.008.001.02 | FI-to-FI Customer Credit Transfer V02   |
-| ✅      | pacs.008.001.03 | FI-to-FI Customer Credit Transfer V03   |
-| ✅      | pacs.008.001.04 | FI-to-FI Customer Credit Transfer V04   |
-| ✅      | pacs.008.001.05 | FI-to-FI Customer Credit Transfer V05   |
-| ✅      | pacs.008.001.06 | FI-to-FI Customer Credit Transfer V06   |
-| ✅      | pacs.008.001.07 | FI-to-FI Customer Credit Transfer V07   |
-| ✅      | pacs.008.001.08 | FI-to-FI Customer Credit Transfer V08   |
-| ✅      | pacs.008.001.09 | FI-to-FI Customer Credit Transfer V09   |
-| ✅      | pacs.008.001.10 | FI-to-FI Customer Credit Transfer V10   |
-| ✅      | pacs.008.001.11 | FI-to-FI Customer Credit Transfer V11   |
-| ✅      | pacs.008.001.12 | FI-to-FI Customer Credit Transfer V12   |
-| ✅      | pacs.008.001.13 | FI-to-FI Customer Credit Transfer V13   |
-
-#### Related ISO 20022 Message Families
-
-| Status | Message type    | Name                               |
-| ------ | --------------- | ---------------------------------- |
-| ✅      | pacs.002.001.12 | FI-to-FI Payment Status Report     |
-| ✅      | pacs.003.001.09 | FI-to-FI Customer Direct Debit     |
-| ✅      | pacs.004.001.11 | Payment Return                     |
-| ✅      | pacs.007.001.11 | FI-to-FI Payment Reversal          |
-| ✅      | pacs.009.001.10 | Financial Institution Credit Transfer |
-| ✅      | pacs.010.001.05 | Financial Institution Direct Debit |
-| ✅      | pacs.028.001.05 | FI-to-FI Payment Status Request    |
+---
 
 ## Licence
 
-The project is licensed under the terms of the Apache Licence (Version 2.0).
+Licensed under the [Apache Licence, Version 2.0](https://opensource.org/license/apache-2-0/).
+See [`LICENSE`](./LICENSE) for the full text. Unless you explicitly state
+otherwise, any contribution intentionally submitted for inclusion in the work
+shall be licensed as above, without any additional terms or conditions.
 
-- [Apache Licence, Version 2.0][01]
+---
 
-## Contribution
+## Contributing
 
-We welcome contributions to **Pacs008**. Please see the
-[contributing instructions][04] for more information.
+Contributions are welcome — please read [`CONTRIBUTING.md`](./CONTRIBUTING.md)
+first. All contributors agree to abide by the project's code of conduct, and
+all pull requests must pass the full CI matrix (`make check`).
 
-Unless you explicitly state otherwise, any contribution intentionally submitted
-for inclusion in the work by you, as defined in the Apache-2.0 licence, shall
-be licensed as above, without any additional terms or conditions.
-
-## Acknowledgements
-
-We would like to extend a big thank you to all the awesome contributors of
-[Pacs008][05] for their help and support.
-
-[00]: https://pacs008.com
-[01]: https://opensource.org/license/apache-2-0/
-[03]: https://github.com/sebastienrousseau/pacs008
-[04]: https://github.com/sebastienrousseau/pacs008/blob/main/CONTRIBUTING.md
-[05]: https://github.com/sebastienrousseau/pacs008/graphs/contributors
-[06]: https://codecov.io/github/sebastienrousseau/pacs008?branch=main
-[07]: https://pypi.org/project/pacs008/
-[release-001]: https://github.com/sebastienrousseau/pacs008/releases/tag/v0.0.1
-
-[banner]: https://kura.pro/pacs008/images/banners/banner-pacs008.svg 'Pacs008, A Python Library for Automating ISO 20022 pacs.008 FI-to-FI Customer Credit Transfer XML Messages.'
-[codecov-badge]: https://img.shields.io/codecov/c/github/sebastienrousseau/pacs008?style=for-the-badge 'Codecov badge'
-[docs-badge]: https://img.shields.io/badge/Docs-pacs008.com-blue?style=for-the-badge 'Documentation badge'
-[docs-url]: https://pacs008.com/
-[licence-badge]: https://img.shields.io/pypi/l/pacs008?style=for-the-badge 'Licence badge'
-[pypi-badge]: https://img.shields.io/pypi/v/pacs008?style=for-the-badge 'PyPI version badge'
-[pypi-downloads-badge]: https://img.shields.io/pypi/dm/pacs008.svg?style=for-the-badge 'PyPI Downloads badge'
-[python-versions-badge]: https://img.shields.io/pypi/pyversions/pacs008.svg?style=for-the-badge 'Python versions badge'
-[quality-badge]: https://img.shields.io/github/actions/workflow/status/sebastienrousseau/pacs008/ci.yml?branch=main&label=Quality&style=for-the-badge 'Code quality badge'
-[quality-url]: https://github.com/sebastienrousseau/pacs008/actions/workflows/ci.yml
-[tests-badge]: https://img.shields.io/github/actions/workflow/status/sebastienrousseau/pacs008/ci.yml?branch=main&label=Tests&style=for-the-badge 'Tests badge'
-[tests-url]: https://github.com/sebastienrousseau/pacs008/actions/workflows/ci.yml
+Thanks to all our [contributors](https://github.com/sebastienrousseau/pacs008/graphs/contributors).
