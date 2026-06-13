@@ -1,0 +1,104 @@
+name: Bug report
+description: Report a defect in pacs008
+title: "[bug] "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report. Please fill in
+        as much detail as possible. If this is a security issue, please
+        follow `SECURITY.md` instead of opening a public issue.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: One or two sentences on what's wrong.
+      placeholder: |
+        e.g. Generating pacs.008.001.08 with a Cyrillic debtor name silently
+        replaces the name with dots instead of transliterating.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Minimal commands or code that triggers the bug.
+      render: bash
+      placeholder: |
+        poetry run pacs008 -t pacs.008.001.08 \
+          -m pacs008/templates/pacs.008.001.08/template.xml \
+          -s pacs008/templates/pacs.008.001.08/pacs.008.001.08.xsd \
+          -d /tmp/bug.csv
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: |
+        Include error output. Please redact any IBANs, BICs, or names before
+        pasting.
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: pacs008 version
+      placeholder: e.g. 0.0.2
+    validations:
+      required: true
+
+  - type: input
+    id: python
+    attributes:
+      label: Python version
+      placeholder: e.g. 3.12.4
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - macOS
+        - Linux
+        - Windows
+        - Docker
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: scheme
+    attributes:
+      label: Scheme profile (if applicable)
+      options:
+        - generic
+        - CBPR+
+        - HVPS+
+        - Fedwire
+        - CHAPS
+        - T2 RTGS
+        - SCT Inst
+        - "Not applicable"
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
+      description: Logs (with PII redacted), screenshots, related issues, etc.
