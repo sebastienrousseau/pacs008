@@ -34,7 +34,13 @@ from pacs008.logging_schema import (
     log_process_start,
     log_process_success,
 )
+from pacs008.profiles import (
+    SchemeViolationError,
+    get_profile,
+)
 from pacs008.security.path_validator import sanitize_for_log, validate_path
+from pacs008.standards.address import validate_addresses
+from pacs008.validation.lei_validator import validate_leis
 
 # CORRECTION: Circular import workaround. Imports moved to top-level.
 
@@ -231,11 +237,70 @@ def _generate_and_log(
     return int((time.time() - gen_start) * 1000)
 
 
+def _run_scheme_validation(
+    payment_data: list[dict[str, Any]],
+    scheme: str,
+) -> None:
+    """Apply scheme-profile business rules, address policy, and LEI checks.
+
+    Raises:
+        SchemeViolationError: if any BLOCK-severity violation is found.
+
+    For ``scheme="generic"`` (the default) this is a no-op — the
+    permissive baseline has empty allowed-charge-bearer overrides and
+    ``UNSTRUCTURED_OK`` address policy.
+    """
+    profile = get_profile(scheme)
+
+    # Business rules (charge bearer, UETR, remit length, cardinality).
+    violations = list(profile.validate_business_rules(payment_data))
+
+    # Address policy (Nov 2026 cliff).
+    address_errors = validate_addresses(
+        payment_data, policy=profile.address_policy()
+    )
+    for err in address_errors:
+        from pacs008.profiles.base import BusinessRuleViolation
+
+        violations.append(
+            BusinessRuleViolation(
+                row=err.row,
+                party=err.party,
+                field=f"{err.party}_address",
+                rule="address_policy",
+                message=err.message,
+            )
+        )
+
+    # LEI requirements (CHAPS-style mandates).
+    required_lei_parties = profile.lei_required_for()
+    if required_lei_parties:
+        lei_errors = validate_leis(
+            payment_data, required_parties=required_lei_parties
+        )
+        for err in lei_errors:
+            from pacs008.profiles.base import BusinessRuleViolation
+
+            violations.append(
+                BusinessRuleViolation(
+                    row=err.row,
+                    party=err.party,
+                    field=err.field,
+                    rule="lei",
+                    message=err.reason,
+                )
+            )
+
+    if violations:
+        raise SchemeViolationError(violations=violations, scheme=scheme)
+
+
 def process_files(
     xml_message_type: str,
     xml_template_file_path: str,
     xsd_schema_file_path: str,
     data_file_path: Union[str, list[dict[str, Any]], dict[str, Any]],
+    scheme: str = "generic",
 ) -> None:
     """
     Generate an ISO 20022 pacs.008 FI-to-FI Customer Credit Transfer message
@@ -246,10 +311,14 @@ def process_files(
         xml_template_file_path: Path to the XML template file.
         xsd_schema_file_path: Path to the XSD schema file.
         data_file_path: File path (CSV/DB/JSON/Parquet) or Python data (list/dict).
+        scheme: Scheme profile name to apply (default ``"generic"``).
+            Pass ``"cbpr_plus"``, ``"fedwire"``, … to enforce
+            scheme-specific rules. See :mod:`pacs008.profiles`.
 
     Raises:
         ValueError: If the XML message type is not supported or data is invalid.
         FileNotFoundError: If required files do not exist.
+        SchemeViolationError: If the active scheme rejects the batch.
     """
 
     # Initialize context and timing
@@ -266,6 +335,7 @@ def process_files(
             xml_message_type, xml_template_file_path, xsd_schema_file_path
         )
         payment_data = _load_data(data_file_path, start_time)
+        _run_scheme_validation(payment_data, scheme)
         _register_message_namespaces(xml_message_type)
         gen_duration = _generate_and_log(
             payment_data,
