@@ -31,7 +31,7 @@ jobs:
         run: pip install poetry
 
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: poetry install --no-interaction --extras otel
 
       - name: Run tests
         run: poetry run pytest tests/ -v --tb=short
@@ -58,7 +58,7 @@ jobs:
         run: pip install poetry
 
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: poetry install --no-interaction --extras otel
 
       - name: Run smoke tests
         run: poetry run pytest tests/ -m smoke -v --no-cov --tb=short
@@ -84,7 +84,7 @@ jobs:
         run: pip install poetry
 
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: poetry install --no-interaction --extras otel
 
       - name: Ruff check
         run: poetry run ruff check pacs008/
@@ -114,7 +114,7 @@ jobs:
         run: pip install poetry
 
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: poetry install --no-interaction --extras otel
 
       - name: Bandit
         run: poetry run bandit -r pacs008/ -c pyproject.toml || poetry run bandit -r pacs008/ -s B101
