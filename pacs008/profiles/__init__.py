@@ -58,16 +58,24 @@ from pacs008.profiles.base import (
 # Import concrete profiles for their side effect of registering
 # themselves; re-export at package level for convenience.
 from pacs008.profiles.cbpr_plus import CBPRPlusProfile
+from pacs008.profiles.chaps import CHAPSProfile
 from pacs008.profiles.fedwire import FedwireProfile
 from pacs008.profiles.generic import GenericProfile
+from pacs008.profiles.hvps_plus import HVPSPlusProfile
+from pacs008.profiles.sct_inst import SCTInstProfile
+from pacs008.profiles.t2_rtgs import T2RTGSProfile
 
 __all__ = [
     "BusinessRuleViolation",
     "CBPRPlusProfile",
+    "CHAPSProfile",
     "FedwireProfile",
     "GenericProfile",
+    "HVPSPlusProfile",
+    "SCTInstProfile",
     "SchemeProfile",
     "SchemeViolationError",
+    "T2RTGSProfile",
     "get_profile",
     "list_profiles",
     "register_profile",
