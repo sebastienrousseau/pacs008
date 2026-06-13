@@ -13,16 +13,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Backward-compatibility shim for ``pacs008.observability``.
+"""Structured observability for pacs008.
 
-The original 1,000+ line module has been split into the
-:mod:`pacs008.observability` package. This module re-exports the
-public (and tested-private) API so existing imports keep working:
+This package houses everything related to logging, tracing, metrics, and
+PII redaction. It replaces the monolithic ``pacs008.logging_schema``
+module while preserving the public API.
 
-    from pacs008.logging_schema import Events, log_event  # still works
+Sub-modules:
 
-New code should import directly from :mod:`pacs008.observability` or one
-of its sub-modules.
+- :mod:`pacs008.observability.fields` — log field/level constants.
+- :mod:`pacs008.observability.events` — event-name constants and the
+  ``log_event`` helpers.
+- :mod:`pacs008.observability.tracing` — request-id ``ContextVar`` for
+  distributed tracing.
+- :mod:`pacs008.observability.redaction` — PII masking and log-injection
+  sanitisation.
+- :mod:`pacs008.observability.formatters` — JSON formatter and
+  ``configure_json_logging`` setup helper.
+- :mod:`pacs008.observability.metrics` — execution summary and telemetry
+  trackers.
+
+Existing code can import either from this package or from
+``pacs008.logging_schema`` (kept as a re-export shim for backward
+compatibility).
 """
 
 from pacs008.observability.events import (
@@ -44,14 +57,8 @@ from pacs008.observability.metrics import (
     ExecutionMetrics,
     ExecutionSummaryTracker,
 )
-from pacs008.observability.redaction import (
-    _redact_pii_from_dict,
-    _sanitize_value,
-    mask_sensitive_data,
-)
+from pacs008.observability.redaction import mask_sensitive_data
 from pacs008.observability.tracing import (
-    __version__,
-    _request_id_context,
     generate_request_id,
     get_request_id,
     set_request_id,
@@ -65,7 +72,6 @@ __all__ = [
     "Fields",
     "JSONFormatter",
     "LogLevel",
-    "__version__",
     "configure_json_logging",
     "generate_request_id",
     "get_request_id",
