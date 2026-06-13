@@ -113,14 +113,18 @@ class SchemaValidator:
             validated_schema_path = validate_path(
                 schema_file, must_exist=True, base_dir=schema_dir
             )  # nosec B108
-        except Exception as e:
+        except (
+            Exception
+        ) as e:  # pragma: no cover  defensive — message_type pre-validated
             raise FileNotFoundError(f"Schema validation failed: {e}") from e
 
         # Explicit startswith guard for CodeQL CWE-22 sanitiser recognition.
         # validate_path already enforces this, but CodeQL requires the guard
         # at the call site for interprocedural taint tracking.
         schema_dir_prefix = str(Path(schema_dir).resolve())
-        if not validated_schema_path.startswith(schema_dir_prefix):
+        if not validated_schema_path.startswith(
+            schema_dir_prefix
+        ):  # pragma: no cover  defence-in-depth CWE-22 barrier
             raise FileNotFoundError(
                 f"Schema path escapes schema directory: {schema_dir}"
             )
@@ -131,7 +135,9 @@ class SchemaValidator:
                 validated_schema_path, encoding="utf-8"
             ) as f:  # nosec B108
                 self.schema = json.load(f)
-        except json.JSONDecodeError as e:
+        except (
+            json.JSONDecodeError
+        ) as e:  # pragma: no cover  bundled schemas are valid
             raise json.JSONDecodeError(
                 f"Invalid JSON in schema file {self.schema_path}: {e.msg}",
                 e.doc,
@@ -166,7 +172,9 @@ class SchemaValidator:
                 rule=str(e.validator) if e.validator else "unknown",
             )
             errors.append(error)
-        except jsonschema.SchemaError as e:
+        except (
+            jsonschema.SchemaError
+        ) as e:  # pragma: no cover  bundled schemas are valid
             raise ValueError(f"Invalid schema: {e.message}") from e
 
         return errors

@@ -46,6 +46,7 @@ __all__ = [
     "XSDValidationError",
     "InvalidIBANError",
     "InvalidBICError",
+    "InvalidLEIError",
     "MissingRequiredFieldError",
 ]
 
@@ -260,6 +261,53 @@ class InvalidBICError(PaymentValidationError):
         """
         super().__init__(message, field=field)
         self.bic = bic
+        self.reason = reason
+
+
+class InvalidLEIError(PaymentValidationError):
+    """Raised when LEI (Legal Entity Identifier) validation fails.
+
+    Indicates issues such as:
+
+    - Invalid LEI format (not 20 alphanumeric characters)
+    - Reserved positions 5-6 not equal to ``"00"``
+    - Check digits (positions 19-20) not numeric
+    - Failed ISO 7064 mod-97-10 checksum verification
+
+    The LEI is mandated for FI fields by the Bank of England for CHAPS
+    payments (post BoE RTGS renewal) and is increasingly expected by
+    CBPR+, HVPS+ and other schemes through 2026-2027.
+
+    References:
+        - ISO 17442-1:2020 — Financial services. Legal entity identifier
+          (LEI). Part 1: Assignment.
+        - GLEIF — Global Legal Entity Identifier Foundation.
+
+    Example:
+        >>> try:
+        ...     validate_lei("INVALID")
+        ... except InvalidLEIError as e:
+        ...     print(f"Invalid LEI: {e}")
+        ...     print(f"Field: {e.field}, Value: {e.lei}")
+    """
+
+    def __init__(
+        self,
+        message: str,
+        lei: str,
+        field: Optional[str] = None,
+        reason: Optional[str] = None,
+    ):
+        """Initialize LEI validation error with the offending value.
+
+        Args:
+            message: Human-readable error message.
+            lei: The invalid LEI value.
+            field: Optional field name (e.g., ``"debtor_lei"``).
+            reason: Optional specific reason for failure.
+        """
+        super().__init__(message, field=field)
+        self.lei = lei
         self.reason = reason
 
 

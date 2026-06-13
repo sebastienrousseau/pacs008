@@ -1,0 +1,70 @@
+name: Feature request
+description: Suggest a new feature or enhancement
+title: "[feat] "
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature. Before opening, please check the
+        roadmap and existing issues — there may already be a tracking
+        issue or a deliberate decision not to implement.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: |
+        What problem are you trying to solve? What does today's library
+        force you to do that you wish it didn't?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: |
+        What would you like pacs008 to do? Be specific — API shape, CLI
+        flag, config option, etc. If you're proposing a new message type
+        or scheme profile, cite the relevant ISO 20022 / scheme rulebook.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+
+  - type: dropdown
+    id: scheme
+    attributes:
+      label: Scheme profile (if applicable)
+      options:
+        - generic
+        - CBPR+
+        - HVPS+
+        - Fedwire
+        - CHAPS
+        - T2 RTGS
+        - SCT Inst
+        - "Not applicable"
+    validations:
+      required: false
+
+  - type: textarea
+    id: standard
+    attributes:
+      label: Standard / rulebook reference
+      description: |
+        Link to the ISO 20022 / SWIFT / EPC / Fed / BoE / ECB document that
+        the proposed feature derives from, if applicable.
+
+  - type: checkboxes
+    id: willingness
+    attributes:
+      label: Are you willing to contribute this yourself?
+      options:
+        - label: Yes, I can open a PR
+        - label: Yes, with guidance
+        - label: No, I'd like someone else to implement it

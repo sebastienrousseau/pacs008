@@ -31,10 +31,21 @@ jobs:
         run: pip install poetry
 
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: poetry install --no-interaction --extras otel
 
-      - name: Run tests
+      - name: Run tests (canonical, gates coverage)
+        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
         run: poetry run pytest tests/ -v --tb=short
+
+      - name: Run tests (matrix, no coverage gate)
+        if: matrix.python-version != '3.12' || matrix.os != 'ubuntu-latest'
+        # The 95% coverage gate fires only on the canonical platform.
+        # Other matrix entries (Windows / macOS, py3.9-3.11) skip a
+        # handful of Linux-only tests and Windows-only paths, which
+        # legitimately lowers coverage by ~0.1pp per platform without
+        # any behaviour regression. Overriding to 0 here keeps those
+        # runs honest while letting the canonical run be the gate.
+        run: poetry run pytest tests/ -v --tb=short --cov-fail-under=0
 
       - name: Upload coverage
         if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
@@ -58,7 +69,7 @@ jobs:
         run: pip install poetry
 
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: poetry install --no-interaction --extras otel
 
       - name: Run smoke tests
         run: poetry run pytest tests/ -m smoke -v --no-cov --tb=short
@@ -84,7 +95,7 @@ jobs:
         run: pip install poetry
 
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: poetry install --no-interaction --extras otel
 
       - name: Ruff check
         run: poetry run ruff check pacs008/
@@ -94,6 +105,9 @@ jobs:
 
       - name: Mypy
         run: poetry run mypy pacs008/
+
+      - name: Doc coverage (interrogate)
+        run: poetry run interrogate pacs008/
 
   security:
     name: Security Scan
@@ -111,7 +125,7 @@ jobs:
         run: pip install poetry
 
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: poetry install --no-interaction --extras otel
 
       - name: Bandit
         run: poetry run bandit -r pacs008/ -c pyproject.toml || poetry run bandit -r pacs008/ -s B101

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/sebastienrousseau/pacs008/security/advisories/new
+    about: |
+      Please report security vulnerabilities privately through GitHub's
+      security advisories, not as a public issue. See SECURITY.md for
+      details.

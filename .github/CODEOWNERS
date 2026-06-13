@@ -1,0 +1,21 @@
+# Code ownership for pacs008.
+#
+# See https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+#
+# Order matters: later patterns take precedence over earlier ones.
+
+# Default — everything is owned by the maintainer until co-maintainers join.
+*                                @sebastienrousseau
+
+# Standards-sensitive areas need extra care; flagged here so future
+# co-maintainers don't merge them without the owner's review.
+/pacs008/schemas/                @sebastienrousseau
+/pacs008/templates/              @sebastienrousseau
+/pacs008/validation/             @sebastienrousseau
+/pacs008/compliance/             @sebastienrousseau
+/pacs008/security/               @sebastienrousseau
+
+# Release and CI plumbing.
+/.github/workflows/              @sebastienrousseau
+/pyproject.toml                  @sebastienrousseau
+/Dockerfile                      @sebastienrousseau

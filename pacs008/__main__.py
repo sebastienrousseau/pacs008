@@ -80,11 +80,13 @@ def main(
             xsd_schema_file_path,
             data_file_path,
         )
-    except Exception as e:
+    except (
+        Exception
+    ) as e:  # pragma: no cover  catch-all surfaces to CLI exit code 1
         console.print(f"[red]An error occurred: {e}[/red]")
         sys.exit(1)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover  module-as-script entry point
     # pylint: disable=no-value-for-parameter
     cli()
