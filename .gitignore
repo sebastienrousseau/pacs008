@@ -28,9 +28,6 @@ coverage.xml
 .DS_Store
 Thumbs.db
 
-# Poetry
-poetry.lock
-
 # Temp
 tmp/
 pacs008/tmp/
