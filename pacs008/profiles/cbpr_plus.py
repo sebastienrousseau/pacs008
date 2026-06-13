@@ -82,12 +82,14 @@ class CBPRPlusProfile(SchemeProfile):
         return 10_000
 
     def address_policy(self, today: date | None = None) -> AddressPolicy:
+        """See :meth:`SchemeProfile.address_policy`."""
         ref = today if today is not None else date.today()
         if ref >= NOV_2026_CLIFF:
             return AddressPolicy.HYBRID_OR_STRUCTURED
         return AddressPolicy.UNSTRUCTURED_OK
 
     def lei_required_for(self) -> tuple[str, ...]:
+        """See :meth:`SchemeProfile.lei_required_for`."""
         # CBPR+ does not yet require LEI; the BoE CHAPS mandate is the
         # forward signal for ECB / Fed but CBPR+ itself remains
         # optional for v0.0.2.
@@ -100,6 +102,7 @@ class CBPRPlusProfile(SchemeProfile):
         return TARGETCalendar()
 
     def pinned_versions(self) -> dict[str, str]:
+        """See :meth:`SchemeProfile.pinned_versions`."""
         # MR2019 pinning for the seven core messages (per ECB T2-0170).
         return {
             "pacs.008": "001.08",

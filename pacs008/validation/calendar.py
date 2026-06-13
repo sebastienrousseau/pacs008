@@ -185,6 +185,7 @@ class AlwaysOpenCalendar(Calendar):
     name = "always_open"
 
     def is_open(self, day: date) -> bool:
+        """See :meth:`Calendar.is_open` — always True."""
         return True
 
 
@@ -209,6 +210,7 @@ class TARGETCalendar(Calendar):
     )
 
     def is_open(self, day: date) -> bool:
+        """See :meth:`Calendar.is_open` — closed on weekends + TARGET holidays."""
         # Weekends
         if day.weekday() >= 5:
             return False
@@ -260,6 +262,7 @@ class FedwireCalendar(Calendar):
     _JUNETEENTH_FIRST_YEAR = 2021
 
     def is_open(self, day: date) -> bool:
+        """See :meth:`Calendar.is_open` — Federal Reserve calendar."""
         if day.weekday() >= 5:
             return False
 
@@ -326,6 +329,7 @@ class CHAPSCalendar(Calendar):
     )
 
     def is_open(self, day: date) -> bool:
+        """See :meth:`Calendar.is_open` — BoE rules + weekend substitution."""
         if day.weekday() >= 5:
             return False
 
@@ -424,6 +428,7 @@ class SettlementDateError:
         calendar: str,
         next_open: date,
     ) -> None:
+        """Initialise a settlement-date finding with row, date, calendar + next_open."""
         self.row = row
         self.field = field
         self.settlement_date = settlement_date

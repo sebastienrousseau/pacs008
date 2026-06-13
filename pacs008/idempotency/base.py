@@ -48,6 +48,7 @@ class IdempotencyViolation(Pacs008Error):
     """
 
     def __init__(self, key: str, previous: IdempotencyEntry) -> None:
+        """Initialise the violation with the duplicate key and prior entry."""
         self.key = key
         self.previous = previous
         super().__init__(

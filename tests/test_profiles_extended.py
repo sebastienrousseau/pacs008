@@ -79,6 +79,11 @@ class TestCHAPSProfile:
     def setup_method(self):
         self.profile = CHAPSProfile()
 
+    def test_name_and_mr_version(self):
+        assert self.profile.name == "chaps"
+        assert self.profile.mr_version == "MR2019"
+        assert self.profile.max_remit_info_len == 140
+
     def test_lei_required_for_fi(self):
         assert set(self.profile.lei_required_for()) == {
             "debtor_agent",
@@ -122,6 +127,11 @@ class TestHVPSPlusProfile:
     def setup_method(self):
         self.profile = HVPSPlusProfile()
 
+    def test_name_and_mr_version(self):
+        assert self.profile.name == "hvps_plus"
+        assert self.profile.mr_version == "UG2026"
+        assert self.profile.max_remit_info_len == 140
+
     def test_single_tx(self):
         assert self.profile.max_transactions_per_msg == 1
 
@@ -134,6 +144,24 @@ class TestHVPSPlusProfile:
     def test_default_calendar_is_target(self):
         assert isinstance(self.profile.calendar, TARGETCalendar)
 
+    def test_address_policy_cliff(self):
+        assert (
+            self.profile.address_policy(today=_PRE_CLIFF)
+            is AddressPolicy.UNSTRUCTURED_OK
+        )
+        assert (
+            self.profile.address_policy(today=_POST_CLIFF)
+            is AddressPolicy.HYBRID_OR_STRUCTURED
+        )
+
+    def test_pinned_versions(self):
+        v = self.profile.pinned_versions()
+        assert v["pacs.008"] == "001.08"
+        assert v["camt.029"] == "001.09"
+
+    def test_lei_optional(self):
+        assert self.profile.lei_required_for() == ()
+
 
 # ---------------------------------------------------------------------------
 # T2 RTGS
@@ -143,6 +171,21 @@ class TestHVPSPlusProfile:
 class TestT2RTGSProfile:
     def setup_method(self):
         self.profile = T2RTGSProfile()
+
+    def test_name(self):
+        assert self.profile.name == "t2_rtgs"
+        assert self.profile.max_remit_info_len == 140
+        assert self.profile.lei_required_for() == ()
+
+    def test_address_policy_cliff(self):
+        assert (
+            self.profile.address_policy(today=_PRE_CLIFF)
+            is AddressPolicy.UNSTRUCTURED_OK
+        )
+        assert (
+            self.profile.address_policy(today=_POST_CLIFF)
+            is AddressPolicy.HYBRID_OR_STRUCTURED
+        )
 
     def test_mr2019_hold(self):
         assert self.profile.mr_version == "MR2019"
@@ -176,6 +219,12 @@ class TestSCTInstProfile:
     def setup_method(self):
         self.profile = SCTInstProfile()
 
+    def test_name_and_mr_version(self):
+        assert self.profile.name == "sct_inst"
+        assert self.profile.mr_version == "MR2019"
+        assert self.profile.max_remit_info_len == 140
+        assert self.profile.lei_required_for() == ()
+
     def test_single_tx_per_file(self):
         assert self.profile.max_transactions_per_msg == 1
 
@@ -188,6 +237,21 @@ class TestSCTInstProfile:
     def test_uetr_not_required(self):
         # SCT Inst uses End-to-End ID; UETR is optional.
         assert self.profile.uetr_required is False
+
+    def test_address_policy_cliff(self):
+        # 24/7 calendar but cliff-aware address policy still applies.
+        assert (
+            self.profile.address_policy(today=_PRE_CLIFF)
+            is AddressPolicy.UNSTRUCTURED_OK
+        )
+        assert (
+            self.profile.address_policy(today=_POST_CLIFF)
+            is AddressPolicy.HYBRID_OR_STRUCTURED
+        )
+
+    def test_pinned_versions(self):
+        v = self.profile.pinned_versions()
+        assert v["pacs.008"] == "001.08"
 
 
 # ---------------------------------------------------------------------------

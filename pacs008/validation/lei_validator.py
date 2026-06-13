@@ -253,6 +253,7 @@ class LEIValidationError:
         value: str,
         reason: str,
     ) -> None:
+        """Initialise a LEI finding with row, party prefix, field, value + reason."""
         self.row = row
         self.party = party
         self.field = field

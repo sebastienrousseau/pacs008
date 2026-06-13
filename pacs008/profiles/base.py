@@ -79,6 +79,7 @@ class SchemeViolationError(Pacs008Error):
         violations: Sequence[BusinessRuleViolation],
         scheme: str,
     ) -> None:
+        """Build a violation error from a list of findings + scheme name."""
         self.violations: tuple[BusinessRuleViolation, ...] = tuple(violations)
         self.scheme = scheme
         n = len(self.violations)

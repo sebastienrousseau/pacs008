@@ -248,12 +248,15 @@ class PostalAddress:
         return AddressClassification.UNSTRUCTURED
 
     def is_structured(self) -> bool:
+        """Return True iff :meth:`classify` is :attr:`AddressClassification.STRUCTURED`."""
         return self.classify() is AddressClassification.STRUCTURED
 
     def is_hybrid(self) -> bool:
+        """Return True iff :meth:`classify` is :attr:`AddressClassification.HYBRID`."""
         return self.classify() is AddressClassification.HYBRID
 
     def is_unstructured(self) -> bool:
+        """Return True iff :meth:`classify` is :attr:`AddressClassification.UNSTRUCTURED`."""
         return self.classify() is AddressClassification.UNSTRUCTURED
 
     def validate(

@@ -408,12 +408,16 @@ def generate_xml_string(
 
     try:
         xml_template_path = validate_path(xml_template_path)
-    except Exception as e:
+    except (
+        Exception
+    ) as e:  # pragma: no cover  defensive — callers pre-validate paths
         raise ValueError(f"Invalid template path: {e}") from e
 
     try:
         xsd_schema_path = validate_path(xsd_schema_path)
-    except Exception as e:
+    except (
+        Exception
+    ) as e:  # pragma: no cover  defensive — callers pre-validate paths
         raise ValueError(f"Invalid schema path: {e}") from e
 
     if payment_initiation_message_type not in xml_data_preparers:
@@ -463,11 +467,15 @@ def generate_xml(
 
     try:
         safe_xml_path = validate_path(updated_xml_file_path)
-    except Exception as e:
+    except (
+        Exception
+    ) as e:  # pragma: no cover  defensive — callers pre-validate paths
         raise ValueError(f"Path validation failed: {e}") from e
 
     cwd_prefix = str(os.path.realpath(os.getcwd()))
-    if not safe_xml_path.startswith(cwd_prefix + os.sep):
+    if not safe_xml_path.startswith(
+        cwd_prefix + os.sep
+    ):  # pragma: no cover  defence-in-depth CWE-22 barrier
         raise ValueError(
             f"Output path outside working directory: {safe_xml_path}"
         )

@@ -95,15 +95,18 @@ class FedwireProfile(SchemeProfile):
         return FedwireCalendar()
 
     def address_policy(self, today: date | None = None) -> AddressPolicy:
+        """See :meth:`SchemeProfile.address_policy`."""
         ref = today if today is not None else date.today()
         if ref >= _FEDWIRE_ADDRESS_CLIFF:
             return AddressPolicy.HYBRID_OR_STRUCTURED
         return AddressPolicy.UNSTRUCTURED_OK
 
     def lei_required_for(self) -> tuple[str, ...]:
+        """See :meth:`SchemeProfile.lei_required_for`."""
         return ()
 
     def pinned_versions(self) -> dict[str, str]:
+        """See :meth:`SchemeProfile.pinned_versions`."""
         return {
             "pacs.008": "001.08",
             "pacs.002": "001.10",

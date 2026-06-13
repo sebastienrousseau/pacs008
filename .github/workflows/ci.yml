@@ -95,6 +95,9 @@ jobs:
       - name: Mypy
         run: poetry run mypy pacs008/
 
+      - name: Doc coverage (interrogate)
+        run: poetry run interrogate pacs008/
+
   security:
     name: Security Scan
     runs-on: ubuntu-latest

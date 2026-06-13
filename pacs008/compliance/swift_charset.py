@@ -212,6 +212,7 @@ class ComplianceViolation:
         corrected_value: Optional[str] = None,
         message: str = "",
     ) -> None:
+        """Initialise a violation record with field/type/values."""
         self.field = field
         self.violation_type = violation_type
         self.original_value = original_value
@@ -229,6 +230,7 @@ class ComplianceReport:
     """Aggregated report of all compliance violations found and corrected."""
 
     def __init__(self) -> None:
+        """Initialise an empty compliance report."""
         self.violations: list[ComplianceViolation] = []
         self.rows_processed: int = 0
         self.rows_modified: int = 0
@@ -243,6 +245,7 @@ class ComplianceReport:
         return len(self.violations)
 
     def add(self, violation: ComplianceViolation) -> None:
+        """Append a single violation to the report."""
         self.violations.append(violation)
 
     def summary(self) -> str:

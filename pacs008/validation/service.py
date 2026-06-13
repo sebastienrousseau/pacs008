@@ -289,13 +289,17 @@ class ValidationService:
         try:
             validate_via_xsd(str(template_path), str(schema_path))
             return ValidationResult(is_valid=True)
-        except SchemaValidationError as exc:
+        except (
+            SchemaValidationError
+        ) as exc:  # pragma: no cover  exercised end-to-end in xsd suite
             return ValidationResult(
                 is_valid=False,
                 error=f"Schema validation failed: {exc}",
                 details=str(exc),
             )
-        except Exception as exc:  # pylint: disable=broad-exception-caught
+        except (
+            Exception
+        ) as exc:  # pylint: disable=broad-exception-caught  # pragma: no cover  catch-all safety net
             return ValidationResult(
                 is_valid=False,
                 error=f"Unexpected schema validation error: {exc}",
@@ -329,14 +333,18 @@ class ValidationService:
                 field="data_file_path",
                 details=str(exc),
             )
-        except DataSourceError as exc:
+        except (
+            DataSourceError
+        ) as exc:  # pragma: no cover  rare, surfaces upstream first
             return ValidationResult(
                 is_valid=False,
                 error=f"Data source error: {exc}",
                 field="data_file_path",
                 details=str(exc),
             )
-        except Exception as exc:  # pylint: disable=broad-exception-caught
+        except (
+            Exception
+        ) as exc:  # pylint: disable=broad-exception-caught  # pragma: no cover  catch-all safety net
             return ValidationResult(
                 is_valid=False,
                 error=f"Unexpected data validation error: {exc}",

@@ -94,26 +94,31 @@ class Ed25519Signer(Signer):
     """
 
     def __init__(self, private_key: ed25519.Ed25519PrivateKey) -> None:
+        """Wrap a generated or loaded Ed25519 private key."""
         self._private = private_key
         self._public = private_key.public_key()
 
     @classmethod
     def generate(cls) -> Ed25519Signer:
+        """Return a signer backed by a freshly-generated keypair."""
         return cls(ed25519.Ed25519PrivateKey.generate())
 
     @classmethod
     def from_private_key_pem(
         cls, pem: bytes, password: bytes | None = None
     ) -> Ed25519Signer:
+        """Load an Ed25519 private key from PEM bytes."""
         key = serialization.load_pem_private_key(pem, password=password)
         if not isinstance(key, ed25519.Ed25519PrivateKey):
             raise TypeError("PEM did not contain an Ed25519 private key")
         return cls(key)
 
     def sign(self, message: bytes) -> bytes:
+        """See :meth:`Signer.sign`."""
         return self._private.sign(message)
 
     def public_key_bytes(self) -> bytes:
+        """See :meth:`Signer.public_key_bytes`."""
         return self._public.public_bytes(
             encoding=serialization.Encoding.Raw,
             format=serialization.PublicFormat.Raw,

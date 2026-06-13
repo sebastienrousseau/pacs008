@@ -49,6 +49,7 @@ class MemoryStore(IdempotencyStore):
     def lookup(
         self, key: str, *, window: timedelta
     ) -> IdempotencyEntry | None:
+        """See :meth:`IdempotencyStore.lookup`."""
         cutoff = _utcnow() - window
         with self._lock:
             entry = self._entries.get(key)
@@ -69,6 +70,7 @@ class MemoryStore(IdempotencyStore):
         *,
         recorded_at: datetime | None = None,
     ) -> IdempotencyEntry:
+        """See :meth:`IdempotencyStore.record`."""
         recorded_at = recorded_at or _utcnow()
         entry = IdempotencyEntry(
             key=key, payload_hash=payload_hash, recorded_at=recorded_at
@@ -81,6 +83,7 @@ class MemoryStore(IdempotencyStore):
         return entry
 
     def purge_older_than(self, cutoff: datetime) -> int:
+        """See :meth:`IdempotencyStore.purge_older_than`."""
         purged = 0
         with self._lock:
             keys = [

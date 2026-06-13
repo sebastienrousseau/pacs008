@@ -74,17 +74,20 @@ class HVPSPlusProfile(SchemeProfile):
         return 1
 
     def address_policy(self, today: date | None = None) -> AddressPolicy:
+        """See :meth:`SchemeProfile.address_policy`."""
         ref = today if today is not None else date.today()
         if ref >= NOV_2026_CLIFF:
             return AddressPolicy.HYBRID_OR_STRUCTURED
         return AddressPolicy.UNSTRUCTURED_OK
 
     def lei_required_for(self) -> tuple[str, ...]:
+        """See :meth:`SchemeProfile.lei_required_for`."""
         # Recommended in HVPS+ but not yet mandated globally — see the
         # rail-specific profiles (CHAPSProfile) for hard mandates.
         return ()
 
     def pinned_versions(self) -> dict[str, str]:
+        """See :meth:`SchemeProfile.pinned_versions`."""
         return {
             "pacs.008": "001.08",
             "pacs.002": "001.10",

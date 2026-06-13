@@ -65,15 +65,18 @@ class T2RTGSProfile(SchemeProfile):
         return 1000
 
     def address_policy(self, today: date | None = None) -> AddressPolicy:
+        """See :meth:`SchemeProfile.address_policy`."""
         ref = today if today is not None else date.today()
         if ref >= NOV_2026_CLIFF:
             return AddressPolicy.HYBRID_OR_STRUCTURED
         return AddressPolicy.UNSTRUCTURED_OK
 
     def lei_required_for(self) -> tuple[str, ...]:
+        """See :meth:`SchemeProfile.lei_required_for`."""
         return ()
 
     def pinned_versions(self) -> dict[str, str]:
+        """See :meth:`SchemeProfile.pinned_versions`."""
         # The seven core MR2019 pins per ECB T2-0170.
         return {
             "pacs.008": "001.08",

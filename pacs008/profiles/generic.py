@@ -59,12 +59,15 @@ class GenericProfile(SchemeProfile):
         return None
 
     def address_policy(self, today: date | None = None) -> AddressPolicy:
+        """See :meth:`SchemeProfile.address_policy`."""
         return AddressPolicy.UNSTRUCTURED_OK
 
     def lei_required_for(self) -> tuple[str, ...]:
+        """See :meth:`SchemeProfile.lei_required_for`."""
         return ()
 
     def pinned_versions(self) -> dict[str, str]:
+        """See :meth:`SchemeProfile.pinned_versions`."""
         return {}
 
 

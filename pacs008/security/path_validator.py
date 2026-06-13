@@ -45,7 +45,9 @@ def _is_allowed_directory(resolved_path: Path) -> bool:
             or resolved_str.startswith(str(base) + os.sep)
             for base in allowed_bases
         )
-    except Exception:
+    except (
+        Exception
+    ):  # pragma: no cover  defensive catch-all on str/Path errors
         return False
 
 
@@ -61,7 +63,10 @@ def _resolve_within_allowed_bases(
     normalized_str = os.path.normpath(path_str)
     try:
         resolved_str = os.path.realpath(normalized_str)
-    except (RuntimeError, OSError) as e:
+    except (
+        RuntimeError,
+        OSError,
+    ) as e:  # pragma: no cover  realpath errors on platform-specific edge cases
         raise PathValidationError(f"Invalid path: {e}") from e
     if base_dir is not None:
         base_str = os.path.realpath(str(base_dir))
@@ -85,6 +90,13 @@ def validate_path(
     must_exist: bool = False,
     base_dir: Union[str, Path, None] = None,
 ) -> str:
+    """Normalise and resolve a user-supplied path against an allow-list of bases.
+
+    Raises :class:`PathValidationError` for traversal attempts or paths
+    outside the allowed base directories. If ``must_exist`` is ``True``,
+    also raises :class:`FileNotFoundError` when the resolved path does
+    not exist on disk.
+    """
     safe_path = _resolve_within_allowed_bases(untrusted_path, base_dir)
     if must_exist and not os.path.exists(safe_path):
         raise FileNotFoundError(f"Path does not exist: {safe_path}")
@@ -92,6 +104,7 @@ def validate_path(
 
 
 def sanitize_for_log(user_input: str, max_length: int = 100) -> str:
+    """Strip control characters and truncate before writing to a log."""
     if not user_input:
         return ""
     sanitized = re.sub(r"[\r\n\t\x00-\x1f\x7f-\x9f]", "", user_input)

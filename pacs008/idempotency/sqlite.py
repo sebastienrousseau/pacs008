@@ -75,6 +75,7 @@ class SQLiteStore(IdempotencyStore):
     def lookup(
         self, key: str, *, window: timedelta
     ) -> IdempotencyEntry | None:
+        """See :meth:`IdempotencyStore.lookup`."""
         cutoff = _utcnow() - window
         with self._lock:
             row = self._conn.execute(
@@ -106,6 +107,7 @@ class SQLiteStore(IdempotencyStore):
         *,
         recorded_at: datetime | None = None,
     ) -> IdempotencyEntry:
+        """See :meth:`IdempotencyStore.record`."""
         recorded_at = recorded_at or _utcnow()
         with self._lock:
             self._conn.execute(
@@ -120,6 +122,7 @@ class SQLiteStore(IdempotencyStore):
         )
 
     def purge_older_than(self, cutoff: datetime) -> int:
+        """See :meth:`IdempotencyStore.purge_older_than`."""
         with self._lock:
             cursor = self._conn.execute(
                 "DELETE FROM idempotency_entries WHERE recorded_at < ?",

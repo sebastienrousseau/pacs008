@@ -64,6 +64,7 @@ pip-licenses = "^4.0.0"
 twine = "^6.2.0"
 types-jsonschema = "^4.26.0.20260109"
 pandas = "^2.3.3"
+interrogate = "^1.7.0"
 
 [tool.poetry.group.docs]
 optional = true
@@ -119,11 +120,12 @@ addopts = [
     "--cov-report=term-missing:skip-covered",
     "--cov-report=xml",
     "--cov-report=html",
-    "--cov-fail-under=90",
+    "--cov-fail-under=95",
     "--tb=short",
     "-ra",
     "--strict-markers",
-    "--disable-warnings"
+    "--disable-warnings",
+    "-m", "not perf",
 ]
 markers = [
     "integration: end-to-end workflow tests",
@@ -189,8 +191,9 @@ ignore_missing_imports = true
 follow_imports = "skip"
 
 [[tool.mypy.overrides]]
-module = ["lxml", "lxml.*", "defusedxml.*", "anyascii", "anyascii.*", "opentelemetry.*"]
+module = ["lxml", "lxml.*", "defusedxml.*", "anyascii", "anyascii.*", "opentelemetry", "opentelemetry.*"]
 ignore_missing_imports = true
+follow_imports = "skip"
 
 [[tool.mypy.overrides]]
 # Modern click ships pattern-matching in some helpers; we target py39 so
@@ -205,3 +208,25 @@ ignore_missing_imports = true
 # is thin glue so we deliberately accept untyped-decorator at this seam.
 module = ["pacs008.cli.cli"]
 disable_error_code = ["untyped-decorator"]
+
+[tool.interrogate]
+# Enforced doc coverage on the public surface. ABC method overrides and
+# property accessors that implement a contract documented on the base
+# class are skipped — the convention is "document the contract once on
+# the ABC, implementations carry only behaviour-specific notes".
+fail-under = 100
+ignore-init-method = false
+ignore-init-module = true
+ignore-magic = true
+ignore-module = true
+ignore-nested-functions = true
+ignore-nested-classes = true
+ignore-private = true
+ignore-semiprivate = true
+ignore-property-decorators = true
+ignore-overloaded-functions = true
+exclude = ["pacs008/templates", "pacs008/tmp", "tests", "docs", "scripts", "examples", "build", ".venv", ".eggs"]
+verbose = 1
+omit-covered-files = true
+quiet = false
+color = true
