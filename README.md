@@ -13,8 +13,9 @@
 [![Quality][quality-badge]][quality-url]
 [![Documentation][docs-badge]][docs-url]
 
-> **Latest Release: v0.0.1** - FI-to-FI credit transfer XML generation, SWIFT compliance, FastAPI REST API, and 13 pacs.008 versions.
-> [See what's new →][release-001]
+> **Latest Release: v0.0.2** — FI-to-FI credit transfer XML generation, SWIFT compliance, FastAPI REST API, and 13 pacs.008 versions.
+>
+> ⚠️ **Pre-1.0 status:** `pacs008` is under active development and is **not yet recommended for live banking traffic**. APIs may change between minor versions. See the [roadmap][release-001] for the path to 1.0.
 
 ## Overview
 
@@ -41,8 +42,8 @@ and SEPA networks.
   Parquet data sources
 - **Automatic XSD Validation:** Validates generated XML against
   ISO 20022 schemas
-- **Comprehensive Testing:** 1,400+ tests with 100% branch coverage
-  ensuring reliability
+- **Comprehensive Testing:** 1,300+ behaviour-driven tests with a 90%
+  branch-coverage floor across Python 3.9–3.12
 - **Secure by Design:** Uses `defusedxml` to prevent XXE attacks
   and implements path traversal protection
 - **Type-Safe:** Full type hints for better IDE support and type
@@ -52,8 +53,9 @@ and SEPA networks.
 - **13 ISO 20022 Versions Supported:** Supports all 13 FI-to-FI
   Customer Credit Transfer versions: pacs.008.001.01 through
   pacs.008.001.13
-- **Production-Ready:** Used in production environments for SWIFT gpi,
-  TARGET2, and SEPA interbank settlements
+- **Production-grade target:** Modelled on SWIFT gpi, TARGET2, and SEPA
+  interbank settlement requirements. **Not yet certified for live
+  traffic** — see the [roadmap to 1.0][release-001].
 
 As of today, the library is designed to be compatible with the:
 
@@ -220,7 +222,7 @@ flowchart LR
   - Silent rejection prevention through proactive data cleansing
   - Full compliance report generation for audit trails
 - **Robust Development:** Comprehensive quality assurance with
-  - 1,400+ tests with 100% branch coverage across Python 3.9–3.12
+  - 1,300+ behaviour-driven tests with a 90% branch-coverage floor across Python 3.9–3.12
   - Code formatting with Black and Ruff
   - Static type checking with mypy (strict mode)
   - Security scanning with Bandit
@@ -757,8 +759,10 @@ pacs008 -t pacs.008.001.05 \
 
 ## REST API (FastAPI)
 
-Pacs008 provides a **production-ready REST API** for integration with web
-services and microservices architectures.
+Pacs008 ships a REST API (FastAPI) for integration with web services and
+microservices architectures. The API surface is stable enough for
+development and CI use; pin to an exact patch version for production
+pilots while we stabilise toward 1.0.
 
 ### Starting the API Server
 
