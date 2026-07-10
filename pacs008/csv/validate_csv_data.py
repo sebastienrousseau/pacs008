@@ -107,7 +107,11 @@ def _validate_row(
             missing_columns.append(column)
             continue
 
-        value = raw_value.strip()
+        # value = raw_value.strip()
+        if isinstance(raw_value, str):
+            value = raw_value.strip()
+        else:
+            value = raw_value
 
         if not value:
             missing_columns.append(column)
