@@ -58,36 +58,61 @@ def _validate_datetime(value: str) -> bool:
             return False
 
 
-def _validate_field_type(value: str, data_type: type) -> bool:
+def _validate_field_type(value: Any, data_type: type) -> bool:
     """Validate a single field against its expected type.
 
+    Accepts both native scalars (``int``, ``float``, ``bool`` from JSON/JSONL)
+    and their string form (from CSV), so one validator serves every source.
+    Never raises: any unparseable or wrong-typed value returns ``False``.
+
     Args:
-        value: The field value to validate.
+        value: The field value to validate (string or native scalar).
         data_type: The expected data type.
 
     Returns:
         bool: True if valid, False otherwise.
     """
     try:
+        if data_type is bool:
+            if isinstance(value, bool):
+                return True
+            return isinstance(value, str) and value.strip().lower() in (
+                "true",
+                "false",
+            )
         if data_type is int:
-            int(value)
-        elif data_type is float:
-            float(value)
-        elif data_type is bool:
-            if value.lower() not in ("true", "false"):
+            # bool is a subclass of int; reject it explicitly.
+            if isinstance(value, bool):
                 return False
-        elif data_type is datetime:
-            return _validate_datetime(value)
-        # str type always passes if not empty
+            if isinstance(value, int):
+                return True
+            if isinstance(value, float):
+                return value.is_integer()
+            int(str(value).strip())
+            return True
+        if data_type is float:
+            if isinstance(value, bool):
+                return False
+            if isinstance(value, int | float):
+                return True
+            float(str(value).strip())
+            return True
+        if data_type is datetime:
+            return isinstance(value, str) and _validate_datetime(value.strip())
+        # str (or any other declared type): a present value is acceptable.
         return True
-    except ValueError:
+    except (ValueError, TypeError):
         return False
 
 
 def _validate_row(
     row: dict[str, Any], required_columns: dict[str, type]
 ) -> tuple[list[str], list[str]]:
-    """Validate a single row of CSV data.
+    """Validate a single row of payment data (CSV, JSON or JSONL).
+
+    A column is *missing* when it is absent, ``None``, or a blank/whitespace
+    string. Native numeric or boolean values -- including ``0``, ``0.0`` and
+    ``False`` -- are real, present values and are never treated as missing.
 
     Args:
         row: A dictionary containing row data.
@@ -102,18 +127,21 @@ def _validate_row(
     for column, data_type in required_columns.items():
         raw_value = row.get(column)
 
-        # Single strip operation, cached result
         if raw_value is None:
             missing_columns.append(column)
             continue
 
-        value = raw_value.strip()
+        # Only strings need stripping; native scalars pass through unchanged
+        # so falsy-but-present values (0, 0.0, False) are not mistaken for
+        # missing.
+        if isinstance(raw_value, str):
+            value: Any = raw_value.strip()
+            if not value:
+                missing_columns.append(column)
+                continue
+        else:
+            value = raw_value
 
-        if not value:
-            missing_columns.append(column)
-            continue
-
-        # Validate type
         if not _validate_field_type(value, data_type):
             invalid_columns.append(column)
 
