@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.5] - 2026-07-12
+
+The **security & robustness** cut. Publishes the dependency and validation
+fixes already on `main` so downstream companions (e.g. `pacs008-mcp`) resolve
+patched transitive dependencies. No API changes.
+
+### Security
+
+- **cryptography** constraint widened from `<47.0.0` to `<49.0.0`, allowing
+  the patched `>=48.0.1` release (vulnerable-OpenSSL-in-wheels advisory).
+  Clears the alert inherited by downstream packages pinned to `pacs008`.
+
+### Fixed
+
+- JSON/JSONL payment validation now accepts native scalar types (int, float,
+  bool) without raising `AttributeError`; falsy-but-present values (`0`,
+  `0.0`, `False`) are no longer treated as missing, and bool-for-int /
+  non-integral-float are correctly rejected.
+
 ## [0.0.4] - 2026-06-13
 
 ### Removed
