@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.6] - 2026-07-16
+
+The **suite alignment** cut. pacs008 0.0.5 was the last member of the
+ISO 20022 MCP suite capping `rich<14` and `markupsafe<3`, forcing every
+co-installation (`iso20022-mcp[all]`) to float on old versions. This
+release raises the caps to match the published constraints of
+camt053 0.0.14 and acmt001 0.0.3. No API changes.
+
+### Changed
+
+- **rich** `^13.7` (`>=13.7,<14`) → `>=13.7.1,<16`, matching
+  camt053/acmt001. Co-installs are now bound by pain001's `rich<15`
+  instead of pacs008.
+- **markupsafe** `^2.1` (`>=2.1,<3`) → `>=2.1,<4`, matching
+  camt053/acmt001; co-installs resolve markupsafe 3.x.
+- **cryptography** `<49.0.0` → `<50.0.0`, matching the
+  `>=48.0.1,<50.0.0` constraint published by camt053/acmt001
+  (cross-suite cap audit).
+- **pyarrow** `<24.0.0` → `<26.0.0`, matching acmt001's `<26.0.0`
+  (cross-suite cap audit).
+
+The full test suite (1875 tests, 96% branch-coverage gate) passes at
+both ends of every widened range: floors
+(rich 13.7.1 / markupsafe 2.1.0 / cryptography 46.0.7 / pyarrow 18.0.0)
+and ceilings
+(rich 15.0.0 / markupsafe 3.0.3 / cryptography 49.0.0 / pyarrow 25.0.0).
+
 ## [0.0.5] - 2026-07-12
 
 The **security & robustness** cut. Publishes the dependency and validation

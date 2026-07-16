@@ -1,6 +1,6 @@
 """The Python pacs008 module."""
 
-__version__ = "0.0.5"
+__version__ = "0.0.6"
 
 from pacs008.__main__ import main
 from pacs008.core.core import process_files
