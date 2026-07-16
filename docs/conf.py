@@ -3,7 +3,7 @@
 project = "pacs008"
 copyright = "2026, Sebastien Rousseau"
 author = "Sebastien Rousseau"
-release = "0.0.1"
+release = "0.0.6"
 
 extensions = [
     "sphinx.ext.autodoc",
