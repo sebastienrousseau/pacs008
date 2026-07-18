@@ -184,20 +184,27 @@ class TestGenerateEndpointFull:
         )
         assert response.status_code == 500
 
-    def test_validation_errors_returned(self, client, valid_json_file):
-        # JSON with string nb_of_txs will fail schema validation
+    def test_validation_errors_returned(self, client, tmp_path, monkeypatch):
+        # A malformed BIC passes the (type/presence-only) row loader but fails
+        # the JSON-schema BIC pattern, so the endpoint returns 200 with
+        # success=False and populated validation_errors. (Numeric strings like
+        # "1"/"1000.00" are now valid and no longer land here — see issue #6.)
+        monkeypatch.chdir(tmp_path)
+        bad_row = {**_make_valid_row(), "debtor_agent_bic": "NOTABIC"}
+        path = tmp_path / "invalid.json"
+        path.write_text(json.dumps([bad_row]), encoding="utf-8")
         response = client.post(
             "/api/generate",
             json={
                 "data_source": "json",
-                "file_path": valid_json_file,
+                "file_path": str(path),
                 "message_type": "pacs.008.001.01",
             },
         )
         assert response.status_code == 200
         data = response.json()
-        # String types will fail JSON schema => success=False with validation_errors
-        assert "success" in data
+        assert data["success"] is False
+        assert data["validation_errors"]
 
 
 class TestAsyncGenerateEndpointFull:

@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.7] - 2026-07-18
+
+The **numeric-string validation** fix. Closes issue #6: JSON payloads whose
+`nb_of_txs` and `interbank_settlement_amount` fields arrive as numeric
+*strings* — the representation CSV-origin rows and many JSON producers emit —
+were rejected by the JSON-schema layer behind `/api/validate` and
+`/api/generate`, even though the row loader (`validate_csv_data`) accepted
+them. The two validators now agree.
+
+### Fixed
+
+- **JSON schemas** (`pacs008/schemas/*.schema.json`): `nb_of_txs` now accepts
+  an integer **or** a numeric string (ISO 20022 `Max15NumericText`), and
+  `interbank_settlement_amount` accepts a number **or** a decimal string
+  (ISO 20022 decimal amount). A `pattern` guards each string branch so
+  genuinely invalid input (non-numeric text, negative or zero counts,
+  non-integral counts, malformed decimals) is still rejected. Applied to all
+  18 schemas carrying `nb_of_txs` and all 16 carrying
+  `interbank_settlement_amount`. (#6)
+
+### Added
+
+- Regression tests (`tests/test_validation.py::TestIssue6NumericStringFields`)
+  covering the reporter's native-scalar payload, the numeric-string form
+  across every pacs.008 version (v01–v13), the combined loader + schema
+  surface, and invalid-input rejection.
+
 ## [0.0.6] - 2026-07-16
 
 The **suite alignment** cut. pacs008 0.0.5 was the last member of the
