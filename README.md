@@ -627,6 +627,13 @@ contains the production dependency set only (no dev tooling).
 | `creditor_agent_bic` | Creditor bank BIC (8 or 11 chars) | `BNPAFRPP` |
 | `creditor_name` | Creditor name (max 140 chars) | `Widget Industries SA` |
 
+> **Numeric fields accept both forms.** `nb_of_txs` and
+> `interbank_settlement_amount` validate whether supplied as native JSON
+> numbers (`1`, `25000.00`) or as numeric strings (`"1"`, `"25000.00"`) — the
+> latter being what CSV rows and many JSON producers emit. Numeric bounds
+> still apply (`nb_of_txs` ≥ 1; a positive decimal amount), and non-numeric
+> values are still rejected.
+
 ### Version-specific columns
 
 | Field | Available from | Description |
