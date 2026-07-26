@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.8] - 2026-07-26
+
+Ship the library's internal type information to consumers. `pacs008` has
+been `mypy --strict` clean for some time, but shipped no PEP 561 marker, so
+downstream projects received **none** of those annotations under `mypy` or
+`pyright`.
+
+### Added
+
+- **PEP 561 `py.typed` marker** (`pacs008/py.typed`), wired into the Poetry
+  `include` list and verified present in the built wheel. Downstream code
+  now type-checks against `pacs008`'s real annotations.
+- **Regression tests** (`tests/test_py_typed_marker.py`) that fail before a
+  release ships if the marker is dropped from the source tree or the
+  packaging includes.
+
+### Changed
+
+- Version `0.0.7` → `0.0.8`; `SECURITY.md` supported-versions table
+  reconciled to `0.0.8`.
+
 ## [0.0.7] - 2026-07-18
 
 The **numeric-string validation** fix. Closes issue #6: JSON payloads whose
