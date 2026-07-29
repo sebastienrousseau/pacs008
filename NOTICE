@@ -1,0 +1,29 @@
+pacs008
+Copyright 2023-2026 Sebastien Rousseau
+
+This product includes software developed by Sebastien Rousseau, licensed under
+the Apache License, Version 2.0.
+
+--------------------------------------------------------------------------------
+ISO 20022 message schemas
+--------------------------------------------------------------------------------
+
+This product bundles XML Schema files produced by the ISO 20022 Registration
+Authority, under pacs008/templates/*/*.xsd.
+
+pacs008 is not the official ISO 20022 site. The sole source of up-to-date
+materials and information on ISO 20022 message standards and the Repository is
+https://www.iso20022.org/.
+
+These files are used under the ISO 20022 Intellectual Property Right Policy,
+which states that the material on the ISO 20022 site is intended to be used and
+reproduced freely by all interested users. See https://www.iso20022.org/terms-use.
+
+The Registration Authority provides this material on an "as is" basis and
+disclaims all warranties, express or implied. Neither the Registration
+Authority nor ISO accepts liability arising from its use.
+
+The bundled schemas are a snapshot. The ISO 20022 Repository is maintained and
+updated frequently, so check the official site for the current version. Each
+schema records the toolchain and, where stated, the ISO 20022 version it was
+generated from, in an XML comment at the top of the file.
