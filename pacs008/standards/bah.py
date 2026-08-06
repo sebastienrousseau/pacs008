@@ -176,8 +176,8 @@ def wrap_in_bah(
         signature=signature,
     )
 
-    nvlp_ns = "{%s}" % _NS_NVLP
-    bah_ns = "{%s}" % _NS_BAH
+    nvlp_ns = f"{{{_NS_NVLP}}}"
+    bah_ns = f"{{{_NS_BAH}}}"
 
     envelope = etree.Element(
         f"{nvlp_ns}BizMsgEnvlp",
