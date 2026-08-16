@@ -18,9 +18,14 @@ import sys
 from pathlib import Path
 
 import pytest
-import tomllib
 
 import pacs008
+
+if sys.version_info >= (3, 11):  # pragma: no cover - version dependent
+    import tomllib
+else:  # pragma: no cover - version dependent
+    # `tomllib` is stdlib only from 3.11, and this package supports 3.10.
+    import tomli as tomllib
 
 ROOT = Path(__file__).resolve().parent.parent
 PYPROJECT = ROOT / "pyproject.toml"
@@ -95,9 +100,6 @@ def test_security_policy_names_the_current_version() -> None:
     )
 
 
-@pytest.mark.skipif(
-    sys.version_info < (3, 10), reason="importlib.metadata shape differs"
-)
 def test_installed_metadata_matches_the_source() -> None:
     """The built distribution must agree with the source tree.
 

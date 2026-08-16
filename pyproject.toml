@@ -40,6 +40,9 @@ pyarrow = ">=18.0.0,<26.0.0"
 
 [tool.poetry.group.dev.dependencies]
 packaging = ">=23.0"
+# `tomllib` is stdlib only from 3.11; tests/test_package_version.py
+# needs a TOML reader on the 3.10 leg of the matrix.
+tomli = { version = ">=2.0", python = "<3.11" }
 pytest = ">=8.0,<10"
 pytest-cov = "^4.0.0"
 pytest-benchmark = "^4.0.0"
