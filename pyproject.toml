@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pacs008"
-version = "0.0.8"
+version = "0.0.9"
 description = "Generate, validate, parse and audit ISO 20022 pacs.008 (FI-to-FI Customer Credit Transfer) messages with scheme-aware rules for CBPR+, HVPS+, Fedwire, CHAPS, T2 RTGS and SCT Inst."
 authors = ["Sebastien Rousseau <contact@sebastienrousseau.com>"]
 license = "Apache-2.0"
@@ -39,6 +39,10 @@ httpx = ">=0.23,<1.0"
 pyarrow = ">=18.0.0,<26.0.0"
 
 [tool.poetry.group.dev.dependencies]
+packaging = ">=23.0"
+# `tomllib` is stdlib only from 3.11; tests/test_package_version.py
+# needs a TOML reader on the 3.10 leg of the matrix.
+tomli = { version = ">=2.0", python = "<3.11" }
 pytest = ">=8.0,<10"
 pytest-cov = "^4.0.0"
 pytest-benchmark = "^4.0.0"
