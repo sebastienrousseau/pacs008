@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.9] - 2026-08-16
+
+Release the `cryptography` ceiling that was raised in the tree but never
+published.
+
+### Fixed
+
+- `cryptography` is now `>=46.0.7,<51.0.0`. The published `0.0.8` still
+  carried `<50.0.0`, which made `cryptography 50.0.0` — the version that
+  patches the high-severity advisory — unresolvable for every dependent.
+  `pacs008-mcp` could not install at all:
+
+      ERROR: Cannot install cryptography>=50.0.0, pacs008==0.0.7 and
+      pacs008==0.0.8 because these package versions have conflicting
+      dependencies.
+
+### Added
+
+- `tests/test_package_version.py`, pinning `__version__` to
+  `pyproject.toml`, `SECURITY.md` and the newest `CHANGELOG.md` heading,
+  and checking the changelog is ordered newest-first. Nothing previously
+  tied these together, so a release could ship with them disagreeing —
+  which is how `0.0.8` came to be published with a constraint the tree
+  had already changed.
+
 ## [0.0.8] - 2026-07-26
 
 Ship the library's internal type information to consumers. `pacs008` has
