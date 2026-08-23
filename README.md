@@ -1,4 +1,4 @@
-<!-- SPDX-License-Identifier: Apache-2.0 -->
+<!-- SPDX-License-Identifier: Apache-2.0 OR MIT>
 
 <p align="center">
   <img src="https://cloudcdn.pro/clients/pacs008/v1/logos/pacs008.svg" alt="pacs008 logo" width="128" />
