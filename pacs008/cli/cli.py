@@ -425,7 +425,9 @@ def main(
     )
 
     # Step 6: Validate message type (redundant with Click validation, kept for logging)
-    if xml_message_type not in valid_xml_types:
+    if (
+        xml_message_type not in valid_xml_types
+    ):  # pragma: no cover  click.Choice rejects this first
         log_validation_event(
             logger,
             "message_type",
