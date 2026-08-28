@@ -399,7 +399,7 @@ def process_files(
         raise
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover  module-as-script entry point
     if len(sys.argv) < 5:
         print(
             "Usage: python3 -m pacs008 "
