@@ -16,9 +16,13 @@
 """SWIFT CBPR+ (Cross-Border Payments and Reporting Plus) profile.
 
 Cross-border correspondent-banking rulebook governing the majority of
-SWIFT-routed payments. The Usage Guidelines UG2026 take force on
-14 November 2026 and decommission fully unstructured postal
-addresses.
+SWIFT-routed payments. The Usage Guidelines UG2026 decommission fully
+unstructured postal addresses.
+
+Swift deferred every payments change in Standards Release 2026 on
+27 August 2026, this one among them, and will confirm replacement timing
+by December at the latest. The rules below are unchanged: the community
+agreed them in 2023 and only their start date moved.
 
 Notable rules captured here:
 

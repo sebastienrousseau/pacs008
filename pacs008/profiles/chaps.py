@@ -23,7 +23,8 @@ RTGS service. Two notable v0.0.2 specifics:
   to unilaterally require LEI.
 - CHAPS Enhanced Data: structured remittance, purpose codes, UETR are
   all mandatory.
-- Address policy switches to HYBRID_OR_STRUCTURED on 2026-11-14
+- Address policy switches to HYBRID_OR_STRUCTURED on 2026-11-14, the Bank
+  of England date, unaffected by Swift deferring the CBPR+ change
   alongside CBPR+ / HVPS+ / T2 / Fedwire.
 
 References:
