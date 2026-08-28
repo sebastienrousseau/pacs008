@@ -16,7 +16,7 @@
 """ISO 20022 ``PostalAddress`` model and the November 2026 cliff tooling.
 
 This module exists to address the **largest near-term operational risk**
-for any pacs.008 user: on 14 November 2026, fully unstructured postal
+for any pacs.008 user: once the deferred cutover lands, fully unstructured postal
 addresses are decommissioned across SWIFT CBPR+, HVPS+, TARGET2 RTGS,
 CHAPS, Fedwire and Lynx. After that date, every cross-border or
 high-value payment with an unstructured-only postal address is rejected
@@ -30,7 +30,8 @@ Three address forms are recognised:
   carrying remaining free-form text. This is the form CBPR+ UG2026
   permits as the minimum bar.
 - **Unstructured** — ``AdrLine`` only, no ``TwnNm`` or ``Ctry``.
-  Rejected by all major schemes from 14 November 2026.
+  Rejected by all major schemes. Swift deferred the CBPR+ start date on
+  27 August 2026; HVPS+, CHAPS and Fedwire set their own.
 
 Public surface:
 
@@ -47,7 +48,7 @@ Public surface:
 References:
 
 - ISO 20022 ``PostalAddress27`` complex type.
-- SWIFT CBPR+ UG2026 (rulebook in force 14 November 2026).
+- SWIFT CBPR+ UG2026 (rulebook start date deferred on 27 August 2026).
 - SWIFT HVPS+ UG2026 collection (Swift, due December 2026).
 - ECB T2-0170 — *Upgrade of T2 messages to ISO MR 2026* (October 2025).
 - Bank of England — *Mandating ISO 20022 enhanced data in CHAPS*.
@@ -63,9 +64,20 @@ from datetime import date
 from enum import Enum
 from typing import Any
 
-# Cliff date — 14 November 2026 across SWIFT CBPR+, HVPS+, T2 RTGS,
-# CHAPS, Fedwire, Lynx. Fedwire's specific cutover is 16 November 2026
-# but the SWIFT date is the binding global deadline.
+# The date the schemes announced in common: SWIFT CBPR+, HVPS+, T2 RTGS,
+# CHAPS and Lynx all named 14 November 2026, and Fedwire 16 November.
+#
+# Swift deferred the CBPR+ change on 27 August 2026 and will confirm
+# replacement timing by December. The other operators set their own dates and
+# Swift's announcement does not move them, so this stays as it is and the
+# CBPR+ profile keeps switching on it.
+#
+# That is deliberate, and conservative. With no date to switch on, the literal
+# reading is that unstructured addresses remain acceptable under CBPR+
+# indefinitely -- which is true of the rulebook and useless as advice. Swift
+# asked the community to keep pressing ahead, so a profile that keeps
+# requiring structured addresses errs towards readiness; one that relaxed
+# would tell a bank it is fine when the date could land in December.
 NOV_2026_CLIFF: date = date(2026, 11, 14)
 
 

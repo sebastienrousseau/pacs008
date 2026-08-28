@@ -24,7 +24,8 @@ This v0.0.2 profile captures the *common* HVPS+ tightening:
 - Strict single-transaction-per-message (HVPS rails settle one
   payment per file).
 - Mandatory UETR.
-- Address policy switches to HYBRID_OR_STRUCTURED on 2026-11-14.
+- Address policy switches to HYBRID_OR_STRUCTURED on 2026-11-14, HVPS+
+  own date, unaffected by Swift deferring the CBPR+ change.
 - Strict ``SHAR``-only charge bearer per HVPS+ UG2026.
 - Defaults the calendar to TARGET because European HVPS volume is
   the largest single segment; institutions deploying for Fedwire HVP

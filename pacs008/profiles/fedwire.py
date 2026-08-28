@@ -46,7 +46,8 @@ from pacs008.standards.address import AddressPolicy
 from pacs008.validation.calendar import Calendar, FedwireCalendar
 
 # Fedwire's address-structuring cutover is dated 16 November 2026,
-# whereas SWIFT CBPR+ uses 14 November 2026.
+# whereas SWIFT CBPR+ announced 14 November 2026 and then deferred it on
+# 27 August 2026. Fedwire sets its own date and is unaffected.
 _FEDWIRE_ADDRESS_CLIFF: date = date(2026, 11, 16)
 
 

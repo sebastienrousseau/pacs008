@@ -31,7 +31,7 @@ shipping in v0.0.2:
   baseline (default). Behaviourally a no-op so legacy callers see no
   change.
 - :class:`~pacs008.profiles.cbpr_plus.CBPRPlusProfile` — SWIFT CBPR+
-  Usage Guidelines UG2026 (in force 2026-11-14).
+  Usage Guidelines UG2026 (start date deferred on 2026-08-27).
 - :class:`~pacs008.profiles.fedwire.FedwireProfile` — Federal Reserve
   Fedwire ISO 20022 profile (structured-address cliff 2026-11-16).
 
