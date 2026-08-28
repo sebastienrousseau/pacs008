@@ -132,7 +132,18 @@ class TestChunking:
         assert seen == [row["msg_id"] for row in rows]
 
 
-@pytest.mark.skipif(os.geteuid() == 0, reason="root reads regardless of mode")
+# Windows has no geteuid and does not deny reads on a 000 file, and root reads
+# regardless of mode on POSIX. Both are conditions where the branch cannot be
+# reached, so the test is skipped rather than made to pass some other way.
+_CANNOT_DENY_READS = (
+    os.name == "nt" or getattr(os, "geteuid", lambda: 1)() == 0
+)
+
+
+@pytest.mark.skipif(
+    _CANNOT_DENY_READS,
+    reason="file modes do not deny reads for this user on this platform",
+)
 class TestUnreadableFile:
     """A file the process is not permitted to open.
 
