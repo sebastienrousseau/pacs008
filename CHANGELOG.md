@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.10] - 2026-08-28
+
+Swift deferred the CBPR+ structured-address start date; the library still
+described it as in force.
+
+### Fixed
+
+- The CBPR+ profile and `standards/address` said the structured-address
+  requirement takes force on 14 November 2026. Swift accepted a community
+  request on 27 August 2026 and deferred every payments change in Standards
+  Release 2026, confirming replacement timing by December at the latest. The
+  requirement itself was agreed by the community in 2023 and stands; only
+  when it bites has moved.
+- `standards/address` said the date bound "all major schemes". The deferral
+  is Swift's and covers CBPR+ only. HVPS+, T2 RTGS, CHAPS, Lynx and Fedwire
+  set their own dates and are unchanged; each now says whose date it is.
+
+### Unchanged
+
+- Every rule, threshold and validation result. `NOV_2026_CLIFF` keeps its
+  value deliberately: five profiles switch address policy on it, and with no
+  CBPR+ date to switch on, the literal reading is that unstructured
+  addresses stay acceptable indefinitely — true of the rulebook and useless
+  as advice. Swift asked the community to keep pressing ahead.
+
 ## [0.0.9] - 2026-08-16
 
 Release the `cryptography` ceiling that was raised in the tree but never
