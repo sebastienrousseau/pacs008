@@ -42,7 +42,7 @@ def public_symbols(py_file: pathlib.Path):
             continue
         if isinstance(
             node,
-            (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef),
+            ast.ClassDef | ast.FunctionDef | ast.AsyncFunctionDef,
         ):
             yield name, node.lineno
 
