@@ -53,14 +53,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pacs008.compliance import (
-    cleanse_data,
-    validate_swift_charset,
-)  # noqa: E402
-from pacs008.core.splitter import (  # noqa: E402
-    required_chunks,
-    split_for_scheme,
-)
+from pacs008.compliance import cleanse_data, validate_swift_charset
+from pacs008.core.splitter import required_chunks, split_for_scheme
 
 SCHEME = "CBPR+"
 
