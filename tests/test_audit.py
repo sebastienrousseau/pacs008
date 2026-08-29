@@ -21,7 +21,7 @@ from datetime import datetime, timezone
 
 import pytest
 from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import ed25519, rsa
+from cryptography.hazmat.primitives.asymmetric import rsa
 
 from pacs008.observability.audit import (
     AuditRecord,

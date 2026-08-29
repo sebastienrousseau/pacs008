@@ -5,7 +5,7 @@ from pathlib import Path
 
 BASE_DIR = Path(os.path.dirname(os.path.abspath(__file__))).resolve()
 
-VERSION = "0.0.1"
+VERSION = "0.0.11"
 SCHEMAS_DIR = BASE_DIR / "schemas"
 TEMPLATES_DIR = BASE_DIR / "templates"
 

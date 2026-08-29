@@ -42,7 +42,7 @@ def public_symbols(py_file: pathlib.Path):
             continue
         if isinstance(
             node,
-            (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef),
+            ast.ClassDef | ast.FunctionDef | ast.AsyncFunctionDef,
         ):
             yield name, node.lineno
 
@@ -121,9 +121,7 @@ def main() -> int:
     print("\n## Summary\n")
     print(f"- **Public top-level symbols inspected:** {total}")
     pct = covered * 100 // total if total else 0
-    print(
-        f"- **Referenced by ≥1 test file:** {covered} ({pct}%)"
-    )
+    print(f"- **Referenced by ≥1 test file:** {covered} ({pct}%)")
     print(f"- **Without test reference:** {len(gaps)}")
     if gaps:
         print("\n### Symbols with no test reference\n")

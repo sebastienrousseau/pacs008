@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pacs008"
-version = "0.0.10"
+version = "0.0.11"
 description = "Generate, validate, parse and audit ISO 20022 pacs.008 (FI-to-FI Customer Credit Transfer) messages with scheme-aware rules for CBPR+, HVPS+, Fedwire, CHAPS, T2 RTGS and SCT Inst."
 authors = ["Sebastien Rousseau <contact@sebastienrousseau.com>"]
 license = "Apache-2.0 OR MIT"
@@ -99,7 +99,11 @@ optional = true
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+# tests/test_suite_conformance.py is generated and vendored from one
+# canonical copy shared across the suite, and checksummed by its own
+# test. The suite uses three different line lengths.
 [tool.black]
+extend-exclude = "tests/test_suite_conformance\\.py"
 line-length = 79
 target-version = ['py310']
 
@@ -153,6 +157,9 @@ select = ["E", "W", "F", "I", "B", "C4", "UP"]
 ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]
+# A standalone benchmark has to put the repository on sys.path before
+# importing the package it measures, so its imports cannot come first.
+"benches/*.py" = ["E402"]
 "__init__.py" = ["F401"]
 "tests/test_csv_loader.py" = ["B017"]
 

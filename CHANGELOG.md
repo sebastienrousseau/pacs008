@@ -5,6 +5,54 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.11] - 2026-08-29
+
+Suite alignment release. Every package in the `pacs008` suite now ships the
+same number: `pacs008`, `pacs008-mcp` and `pacs008-loader-mt103` were at
+0.0.10, 0.0.9 and 0.0.3 respectively — three numbers for one suite, and no
+way for a user to reason about which combination was intended.
+
+### Fixed
+
+- **`constants.VERSION` said `0.0.1`.** It had said so since the first
+  release, through nine subsequent ones, so anything reading it reported a
+  version that had not been current for months.
+
+  It survived because the test guarding it asserted `VERSION == "0.0.1"`.
+  A pinned literal does not guard a value; it preserves whatever it was
+  set to. The test now compares against `pacs008.__version__`, and the
+  shared conformance file checks every restatement of the version agrees.
+
+### Added
+
+- **`benches/bench_batch_pipeline.py`** — what a batch costs to cleanse
+  and split.
+
+  **Cleansing is linear** (`us/row` moves 1.19x between 100 and 50,000
+  rows) and dominates, at ~10 µs per row. **Splitting is arithmetic**, at
+  about 3% of cleansing. `validate_swift_charset` is ~0.5 µs per value and
+  is the innermost loop — per character, per field, per row — so a change
+  there multiplies through everything above it.
+
+  Recorded because it is easy to get wrong: `split_for_scheme` returns a
+  **generator**. Timing the bare call measures building the generator
+  object, reports that splitting is free, and measures nothing. It is
+  benchmarked consumed.
+
+- **`scripts/check_suite_consistency.py`** and a scheduled
+  **`suite-consistency`** workflow, modelled on `camt053`'s. It compares
+  every published member against the core and fails when they disagree —
+  and catches the version bumped in the tree but never released, which has
+  happened three times elsewhere in this suite and each time stranded a
+  security floor that reached nobody.
+
+- **`tests/test_suite_conformance.py`** — invariants shared across the
+  suite, vendored from one canonical copy and checksummed by its own test.
+
+### Changed
+
+- CI lints and formats `benches/` and `scripts/`, and runs the benchmark.
+
 ## [0.0.10] - 2026-08-28
 
 Swift deferred the CBPR+ structured-address start date; the library still
