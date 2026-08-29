@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.12] - 2026-08-29
+
+Aligns the `pacs008` suite on one version number.
+
+### Changed
+
+- Version aligned to `0.0.12` across `pacs008`, `pacs008-mcp` and
+  `pacs008-loader-mt103`, which had drifted to `0.0.11`, `0.0.9` and
+  `0.0.3`. The suite ships one number by policy; the `Suite Consistency`
+  workflow added in 0.0.11 exists to catch exactly this and had been
+  reporting it.
+- Refreshed the vendored `tests/test_suite_conformance.py` to the
+  current canonical copy. The drift-check probe now matches the bare
+  word `pypi` rather than the hostname: CodeQL read a containment test
+  against a dotted host as an incomplete URL sanitisation, and matching
+  the word is both quieter and strictly broader.
+
 ## [0.0.11] - 2026-08-29
 
 Suite alignment release. Every package in the `pacs008` suite now ships the
