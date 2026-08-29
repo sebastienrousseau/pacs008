@@ -37,6 +37,13 @@ jobs:
         if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
         run: poetry run pytest tests/ -v --tb=short
 
+      # Not a timing gate -- wall-clock is not comparable between
+      # runners. This proves the benchmark still runs against the
+      # current API rather than rotting into a file that reads as
+      # verified and is not.
+      - name: Run the benchmark
+        run: poetry run python benches/bench_batch_pipeline.py --quick
+
       - name: Run tests (matrix, no coverage gate)
         if: matrix.python-version != '3.12' || matrix.os != 'ubuntu-latest'
         # The 95% coverage gate fires only on the canonical platform.
@@ -98,10 +105,10 @@ jobs:
         run: poetry install --no-interaction --extras otel
 
       - name: Ruff check
-        run: poetry run ruff check pacs008/
+        run: poetry run ruff check pacs008/ benches/ scripts/
 
       - name: Black check
-        run: poetry run black --check pacs008/ tests/
+        run: poetry run black --check pacs008/ tests/ benches/ scripts/
 
       - name: Mypy
         run: poetry run mypy pacs008/

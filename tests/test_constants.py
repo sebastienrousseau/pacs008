@@ -24,7 +24,17 @@ def test_app_name():
 
 
 def test_version():
-    assert VERSION == "0.0.1"
+    """`constants.VERSION` must equal the package version.
+
+    Deliberately not a literal. This test asserted `== "0.0.1"` and passed
+    for nine releases while `constants.VERSION` really was `0.0.1` and
+    `pyproject.toml` had reached `0.0.10` — the pinned literal was not
+    guarding the value, it was preserving a stale one. Anything reading
+    `constants.VERSION` reported `0.0.1` the entire time.
+    """
+    import pacs008
+
+    assert VERSION == pacs008.__version__
 
 
 def test_base_dir_exists():

@@ -340,8 +340,7 @@ class TestCoreErrorPaths:
         from datetime import date
 
         from pacs008.core.core import _run_scheme_validation
-        from pacs008.profiles import SchemeViolationError
-        from pacs008.profiles import cbpr_plus
+        from pacs008.profiles import SchemeViolationError, cbpr_plus
 
         class FakeDate(date):
             @classmethod
@@ -556,7 +555,7 @@ class TestValidationServiceErrors:
 def test_address_validate_unknown_policy_passes_silently():
     """An unknown AddressPolicy enum value should not block payment —
     forward-compat path returns None."""
-    from pacs008.standards.address import AddressPolicy, PostalAddress
+    from pacs008.standards.address import PostalAddress
 
     addr = PostalAddress(adr_line=("foo",))
     # Manually monkeypatch to simulate an unknown enum variant.

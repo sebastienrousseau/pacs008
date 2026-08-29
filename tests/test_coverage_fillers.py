@@ -25,8 +25,6 @@ from __future__ import annotations
 
 import logging
 
-import pytest
-
 from pacs008.observability.formatters import (
     JSONFormatter,
     configure_json_logging,
