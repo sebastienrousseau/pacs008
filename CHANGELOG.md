@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Release provenance. Each release now attaches, next to the wheel and
+  sdist: a GitHub artifact attestation per distribution, signed SLSA
+  Build Level 3 provenance over every asset (`multiple.intoto.jsonl`),
+  CycloneDX SBOMs in JSON and XML, a licence manifest, and `SHA256SUMS`.
+  Verify with `gh attestation verify <file> --owner sebastienrousseau`
+  or `slsa-verifier verify-artifact`. The SBOM is taken from
+  `poetry.lock` (runtime dependencies only), and the SBOM tools
+  themselves are installed from a hash-pinned requirements file.
+- CodeQL code scanning on pushes and pull requests to `main` and weekly.
+  The repository had no code-scanning analysis before.
+
+### Changed
+
+- Release workflow actions are pinned to commit SHAs, the checkout no
+  longer persists credentials, and permissions are scoped per job.
+
+### Security
+
+- `soupsieve` 2.8.4 to 2.9 (development dependency), fixing two
+  polynomial-time ReDoS advisories (Dependabot alerts #16 and #17).
+
 ## [0.0.12] - 2026-08-29
 
 Aligns the `pacs008` suite on one version number.
