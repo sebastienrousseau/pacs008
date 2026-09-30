@@ -1,5 +1,22 @@
 name: Release
 
+# Every release ships its distributions together with the evidence a bank's
+# procurement and security review asks for:
+#
+#   - a GitHub artifact attestation per distribution
+#       gh attestation verify pacs008-<v>-py3-none-any.whl --owner sebastienrousseau
+#   - SLSA Build Level 3 provenance over every release asset
+#       slsa-verifier verify-artifact pacs008-<v>-py3-none-any.whl \
+#         --provenance-path multiple.intoto.jsonl \
+#         --source-uri github.com/sebastienrousseau/pacs008 --source-tag v<v>
+#   - CycloneDX SBOMs (JSON and XML) of the runtime dependency set, taken
+#     from poetry.lock, and a licence manifest of the installed packages
+#   - SHA256SUMS over every attached file
+#
+# Ported from pain001's release pipeline, with one correction: the SBOM is
+# generated from the project's lock file (`cyclonedx-py poetry`), not from
+# the environment the SBOM tool itself was installed into.
+
 on:
   push:
     tags:
@@ -12,25 +29,34 @@ on:
         default: "v0.0.1"
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   publish:
     name: Build And Publish
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the release and upload its assets
+      id-token: write # sign the artifact attestation via Sigstore OIDC
+      attestations: write # store the artifact attestation
     env:
       RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
+    outputs:
+      hashes: ${{ steps.hashes.outputs.hashes }}
+      tag: ${{ steps.hashes.outputs.tag }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
 
       - name: Install Poetry
-        run: pip install poetry
+        run: pip install poetry==2.4.3
 
       - name: Install dependencies
         run: poetry install --no-interaction
@@ -41,6 +67,40 @@ jobs:
       - name: Check distributions
         run: poetry run twine check dist/*
 
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: "dist/*"
+
+      - name: Generate SBOM (CycloneDX) and licence manifest
+        run: |
+          set -euo pipefail
+          version="${RELEASE_TAG#v}"
+          python -m venv .sbom-tools
+          .sbom-tools/bin/pip install --quiet --require-hashes -r .github/requirements/sbom.txt
+          mkdir -p sbom
+          .sbom-tools/bin/cyclonedx-py poetry --no-dev --mc-type library \
+            --output-reproducible --output-file "sbom/pacs008-${version}.cdx.json"
+          .sbom-tools/bin/cyclonedx-py poetry --no-dev --mc-type library \
+            --output-reproducible --output-format XML --output-file "sbom/pacs008-${version}.cdx.xml"
+          poetry install --no-interaction --only main --sync
+          .sbom-tools/bin/pip-licenses --python "$(poetry env info --executable)" \
+            --format=json --with-license-file --no-license-path \
+            --output-file="sbom/pacs008-${version}.spdx-licenses.json"
+          ls -la sbom/
+
+      # Hash from inside each directory so the subject names are the bare
+      # release asset names; a path prefix would match no verifier.
+      - name: Hash release assets
+        id: hashes
+        run: |
+          set -euo pipefail
+          sums=$( (cd dist && sha256sum -- *) ; (cd sbom && sha256sum -- *) )
+          printf '%s\n' "$sums" > SHA256SUMS
+          cat SHA256SUMS
+          echo "hashes=$(base64 -w0 < SHA256SUMS)" >> "$GITHUB_OUTPUT"
+          echo "tag=${RELEASE_TAG}" >> "$GITHUB_OUTPUT"
+
       - name: Publish to PyPI
         env:
           TWINE_USERNAME: __token__
@@ -50,9 +110,31 @@ jobs:
       - name: Publish release artifacts to GitHub
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
         run: |
-          if gh release view "${RELEASE_TAG}" --repo "${{ github.repository }}" >/dev/null 2>&1; then
-            gh release upload "${RELEASE_TAG}" dist/* --repo "${{ github.repository }}" --clobber
+          if gh release view "${RELEASE_TAG}" --repo "${REPO}" >/dev/null 2>&1; then
+            gh release upload "${RELEASE_TAG}" dist/* sbom/* SHA256SUMS --repo "${REPO}" --clobber
           else
-            gh release create "${RELEASE_TAG}" dist/* --repo "${{ github.repository }}" --title "${RELEASE_TAG}" --generate-notes
+            gh release create "${RELEASE_TAG}" dist/* sbom/* SHA256SUMS --repo "${REPO}" --title "${RELEASE_TAG}" --generate-notes
           fi
+
+  # Signed SLSA provenance over every release asset. It lives in this
+  # workflow because a release created with GITHUB_TOKEN triggers no further
+  # workflow runs, so a separate `on: release` workflow would never fire.
+  #
+  # The reusable generator MUST be referenced by tag, not SHA: slsa-verifier
+  # validates the generator's own provenance against its release tag. This
+  # is the documented exception to SHA pinning.
+  provenance:
+    name: Generate signed provenance
+    needs: publish
+    permissions:
+      actions: read # read the workflow path
+      id-token: write # sign via Sigstore OIDC
+      contents: write # upload the attestation to the release
+    # zizmor: ignore[unpinned-uses] slsa-verifier requires the generator by release tag (see above)
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.1.0
+    with:
+      base64-subjects: ${{ needs.publish.outputs.hashes }}
+      upload-tag-name: ${{ needs.publish.outputs.tag }}
+      upload-assets: true
