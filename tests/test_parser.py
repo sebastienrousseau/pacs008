@@ -173,6 +173,17 @@ class TestFailures:
         assert msg.bah.biz_msg_idr == "BIZ-é"
         assert msg.msg_def_idr == "pacs.008.001.08"
 
+    def test_envelope_name_legal_only_in_its_declared_encoding_raises_parse_error(
+        self,
+    ):
+        # Expat's ISO-8859-1 decoder accepts U+00BA in an element name; the
+        # UTF-8 re-serialisation the BAH reader parses does not.
+        x = _envelope_with_biz_msg_idr("BIZ-1", "ISO-8859-1").replace(
+            "<Document ", "<Documen\u00bat "
+        )
+        with pytest.raises(ParseError, match="malformed envelope"):
+            parse(x.encode("ISO-8859-1"))
+
 
 _NS_NVLP = "urn:iso:std:iso:20022:tech:xsd:nvlp.001.001.01"
 

@@ -32,7 +32,9 @@ never released for this package. `pacs008`, `pacs008-loader-mt103` and
   `AppHdr` child) raised a bare `ValueError`, and an envelope passed as
   bytes in a non-UTF-8 encoding (ISO-8859-1, UTF-16) raised
   `UnicodeDecodeError`. Such envelopes are now parsed in their declared
-  encoding. `ParseError` subclasses `ValueError`, so existing handlers
+  encoding. An ISO-8859-1 envelope with a character in an element name
+  that only Latin-1 decoding lets through raised
+  `xml.etree.ElementTree.ParseError`; it is now a malformed envelope. `ParseError` subclasses `ValueError`, so existing handlers
   keep working.
 
 ### Added
