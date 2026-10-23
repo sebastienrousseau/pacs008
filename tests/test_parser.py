@@ -17,6 +17,8 @@
 
 from __future__ import annotations
 
+import dataclasses
+
 import pytest
 
 from pacs008.standards.bah import wrap_in_bah
@@ -167,5 +169,5 @@ class TestFailures:
 class TestParsedMessageImmutability:
     def test_frozen(self):
         msg = parse(_unwrapped("pacs.008", "001.08"))
-        with pytest.raises(Exception):
+        with pytest.raises(dataclasses.FrozenInstanceError):
             msg.msg_family = "OTHER"  # type: ignore[misc]

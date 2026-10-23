@@ -17,6 +17,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 import threading
 from datetime import datetime, timedelta, timezone
 
@@ -218,7 +219,7 @@ class TestABCContract:
         e = IdempotencyEntry(
             key="k", payload_hash="h", recorded_at=datetime.now()
         )
-        with pytest.raises(Exception):
+        with pytest.raises(dataclasses.FrozenInstanceError):
             e.key = "other"  # type: ignore[misc]
 
     def test_cannot_instantiate_abc(self):
