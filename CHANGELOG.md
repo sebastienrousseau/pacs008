@@ -5,6 +5,78 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.15] - Unreleased
+
+Security, supply-chain and release-evidence release. The version moves
+from 0.0.12 straight to 0.0.15 to stay in lockstep with the suite:
+`pacs008-mcp` has already published 0.0.14, and 0.0.13 and 0.0.14 were
+never released for this package. `pacs008`, `pacs008-loader-mt103` and
+`pacs008-mcp` all ship 0.0.15.
+
+### Security
+
+- `certifi >= 2026.10.19` is now a runtime floor (it arrives through
+  `httpx`), so no install can resolve a CA bundle affected by
+  GHSA-6q48-6c7w-9gw2.
+- The `otel` extra requires `opentelemetry-api >= 1.45.1`
+  (GHSA-xcq7-p3pf-p88h, ReDoS in `TraceState.from_header`).
+- Development and docs floors: `urllib3 >= 2.8.0` (GHSA-vxq7-64xx-v4gw,
+  GHSA-gh4c-6fx4-qh6g), `soupsieve >= 2.9.0` (GHSA-gjv8-xp57-g29c,
+  GHSA-j934-xhv5-fg8f; Dependabot alerts #16 and #17) and
+  `black >= 26.10.1` (GHSA-cg8m-r9f2-5wm2).
+
+### Fixed
+
+- `parse()` now raises `ParseError` for every malformed `BizMsgEnvlp`, as
+  documented. An envelope with no `AppHdr` (or a missing mandatory
+  `AppHdr` child) raised a bare `ValueError`, and an envelope passed as
+  bytes in a non-UTF-8 encoding (ISO-8859-1, UTF-16) raised
+  `UnicodeDecodeError`. Such envelopes are now parsed in their declared
+  encoding. `ParseError` subclasses `ValueError`, so existing handlers
+  keep working.
+
+### Added
+
+- Release provenance. Each release now attaches, next to the wheel and
+  sdist: a GitHub artifact attestation per distribution, signed SLSA
+  Build Level 3 provenance over every asset (`multiple.intoto.jsonl`),
+  CycloneDX SBOMs in JSON and XML, a licence manifest, and `SHA256SUMS`.
+  Verify with `gh attestation verify <file> --owner sebastienrousseau`
+  or `slsa-verifier verify-artifact`. The SBOM is taken from
+  `poetry.lock` (runtime dependencies only), and the SBOM tools
+  themselves are installed from a hash-pinned requirements file.
+- CodeQL code scanning on pushes and pull requests to `main` and weekly.
+  The repository had no code-scanning analysis before.
+- OpenSSF Scorecard, published weekly and on pushes to `main`.
+- A dependency audit job: `pip-audit` over every version in
+  `poetry.lock` (all groups and extras, on Python 3.10, 3.11 and 3.12)
+  and over every hash-pinned CI requirements file. `make audit` runs the
+  same locally.
+- Coverage-guided fuzzing of `parse()` with Atheris
+  (`fuzz/fuzz_parse.py`), two minutes on every change and thirty
+  weekly, seeded from `fuzz/corpus/`, which also holds the inputs of the
+  envelope bugs fixed above.
+- A complexity gate (`scripts/check_complexity.py`, run by CI and
+  `make check`): per function cyclomatic 10, cognitive 15, Halstead
+  difficulty 30 and 60 lines, and 500 lines per file. The 41 existing
+  offenders are recorded in `complexity-baseline.json`, which may only
+  shrink.
+- A Developer Certificate of Origin check on pull requests (`DCO.txt`).
+- Dependabot version updates for `poetry.lock` and the workflow actions.
+
+### Changed
+
+- Every workflow action is pinned to a commit SHA, every `pip install`
+  in CI is hash-pinned (Poetry 2.5.1 from
+  `.github/requirements/poetry.txt`; everything else from
+  `poetry.lock`), checkouts no longer persist credentials, and
+  permissions are scoped per job.
+- CI lints `tests/`, `examples/` and `fuzz/` as well, and checks that
+  `poetry.lock` is current. The ruff and black findings this surfaced
+  were fixed, not suppressed.
+- The Sphinx `release` is read from `pacs008.__version__`; it had said
+  `0.0.7`.
+
 ## [0.0.12] - 2026-08-29
 
 Aligns the `pacs008` suite on one version number.

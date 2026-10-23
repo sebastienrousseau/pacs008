@@ -1,9 +1,12 @@
 """Sphinx configuration for pacs008 documentation."""
 
+from pacs008 import __version__
+
 project = "pacs008"
 copyright = "2026, Sebastien Rousseau"
 author = "Sebastien Rousseau"
-release = "0.0.7"
+# Read from the package so the docs can never name a stale release.
+release = __version__
 
 extensions = [
     "sphinx.ext.autodoc",
