@@ -37,6 +37,10 @@ fastapi = ">=0.95,<1.0"
 uvicorn = {version = ">=0.20,<1.0", extras = ["standard"]}
 httpx = ">=0.23,<1.0"
 pyarrow = ">=18.0.0,<26.0.0"
+# Advisory floor on a transitive dependency (via httpx and requests): no
+# affected version may resolve for anyone installing pacs008.
+# GHSA-6q48-6c7w-9gw2: certifi < 2026.10.19 trusts a distrusted root.
+certifi = ">=2026.10.19"
 
 [tool.poetry.group.dev.dependencies]
 packaging = ">=23.0"
@@ -47,7 +51,8 @@ pytest = ">=8.0,<10"
 pytest-cov = "^4.0.0"
 pytest-benchmark = "^4.0.0"
 pytest-xdist = "^3.0.0"
-black = "^26.3.1"
+# GHSA-cg8m-r9f2-5wm2: black < 26.10.1.
+black = "^26.10.1"
 flake8 = "^7.0.0"
 isort = "^5.13.0"
 mypy = "^1.11.0"
@@ -95,8 +100,10 @@ soupsieve = ">=2.9.0"
 # silently no-op so callers can leave instrumentation in place.
 otel = ["opentelemetry-api", "opentelemetry-sdk"]
 
+# GHSA-xcq7-p3pf-p88h: opentelemetry-api < 1.45.1 (ReDoS in
+# TraceState.from_header).
 [tool.poetry.dependencies.opentelemetry-api]
-version = ">=1.20,<2"
+version = ">=1.45.1,<2"
 optional = true
 
 [tool.poetry.dependencies.opentelemetry-sdk]
