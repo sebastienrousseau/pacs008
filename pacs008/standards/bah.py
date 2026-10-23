@@ -56,7 +56,6 @@ from pacs008.validation.bic_validator import validate_bic_safe
 # Namespaces used by the envelope.
 _NS_NVLP = "urn:iso:std:iso:20022:tech:xsd:nvlp.001.001.01"
 _NS_BAH = "urn:iso:std:iso:20022:tech:xsd:head.001.001.02"
-_NS_PAYLOAD_PREFIX = "urn:iso:std:iso:20022:tech:xsd:"
 
 # Recognised priority codes per AppHdr (HIGH / NORM / URGT).
 _VALID_PRIORITIES = frozenset({"HIGH", "NORM", "URGT"})

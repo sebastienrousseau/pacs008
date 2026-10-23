@@ -73,8 +73,10 @@ def _resolve_within_allowed_bases(
     else:
         allowed_bases = _get_allowed_bases_str()
     for base in allowed_bases:
-        if resolved_str == base or resolved_str.startswith(base + os.sep):
-            return base + resolved_str[len(base) :]
+        if resolved_str == base:
+            return base
+        if resolved_str.startswith(base + os.sep):
+            return resolved_str
     if base_dir:
         raise SecurityError(
             f"Path '{resolved_str}' escapes base directory '{base_dir}'."

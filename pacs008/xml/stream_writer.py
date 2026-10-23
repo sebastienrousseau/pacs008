@@ -266,6 +266,7 @@ def _aggregate(
         try:
             running_total += Decimal(str(amount))
         except (ValueError, ArithmeticError):
+            # A non-numeric amount stays out of the control sum.
             pass
     currency = row.get("interbank_settlement_currency")
     if currency and seen_currency is None:

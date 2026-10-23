@@ -1,4 +1,6 @@
-FROM python:3.12-slim AS base
+# python:3.12-slim, pinned by digest (OpenSSF Scorecard Pinned-Dependencies).
+# Refresh with: docker buildx imagetools inspect python:3.12-slim
+FROM python:3.12-slim@sha256:a0f57064cbdcd6285fa45f51237ab0b35ea8ebaed06a1f5973e89e19dfb86704 AS base
 
 LABEL maintainer="Sebastien Rousseau <sebastian.rousseau@gmail.com>"
 LABEL description="Pacs008 ISO 20022 pacs.008 XML Generation API"
@@ -10,11 +12,12 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends gcc && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Poetry
-RUN pip install --no-cache-dir poetry
+# Install Poetry, hash-pinned; poetry.lock pins everything it installs
+COPY .github/requirements/poetry.txt /tmp/poetry.txt
+RUN pip install --no-cache-dir --require-hashes -r /tmp/poetry.txt
 
 # Copy dependency files first (layer caching)
-COPY pyproject.toml ./
+COPY pyproject.toml poetry.lock ./
 
 # Install dependencies without dev deps
 RUN poetry config virtualenvs.create false && \

@@ -12,6 +12,7 @@ coverage.xml
 .coverage
 .git
 .github
+!.github/requirements/poetry.txt
 tests
 docs
 examples

@@ -37,6 +37,11 @@ SimpleSpanProcessor = _sdk_export.SimpleSpanProcessor
 InMemorySpanExporter = _in_memory.InMemorySpanExporter
 
 
+def _raise(exc: Exception) -> None:
+    """Raise ``exc`` from a call, so the code after the block stays reachable."""
+    raise exc
+
+
 @pytest.fixture
 def exporter():
     """Wire an in-memory span exporter as the global TracerProvider."""
@@ -109,7 +114,7 @@ class TestTraceSpan:
     def test_exception_marks_span_error(self, exporter):
         with pytest.raises(RuntimeError):
             with trace_span("boom"):
-                raise RuntimeError("nope")
+                _raise(RuntimeError("nope"))
         spans = exporter.get_finished_spans()
         assert spans[0].status.status_code == otel_trace.StatusCode.ERROR
 
