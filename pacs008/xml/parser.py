@@ -57,7 +57,6 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from typing import Any
-from xml.etree.ElementTree import ParseError as XMLSyntaxError
 
 from defusedxml import ElementTree as DET
 
@@ -151,7 +150,7 @@ def _parse_envelope(root: Any) -> ParsedMessage:
     envelope_xml = DET.tostring(root, encoding="unicode")
     try:
         bah = extract_bah_fields(envelope_xml)
-    except (ValueError, XMLSyntaxError) as exc:
+    except (ValueError, DET.ParseError) as exc:
         raise ParseError(f"malformed envelope: {exc}") from exc
     msg_def_idr = bah.msg_def_idr
     family, version = _split_msg_def_idr(msg_def_idr)
