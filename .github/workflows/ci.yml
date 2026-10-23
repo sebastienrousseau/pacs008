@@ -132,6 +132,14 @@ jobs:
       - name: Doc coverage (interrogate)
         run: poetry run interrogate pacs008/
 
+      # Per function: cyclomatic <= 10, cognitive <= 15, Halstead
+      # difficulty <= 30, <= 60 lines; <= 500 lines per file. Offenders
+      # that predate the gate live in complexity-baseline.json, which may
+      # only shrink. tests/ is not measured: test_suite_conformance.py is
+      # vendored from one canonical copy and checksummed.
+      - name: Complexity
+        run: poetry run python scripts/check_complexity.py
+
   security:
     name: Security Scan
     runs-on: ubuntu-latest

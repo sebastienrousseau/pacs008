@@ -1,4 +1,4 @@
-.PHONY: help install dev test lint format type-check security clean docs docker smoke examples audit pip-compile fuzz
+.PHONY: help install dev test lint format type-check security clean docs docker smoke examples audit pip-compile fuzz complexity
 
 PYTHON ?= python3
 POETRY ?= poetry
@@ -64,6 +64,9 @@ examples: ## Verify example scripts run
 	$(POETRY) run python examples/swift_compliance.py
 	@rm -f output_pacs008.xml
 
+complexity: ## Complexity ceilings against complexity-baseline.json
+	$(POETRY) run python scripts/check_complexity.py
+
 REQS := .github/requirements
 AUDIT_VENV := .venv-audit
 
@@ -94,4 +97,4 @@ pip-compile: ## Regenerate hash-pinned $(REQS)/*.txt from their .in files (needs
 fuzz: ## Atheris for FUZZ_SECONDS (default 60); Linux x86_64 with $(REQS)/fuzz.txt installed
 	$(POETRY) run python fuzz/fuzz_parse.py fuzz/corpus -max_total_time=$(or $(FUZZ_SECONDS),60)
 
-check: lint type-check security test examples ## Run all checks
+check: lint type-check complexity security test examples ## Run all checks

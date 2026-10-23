@@ -63,7 +63,10 @@ ruff = "^0.1.0"
 types-defusedxml = "^0.7.0"
 diff-cover = "^8.0.0"
 types-setuptools = "^65.0.0"
-radon = "^5.1.0"
+# scripts/check_complexity.py: exact pins, because the committed
+# complexity-baseline.json records the numbers these versions report.
+radon = "==6.0.1"
+complexipy = { version = "==8.1.0", python = "<3.16" }
 mutmut = "^2.4.0"
 hypothesis = "^6.0.0"
 memory-profiler = "^0.60.0"
@@ -198,6 +201,8 @@ check_untyped_defs = true
 strict_equality = true
 exclude = [
     "pacs008/templates/",
+    # conftest.py points pytest's basetemp here (gitignored scratch).
+    "pacs008/tmp/",
     "setup.py",
     "scripts/",
     "tmp_env/",

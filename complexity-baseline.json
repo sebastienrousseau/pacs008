@@ -1,0 +1,142 @@
+{
+  "pacs008/__main__.py::main": {
+    "lines": 73
+  },
+  "pacs008/api/app.py": {
+    "file_lines": 612
+  },
+  "pacs008/api/app.py::_process_generation_job": {
+    "lines": 88
+  },
+  "pacs008/api/app.py::generate_xml_sync": {
+    "lines": 88
+  },
+  "pacs008/cli/cli.py::main": {
+    "lines": 123
+  },
+  "pacs008/compliance/swift_charset.py": {
+    "file_lines": 563
+  },
+  "pacs008/compliance/swift_charset.py::_transliterate": {
+    "cyclomatic": 11
+  },
+  "pacs008/compliance/swift_charset.py::cleanse_data_with_report": {
+    "cognitive": 23,
+    "lines": 65
+  },
+  "pacs008/core/core.py::_run_scheme_validation": {
+    "lines": 73
+  },
+  "pacs008/core/core.py::_validate_inputs": {
+    "lines": 73
+  },
+  "pacs008/core/core.py::process_files": {
+    "lines": 84
+  },
+  "pacs008/core/splitter.py::split_for_scheme": {
+    "lines": 71
+  },
+  "pacs008/csv/load_csv_data.py::load_csv_data": {
+    "lines": 68
+  },
+  "pacs008/csv/load_csv_data.py::load_csv_data_streaming": {
+    "lines": 85
+  },
+  "pacs008/csv/validate_csv_data.py::_validate_field_type": {
+    "cognitive": 19,
+    "cyclomatic": 14
+  },
+  "pacs008/data/loader.py::load_payment_data": {
+    "lines": 65
+  },
+  "pacs008/data/loader.py::load_payment_data_streaming": {
+    "lines": 64
+  },
+  "pacs008/db/load_db_data.py::load_db_data": {
+    "lines": 76
+  },
+  "pacs008/db/load_db_data_streaming.py::load_db_data_streaming": {
+    "lines": 90
+  },
+  "pacs008/json/load_json_data.py::load_json_data": {
+    "lines": 73
+  },
+  "pacs008/json/load_json_data.py::load_jsonl_data": {
+    "lines": 67
+  },
+  "pacs008/json/load_json_data.py::load_jsonl_data_streaming": {
+    "cyclomatic": 11,
+    "lines": 77
+  },
+  "pacs008/observability/redaction.py::_redact_pii_from_dict": {
+    "cognitive": 24,
+    "cyclomatic": 15
+  },
+  "pacs008/profiles/base.py::SchemeProfile.validate_business_rules": {
+    "cognitive": 19,
+    "cyclomatic": 13,
+    "lines": 86
+  },
+  "pacs008/standards/address.py": {
+    "file_lines": 1037
+  },
+  "pacs008/standards/address.py::_from_unstructured_gb": {
+    "cognitive": 20,
+    "cyclomatic": 11
+  },
+  "pacs008/standards/address.py::_from_unstructured_jp": {
+    "cognitive": 20,
+    "cyclomatic": 11
+  },
+  "pacs008/standards/address.py::_from_unstructured_us": {
+    "cognitive": 32,
+    "cyclomatic": 16
+  },
+  "pacs008/standards/bah.py::wrap_in_bah": {
+    "lines": 70
+  },
+  "pacs008/validation/bic_validator.py::validate_bic_format": {
+    "cyclomatic": 14,
+    "lines": 76
+  },
+  "pacs008/validation/calendar.py": {
+    "file_lines": 521
+  },
+  "pacs008/validation/calendar.py::FedwireCalendar.is_open": {
+    "cognitive": 17,
+    "cyclomatic": 16
+  },
+  "pacs008/validation/iban_validator.py::validate_iban_format": {
+    "cyclomatic": 11,
+    "lines": 69
+  },
+  "pacs008/validation/lei_validator.py::validate_leis": {
+    "lines": 66
+  },
+  "pacs008/validation/service.py::ValidationService.validate_all": {
+    "cyclomatic": 13,
+    "lines": 95
+  },
+  "pacs008/vop/match.py::validate_vop_results": {
+    "lines": 65
+  },
+  "pacs008/xml/generate_xml.py": {
+    "file_lines": 502
+  },
+  "pacs008/xml/generate_xml.py::generate_xml_string": {
+    "lines": 72
+  },
+  "pacs008/xml/stream_writer.py::write_stream": {
+    "cyclomatic": 12,
+    "lines": 113
+  },
+  "pacs008/xml/write_xml_to_file.py::indent_xml": {
+    "cognitive": 18,
+    "cyclomatic": 12
+  },
+  "scripts/regression_matrix.py::main": {
+    "cognitive": 36,
+    "cyclomatic": 15,
+    "lines": 80
+  }
+}
