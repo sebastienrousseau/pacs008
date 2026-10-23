@@ -160,6 +160,42 @@ class TestFailures:
         with pytest.raises(ParseError, match="msg_def_idr"):
             parse(x)
 
+    def test_envelope_without_app_hdr_raises_parse_error(self):
+        x = f'<BizMsgEnvlp xmlns="{_NS_NVLP}"><Hdr/><Doc/></BizMsgEnvlp>'
+        with pytest.raises(ParseError, match="AppHdr"):
+            parse(x)
+
+    @pytest.mark.parametrize("encoding", ["ISO-8859-1", "UTF-16"])
+    def test_envelope_bytes_honour_their_declared_encoding(self, encoding):
+        x = _envelope_with_biz_msg_idr("BIZ-é", encoding)
+        msg = parse(x.encode(encoding))
+        assert msg.bah is not None
+        assert msg.bah.biz_msg_idr == "BIZ-é"
+        assert msg.msg_def_idr == "pacs.008.001.08"
+
+
+_NS_NVLP = "urn:iso:std:iso:20022:tech:xsd:nvlp.001.001.01"
+
+
+def _envelope_with_biz_msg_idr(biz_msg_idr: str, encoding: str) -> str:
+    return (
+        f'<?xml version="1.0" encoding="{encoding}"?>'
+        f'<BizMsgEnvlp xmlns="{_NS_NVLP}">'
+        "<Hdr>"
+        '<AppHdr xmlns="urn:iso:std:iso:20022:tech:xsd:head.001.001.02">'
+        "<Fr><FIId><FinInstnId><BICFI>HSBCGB2L</BICFI></FinInstnId></FIId></Fr>"
+        "<To><FIId><FinInstnId><BICFI>DEUTDEFF</BICFI></FinInstnId></FIId></To>"
+        f"<BizMsgIdr>{biz_msg_idr}</BizMsgIdr>"
+        "<MsgDefIdr>pacs.008.001.08</MsgDefIdr>"
+        "<CreDt>2026-06-13T12:00:00Z</CreDt>"
+        "</AppHdr>"
+        "</Hdr>"
+        "<Doc>"
+        '<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08"/>'
+        "</Doc>"
+        "</BizMsgEnvlp>"
+    )
+
 
 # ---------------------------------------------------------------------------
 # ParsedMessage dataclass

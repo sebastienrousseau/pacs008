@@ -130,9 +130,7 @@ def parse(xml: str | bytes) -> ParsedMessage:
     namespace_uri, local_name = _split_qname(root.tag)
 
     if namespace_uri == _NS_NVLP and local_name == "BizMsgEnvlp":
-        return _parse_envelope(
-            xml.decode("utf-8") if isinstance(xml, bytes) else xml, root
-        )
+        return _parse_envelope(root)
 
     return _parse_unwrapped(root, namespace_uri, local_name)
 
@@ -142,9 +140,18 @@ def parse(xml: str | bytes) -> ParsedMessage:
 # ---------------------------------------------------------------------------
 
 
-def _parse_envelope(envelope_xml: str, root: Any) -> ParsedMessage:
-    """Classify a BAH-wrapped envelope."""
-    bah = extract_bah_fields(envelope_xml)
+def _parse_envelope(root: Any) -> ParsedMessage:
+    """Classify a BAH-wrapped envelope.
+
+    The BAH is read back from the already-parsed tree, re-serialised as
+    text, so an envelope in any declared encoding is handled the same
+    way and nothing is decoded twice.
+    """
+    envelope_xml = DET.tostring(root, encoding="unicode")
+    try:
+        bah = extract_bah_fields(envelope_xml)
+    except ValueError as exc:
+        raise ParseError(f"malformed envelope: {exc}") from exc
     msg_def_idr = bah.msg_def_idr
     family, version = _split_msg_def_idr(msg_def_idr)
 
