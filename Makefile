@@ -38,7 +38,7 @@ type-check: ## Run mypy type checking
 
 security: ## Run security scan (bandit)
 	$(POETRY) run bandit -r pacs008/ -c pyproject.toml 2>/dev/null || \
-		$(POETRY) run bandit -r pacs008/ -ll
+		$(POETRY) run bandit -r pacs008/ -s B101
 
 clean: ## Remove build artifacts and caches
 	rm -rf build/ dist/ *.egg-info .eggs/
