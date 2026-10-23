@@ -87,6 +87,8 @@ jobs:
           .sbom-tools/bin/pip-licenses --python "$(poetry env info --executable)" \
             --format=json --with-license-file --no-license-path \
             --output-file="sbom/pacs008-${version}.spdx-licenses.json"
+          # --sync above removed the dev group, twine included; restore it for the upload.
+          poetry install --no-interaction --sync
           ls -la sbom/
 
       # Hash from inside each directory so the subject names are the bare
