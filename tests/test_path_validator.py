@@ -57,6 +57,11 @@ class TestValidatePath:
         result = validate_path(str(test_file), base_dir=str(tmp_path))
         assert "file.txt" in result
 
+    def test_base_dir_itself_allowed(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        result = validate_path(str(tmp_path), base_dir=str(tmp_path))
+        assert result == os.path.realpath(tmp_path)
+
     def test_base_dir_escape_rejected(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         with pytest.raises((SecurityError, PathValidationError)):
@@ -159,9 +164,7 @@ class TestPlatformConditionalBases:
         assert var_tmp in bases_str
 
     def test_var_tmp_excluded_on_win32(self, monkeypatch):
-        import pacs008.security.path_validator as pv
-
-        monkeypatch.setattr(pv.sys, "platform", "win32")
+        monkeypatch.setattr("sys.platform", "win32")
         bases_str = _get_allowed_bases_str()
         var_tmp = os.path.realpath(os.path.join(os.path.sep, "var", "tmp"))
         assert var_tmp not in bases_str
@@ -169,9 +172,7 @@ class TestPlatformConditionalBases:
     def test_pathlib_var_tmp_excluded_on_win32(self, monkeypatch):
         from pathlib import Path
 
-        import pacs008.security.path_validator as pv
-
-        monkeypatch.setattr(pv.sys, "platform", "win32")
+        monkeypatch.setattr("sys.platform", "win32")
         bases = _get_allowed_bases_pathlib()
         var_tmp = Path(os.path.join(os.path.sep, "var", "tmp")).resolve()
         assert var_tmp not in bases

@@ -64,7 +64,6 @@ from pacs008.standards.bah import BusinessApplicationHeader, extract_bah_fields
 
 # Envelope namespaces.
 _NS_NVLP = "urn:iso:std:iso:20022:tech:xsd:nvlp.001.001.01"
-_NS_BAH = "urn:iso:std:iso:20022:tech:xsd:head.001.001.02"
 
 # Identifier shape inside the namespace URI.
 _NS_IDENTIFIER = re.compile(

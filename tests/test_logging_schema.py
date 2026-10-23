@@ -16,8 +16,6 @@ from pacs008.logging_schema import (
     Fields,
     JSONFormatter,
     LogLevel,
-    _redact_pii_from_dict,
-    _sanitize_value,
     configure_json_logging,
     generate_request_id,
     get_request_id,
@@ -31,6 +29,15 @@ from pacs008.logging_schema import (
     mask_sensitive_data,
     set_request_id,
 )
+from pacs008.observability.redaction import (
+    _redact_pii_from_dict,
+    _sanitize_value,
+)
+
+
+def _raise(exc: Exception) -> None:
+    """Raise ``exc`` from a call, so the code after the block stays reachable."""
+    raise exc
 
 
 class TestMaskSensitiveData:
@@ -290,7 +297,7 @@ class TestExecutionSummaryTracker:
         with caplog.at_level(logging.INFO, logger="test_tracker_err"):
             with pytest.raises(ValueError):
                 with ExecutionSummaryTracker(logger) as tracker:
-                    raise ValueError("test")
+                    _raise(ValueError("test"))
 
         assert tracker.has_errors
         assert tracker.aborted

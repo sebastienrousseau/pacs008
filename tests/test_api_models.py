@@ -21,7 +21,7 @@ class TestMessageType:
         assert len(MessageType) == 20
 
     def test_values_format(self):
-        for mt in MessageType:
+        for mt in list(MessageType):
             assert mt.value.startswith("pacs.")
 
     def test_v01(self):

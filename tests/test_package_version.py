@@ -109,8 +109,10 @@ def test_installed_metadata_matches_the_source() -> None:
     from importlib.metadata import PackageNotFoundError, version
 
     try:
-        installed = version("pacs008")
+        installed: str | None = version("pacs008")
     except PackageNotFoundError:  # pragma: no cover - not installed
+        installed = None
+    if installed is None:  # pragma: no cover - not installed
         pytest.skip("pacs008 is not installed in this environment")
 
     assert installed == pacs008.__version__, (
