@@ -1,4 +1,4 @@
-.PHONY: help install dev test lint format type-check security clean docs docker smoke examples audit pip-compile
+.PHONY: help install dev test lint format type-check security clean docs docker smoke examples audit pip-compile fuzz
 
 PYTHON ?= python3
 POETRY ?= poetry
@@ -23,7 +23,7 @@ test-parallel: ## Run tests in parallel
 	$(POETRY) run pytest tests/ -v -n auto
 
 # Same paths CI lints, so a green `make lint` means a green lint job.
-LINT_PATHS := pacs008/ tests/ examples/ benches/ scripts/
+LINT_PATHS := pacs008/ tests/ examples/ benches/ scripts/ fuzz/
 
 lint: ## Run linters (ruff + black check)
 	$(POETRY) run ruff check $(LINT_PATHS)
@@ -87,5 +87,11 @@ pip-compile: ## Regenerate hash-pinned $(REQS)/*.txt from their .in files (needs
 	done
 	uv pip compile --quiet --generate-hashes --python-version 3.12 --universal \
 		$(REQS)/sbom.in -o $(REQS)/sbom.txt
+	@echo "compiling $(REQS)/fuzz.in (Linux x86_64, Atheris wheels only)"
+	uv pip compile --quiet --generate-hashes --python-platform x86_64-manylinux_2_17 \
+		--python-version 3.12 $(REQS)/fuzz.in -o $(REQS)/fuzz.txt
+
+fuzz: ## Atheris for FUZZ_SECONDS (default 60); Linux x86_64 with $(REQS)/fuzz.txt installed
+	$(POETRY) run python fuzz/fuzz_parse.py fuzz/corpus -max_total_time=$(or $(FUZZ_SECONDS),60)
 
 check: lint type-check security test examples ## Run all checks

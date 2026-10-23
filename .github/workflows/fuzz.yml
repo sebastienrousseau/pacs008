@@ -1,0 +1,64 @@
+# SPDX-FileCopyrightText: 2026 Sebastien Rousseau <sebastian.rousseau@gmail.com>
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+
+name: Fuzz
+
+# Coverage-guided fuzzing of pacs008.xml.parser.parse with Atheris
+# (fuzz/fuzz_parse.py), seeded from fuzz/corpus/, which also holds the
+# inputs of fixed bugs. Two minutes on every change, thirty weekly. A
+# crash fails the job and the reproducer is uploaded.
+on:
+  push:
+    branches: [main, "feat/**"]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Weekly, Monday 06:30 UTC.
+    - cron: "30 6 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  atheris:
+    name: Atheris (parse)
+    # Atheris ships Linux x86_64 wheels only; fuzz.txt is compiled for it.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      # Poetry and Atheris from hash-pinned files, the runtime tree from
+      # poetry.lock.
+      - name: Install the fuzz toolchain and this package (hash-pinned)
+        run: |
+          pip install --require-hashes -r .github/requirements/poetry.txt
+          poetry install --no-interaction --only main
+          poetry run pip install --require-hashes -r .github/requirements/fuzz.txt
+
+      # Replays the committed corpus first (each file once), then fuzzes
+      # with it as the seed set. New inputs go to a scratch directory so the
+      # committed corpus stays reviewable.
+      - name: Fuzz
+        env:
+          FUZZ_SECONDS: ${{ github.event_name == 'schedule' && '1800' || '120' }}
+        run: |
+          set -euo pipefail
+          mkdir -p crashes work
+          poetry run python fuzz/fuzz_parse.py fuzz/corpus/*
+          poetry run python fuzz/fuzz_parse.py work fuzz/corpus \
+            -max_total_time="$FUZZ_SECONDS" \
+            -artifact_prefix=crashes/
+
+      - name: Upload crash reproducers
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: fuzz-crashes
+          path: crashes/

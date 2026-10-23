@@ -38,3 +38,6 @@ Dockerfile text eol=lf
 *.db binary
 *.sqlite binary
 *.parquet binary
+
+# Fuzz inputs are byte-exact (one is UTF-16); never normalise them.
+fuzz/corpus/** binary

@@ -121,10 +121,10 @@ jobs:
       # Same paths as `make lint`, so a green `make lint` means a green
       # lint job.
       - name: Ruff check
-        run: poetry run ruff check pacs008/ tests/ examples/ benches/ scripts/
+        run: poetry run ruff check pacs008/ tests/ examples/ benches/ scripts/ fuzz/
 
       - name: Black check
-        run: poetry run black --check pacs008/ tests/ examples/ benches/ scripts/
+        run: poetry run black --check pacs008/ tests/ examples/ benches/ scripts/ fuzz/
 
       - name: Mypy
         run: poetry run mypy pacs008/
