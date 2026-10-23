@@ -64,7 +64,7 @@ pip install poetry
    ```
 6. **Sign and commit**:
    ```bash
-   git commit -S -m "feat: add my feature"
+   git commit -S -s -m "feat: add my feature"
    ```
 7. **Push** and open a pull request
 
@@ -78,6 +78,21 @@ All commits **must** be signed with SSH or GPG.
 git config --global gpg.format ssh
 git config --global user.signingkey ~/.ssh/id_ed25519
 git config --global commit.gpgsign true
+```
+
+### Developer Certificate of Origin (Required)
+
+Every commit in a pull request must carry a `Signed-off-by:` trailer
+with your name and email. It certifies that you have the right to
+submit the work under this project's licence, as set out in
+[DCO.txt](DCO.txt). `git commit -s` adds it; the DCO workflow checks
+every non-merge commit in the pull request.
+
+To add it to commits already on a branch:
+
+```bash
+git rebase --signoff main
+git push --force-with-lease
 ```
 
 ### Commit Message Format
