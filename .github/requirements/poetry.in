@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: 2026 Sebastien Rousseau <sebastian.rousseau@gmail.com>
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+# Poetry itself, hash-pinned for every CI job that runs `poetry install`
+# (OpenSSF Scorecard Pinned-Dependencies). poetry.lock carries the hashes
+# of everything Poetry then installs. Keep in step with the Poetry that
+# wrote poetry.lock.
+# Regenerate with: make pip-compile
+poetry==2.5.1

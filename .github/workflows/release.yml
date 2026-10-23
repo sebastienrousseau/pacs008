@@ -55,8 +55,8 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install Poetry
-        run: pip install poetry==2.4.3
+      - name: Install Poetry (hash-pinned)
+        run: pip install --require-hashes -r .github/requirements/poetry.txt
 
       - name: Install dependencies
         run: poetry install --no-interaction
