@@ -19,20 +19,22 @@ from __future__ import annotations
 
 import pytest
 
-# These imports require the [otel] extra to be installed.
-otel_api = pytest.importorskip("opentelemetry")
-from opentelemetry import trace as otel_trace
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import SimpleSpanProcessor
-from opentelemetry.sdk.trace.export.in_memory_span_exporter import (
-    InMemorySpanExporter,
-)
-
 from pacs008.observability.otel import (
     add_attribute,
     is_enabled,
     trace_span,
 )
+
+# These modules come with the [otel] extra; without it the module skips.
+otel_trace = pytest.importorskip("opentelemetry.trace")
+_sdk_trace = pytest.importorskip("opentelemetry.sdk.trace")
+_sdk_export = pytest.importorskip("opentelemetry.sdk.trace.export")
+_in_memory = pytest.importorskip(
+    "opentelemetry.sdk.trace.export.in_memory_span_exporter"
+)
+TracerProvider = _sdk_trace.TracerProvider
+SimpleSpanProcessor = _sdk_export.SimpleSpanProcessor
+InMemorySpanExporter = _in_memory.InMemorySpanExporter
 
 
 @pytest.fixture

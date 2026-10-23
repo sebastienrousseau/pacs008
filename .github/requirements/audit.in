@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: 2026 Sebastien Rousseau <sebastian.rousseau@gmail.com>
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+# Dependency advisory audit for the CI "audit" job: poetry.lock is
+# exported with poetry-plugin-export and every pinned version, plus every
+# hash-pinned file in this directory, goes through pip-audit.
+# Regenerate with: make pip-compile
+-r poetry.in
+poetry-plugin-export==1.10.1
+pip-audit

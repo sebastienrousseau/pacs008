@@ -17,6 +17,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 from datetime import date
 
 import pytest
@@ -470,5 +471,5 @@ class TestAddressValidationError:
         )
         # frozen dataclass — hashable, settable attrs blocked
         hash(err)
-        with pytest.raises(Exception):
+        with pytest.raises(dataclasses.FrozenInstanceError):
             err.row = 1  # type: ignore[misc]

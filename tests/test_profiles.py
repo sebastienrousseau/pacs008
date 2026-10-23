@@ -17,6 +17,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 from datetime import date
 
 import pytest
@@ -298,7 +299,7 @@ class TestSchemeViolationError:
 class TestBusinessRuleViolation:
     def test_is_frozen_dataclass(self):
         v = BusinessRuleViolation(0, None, "a", "ra", "ma")
-        with pytest.raises(Exception):
+        with pytest.raises(dataclasses.FrozenInstanceError):
             v.row = 99  # type: ignore[misc]
 
     def test_severity_defaults_to_block(self):

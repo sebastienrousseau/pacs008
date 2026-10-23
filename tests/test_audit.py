@@ -17,6 +17,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 from datetime import datetime, timezone
 
 import pytest
@@ -38,13 +39,13 @@ def signer() -> Ed25519Signer:
 
 
 def _record(signer: Signer, **overrides) -> AuditRecord:
-    kwargs = dict(
-        input_payload=b"csv-content",
-        output_xml=b"<Document/>",
-        validator_decisions=("swift_charset:cleansed",),
-        scheme="cbpr_plus",
-        signer=signer,
-    )
+    kwargs = {
+        "input_payload": b"csv-content",
+        "output_xml": b"<Document/>",
+        "validator_decisions": ("swift_charset:cleansed",),
+        "scheme": "cbpr_plus",
+        "signer": signer,
+    }
     kwargs.update(overrides)
     return sign_envelope(**kwargs)
 
@@ -214,7 +215,7 @@ class TestSignVerify:
 class TestAuditRecordImmutability:
     def test_frozen(self, signer):
         rec = _record(signer)
-        with pytest.raises(Exception):
+        with pytest.raises(dataclasses.FrozenInstanceError):
             rec.scheme = "other"  # type: ignore[misc]
 
 

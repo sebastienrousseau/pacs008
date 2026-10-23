@@ -35,3 +35,4 @@ pacs008/tmp/
 
 # Benchmarks
 .benchmarks/
+.venv-audit/

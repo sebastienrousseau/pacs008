@@ -1,4 +1,4 @@
-.PHONY: help install dev test lint format type-check security clean docs docker smoke examples
+.PHONY: help install dev test lint format type-check security clean docs docker smoke examples audit pip-compile fuzz complexity
 
 PYTHON ?= python3
 POETRY ?= poetry
@@ -22,20 +22,23 @@ test-fast: ## Run tests without coverage (faster)
 test-parallel: ## Run tests in parallel
 	$(POETRY) run pytest tests/ -v -n auto
 
+# Same paths CI lints, so a green `make lint` means a green lint job.
+LINT_PATHS := pacs008/ tests/ examples/ benches/ scripts/ fuzz/
+
 lint: ## Run linters (ruff + black check)
-	$(POETRY) run ruff check pacs008/ tests/
-	$(POETRY) run black --check pacs008/ tests/
+	$(POETRY) run ruff check $(LINT_PATHS)
+	$(POETRY) run black --check $(LINT_PATHS)
 
 format: ## Auto-format code (ruff fix + black)
-	$(POETRY) run ruff check --fix pacs008/ tests/
-	$(POETRY) run black pacs008/ tests/
+	$(POETRY) run ruff check --fix $(LINT_PATHS)
+	$(POETRY) run black $(LINT_PATHS)
 
 type-check: ## Run mypy type checking
 	$(POETRY) run mypy pacs008/
 
 security: ## Run security scan (bandit)
 	$(POETRY) run bandit -r pacs008/ -c pyproject.toml 2>/dev/null || \
-		$(POETRY) run bandit -r pacs008/ -ll
+		$(POETRY) run bandit -r pacs008/ -s B101
 
 clean: ## Remove build artifacts and caches
 	rm -rf build/ dist/ *.egg-info .eggs/
@@ -61,4 +64,37 @@ examples: ## Verify example scripts run
 	$(POETRY) run python examples/swift_compliance.py
 	@rm -f output_pacs008.xml
 
-check: lint type-check security test examples ## Run all checks
+complexity: ## Complexity ceilings against complexity-baseline.json
+	$(POETRY) run python scripts/check_complexity.py
+
+REQS := .github/requirements
+AUDIT_VENV := .venv-audit
+
+audit: ## pip-audit poetry.lock and every hash-pinned CI requirements file
+	python3 -m venv $(AUDIT_VENV)
+	$(AUDIT_VENV)/bin/pip install --quiet --require-hashes -r $(REQS)/audit.txt
+	$(AUDIT_VENV)/bin/poetry export --all-groups --all-extras \
+		-f requirements.txt -o $(AUDIT_VENV)/poetry-lock.txt
+	@for f in $(AUDIT_VENV)/poetry-lock.txt $(REQS)/*.txt; do \
+		echo "--- $$f"; \
+		$(AUDIT_VENV)/bin/pip-audit --progress-spinner off --require-hashes \
+			--disable-pip -r "$$f" || exit 1; \
+	done
+
+pip-compile: ## Regenerate hash-pinned $(REQS)/*.txt from their .in files (needs uv)
+	@command -v uv >/dev/null || { echo "uv is required: https://docs.astral.sh/uv/"; exit 1; }
+	@for f in poetry audit; do \
+		echo "compiling $(REQS)/$$f.in"; \
+		uv pip compile --quiet --generate-hashes --universal \
+			--python-version 3.10 $(REQS)/$$f.in -o $(REQS)/$$f.txt; \
+	done
+	uv pip compile --quiet --generate-hashes --python-version 3.12 --universal \
+		$(REQS)/sbom.in -o $(REQS)/sbom.txt
+	@echo "compiling $(REQS)/fuzz.in (Linux x86_64, Atheris wheels only)"
+	uv pip compile --quiet --generate-hashes --python-platform x86_64-manylinux_2_17 \
+		--python-version 3.12 $(REQS)/fuzz.in -o $(REQS)/fuzz.txt
+
+fuzz: ## Atheris for FUZZ_SECONDS (default 60); Linux x86_64 with $(REQS)/fuzz.txt installed
+	$(POETRY) run python fuzz/fuzz_parse.py fuzz/corpus -max_total_time=$(or $(FUZZ_SECONDS),60)
+
+check: lint type-check complexity security test examples ## Run all checks

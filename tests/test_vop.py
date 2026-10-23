@@ -17,6 +17,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 from datetime import date
 
 import pytest
@@ -216,5 +217,5 @@ class TestValidateVoPResults:
 class TestVoPValidationError:
     def test_frozen_dataclass(self):
         err = VoPValidationError(0, "vop_result", "vop_required", "x")
-        with pytest.raises(Exception):
+        with pytest.raises(dataclasses.FrozenInstanceError):
             err.row = 99  # type: ignore[misc]

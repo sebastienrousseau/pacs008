@@ -9,6 +9,11 @@ on:
 permissions:
   contents: read
 
+# Every action is pinned to a commit SHA, and every pip install is
+# hash-pinned (OpenSSF Scorecard Pinned-Dependencies): Poetry comes from
+# .github/requirements/poetry.txt and everything it installs from
+# poetry.lock, which carries the hashes.
+
 jobs:
   test:
     name: Test (Python ${{ matrix.python-version }}, ${{ matrix.os }})
@@ -20,15 +25,17 @@ jobs:
         python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install Poetry
-        run: pip install poetry
+      - name: Install Poetry (hash-pinned)
+        run: pip install --require-hashes -r .github/requirements/poetry.txt
 
       - name: Install dependencies
         run: poetry install --no-interaction --extras otel
@@ -46,8 +53,8 @@ jobs:
 
       - name: Run tests (matrix, no coverage gate)
         if: matrix.python-version != '3.12' || matrix.os != 'ubuntu-latest'
-        # The 95% coverage gate fires only on the canonical platform.
-        # Other matrix entries (Windows / macOS, py3.9-3.11) skip a
+        # The coverage gate fires only on the canonical platform.
+        # Other matrix entries (Windows / macOS, other Pythons) skip a
         # handful of Linux-only tests and Windows-only paths, which
         # legitimately lowers coverage by ~0.1pp per platform without
         # any behaviour regression. Overriding to 0 here keeps those
@@ -56,7 +63,7 @@ jobs:
 
       - name: Upload coverage
         if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           files: coverage.xml
           fail_ci_if_error: false
@@ -65,15 +72,17 @@ jobs:
     name: Smoke Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
 
-      - name: Install Poetry
-        run: pip install poetry
+      - name: Install Poetry (hash-pinned)
+        run: pip install --require-hashes -r .github/requirements/poetry.txt
 
       - name: Install dependencies
         run: poetry install --no-interaction --extras otel
@@ -91,24 +100,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
 
-      - name: Install Poetry
-        run: pip install poetry
+      - name: Install Poetry (hash-pinned)
+        run: pip install --require-hashes -r .github/requirements/poetry.txt
+
+      - name: Verify poetry.lock is current
+        run: poetry check --lock
 
       - name: Install dependencies
         run: poetry install --no-interaction --extras otel
 
+      # Same paths as `make lint`, so a green `make lint` means a green
+      # lint job.
       - name: Ruff check
-        run: poetry run ruff check pacs008/ benches/ scripts/
+        run: poetry run ruff check pacs008/ tests/ examples/ benches/ scripts/ fuzz/
 
       - name: Black check
-        run: poetry run black --check pacs008/ tests/ benches/ scripts/
+        run: poetry run black --check pacs008/ tests/ examples/ benches/ scripts/ fuzz/
 
       - name: Mypy
         run: poetry run mypy pacs008/
@@ -116,23 +132,67 @@ jobs:
       - name: Doc coverage (interrogate)
         run: poetry run interrogate pacs008/
 
+      # Per function: cyclomatic <= 10, cognitive <= 15, Halstead
+      # difficulty <= 30, <= 60 lines; <= 500 lines per file. Offenders
+      # that predate the gate live in complexity-baseline.json, which may
+      # only shrink. tests/ is not measured: test_suite_conformance.py is
+      # vendored from one canonical copy and checksummed.
+      - name: Complexity
+        run: poetry run python scripts/check_complexity.py
+
   security:
     name: Security Scan
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
 
-      - name: Install Poetry
-        run: pip install poetry
+      - name: Install Poetry (hash-pinned)
+        run: pip install --require-hashes -r .github/requirements/poetry.txt
 
       - name: Install dependencies
         run: poetry install --no-interaction --extras otel
 
       - name: Bandit
         run: poetry run bandit -r pacs008/ -c pyproject.toml || poetry run bandit -r pacs008/ -s B101
+
+  # The native advisory audit, so a published advisory against anything in
+  # poetry.lock fails the pull request rather than waiting for a Dependabot
+  # alert. pip-audit evaluates environment markers against the running
+  # interpreter, and poetry.lock pins different versions of some packages
+  # below 3.11 and below 3.12, so each of those splits is audited.
+  audit:
+    name: Dependency audit (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry, its export plugin and pip-audit (hash-pinned)
+        run: pip install --require-hashes -r .github/requirements/audit.txt
+
+      - name: pip-audit
+        run: |
+          set -euo pipefail
+          poetry export --all-groups --all-extras -f requirements.txt -o "$RUNNER_TEMP/poetry-lock.txt"
+          for f in "$RUNNER_TEMP/poetry-lock.txt" .github/requirements/*.txt; do
+            echo "--- $f ---"
+            pip-audit --progress-spinner off --require-hashes --disable-pip -r "$f"
+          done

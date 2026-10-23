@@ -36,7 +36,9 @@ clean = cleanse_data(raw_data)
 print("=== Simple Cleanse ===")
 print(f"  debtor_name: {raw_data[0]['debtor_name']!r}")
 print(f"           -> {clean[0]['debtor_name']!r}")
-print(f"  msg_id length: {len(raw_data[0]['msg_id'])} -> {len(clean[0]['msg_id'])}")
+print(
+    f"  msg_id length: {len(raw_data[0]['msg_id'])} -> {len(clean[0]['msg_id'])}"
+)
 print()
 
 # Option 2: Cleanse with detailed report

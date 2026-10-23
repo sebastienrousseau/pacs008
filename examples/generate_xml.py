@@ -36,7 +36,9 @@ data = [
 
 # Paths to template and XSD
 version = "pacs.008.001.05"
-base = Path(__file__).resolve().parent.parent / "pacs008" / "templates" / version
+base = (
+    Path(__file__).resolve().parent.parent / "pacs008" / "templates" / version
+)
 template = str(base / "template.xml")
 xsd = str(base / f"{version}.xsd")
 

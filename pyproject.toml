@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pacs008"
-version = "0.0.12"
+version = "0.0.15"
 description = "Generate, validate, parse and audit ISO 20022 pacs.008 (FI-to-FI Customer Credit Transfer) messages with scheme-aware rules for CBPR+, HVPS+, Fedwire, CHAPS, T2 RTGS and SCT Inst."
 authors = ["Sebastien Rousseau <contact@sebastienrousseau.com>"]
 license = "Apache-2.0 OR MIT"
@@ -37,6 +37,10 @@ fastapi = ">=0.95,<1.0"
 uvicorn = {version = ">=0.20,<1.0", extras = ["standard"]}
 httpx = ">=0.23,<1.0"
 pyarrow = ">=18.0.0,<26.0.0"
+# Advisory floor on a transitive dependency (via httpx and requests): no
+# affected version may resolve for anyone installing pacs008.
+# GHSA-6q48-6c7w-9gw2: certifi < 2026.10.19 trusts a distrusted root.
+certifi = ">=2026.10.19"
 
 [tool.poetry.group.dev.dependencies]
 packaging = ">=23.0"
@@ -47,7 +51,8 @@ pytest = ">=8.0,<10"
 pytest-cov = "^4.0.0"
 pytest-benchmark = "^4.0.0"
 pytest-xdist = "^3.0.0"
-black = "^26.3.1"
+# GHSA-cg8m-r9f2-5wm2: black < 26.10.1.
+black = "^26.10.1"
 flake8 = "^7.0.0"
 isort = "^5.13.0"
 mypy = "^1.11.0"
@@ -58,7 +63,10 @@ ruff = "^0.1.0"
 types-defusedxml = "^0.7.0"
 diff-cover = "^8.0.0"
 types-setuptools = "^65.0.0"
-radon = "^5.1.0"
+# scripts/check_complexity.py: exact pins, because the committed
+# complexity-baseline.json records the numbers these versions report.
+radon = "==6.0.1"
+complexipy = { version = "==8.1.0", python = "<3.16" }
 mutmut = "^2.4.0"
 hypothesis = "^6.0.0"
 memory-profiler = "^0.60.0"
@@ -70,6 +78,10 @@ twine = "^6.2.0"
 types-jsonschema = "^4.26.0.20260109"
 pandas = "^2.3.3"
 interrogate = "^1.7.0"
+# Advisory floors on transitive dependencies (via requests, twine and
+# sphinx): no affected version may resolve.
+# GHSA-vxq7-64xx-v4gw, GHSA-gh4c-6fx4-qh6g: urllib3 < 2.8.0.
+urllib3 = ">=2.8.0"
 
 [tool.poetry.group.docs]
 optional = true
@@ -80,6 +92,10 @@ pydata-sphinx-theme = "^0.15.0"
 sphinx-autodoc-typehints = "^1.0.0"
 sphinx-design = "^0.6.0"
 myst-parser = "^2.0.0"
+# Advisory floor on a transitive dependency (via beautifulsoup4 under
+# pydata-sphinx-theme): no affected version may resolve.
+# GHSA-gjv8-xp57-g29c, GHSA-j934-xhv5-fg8f: soupsieve < 2.9.0.
+soupsieve = ">=2.9.0"
 
 [tool.poetry.extras]
 # Optional OpenTelemetry tracing. `pip install pacs008[otel]` activates
@@ -87,8 +103,10 @@ myst-parser = "^2.0.0"
 # silently no-op so callers can leave instrumentation in place.
 otel = ["opentelemetry-api", "opentelemetry-sdk"]
 
+# GHSA-xcq7-p3pf-p88h: opentelemetry-api < 1.45.1 (ReDoS in
+# TraceState.from_header).
 [tool.poetry.dependencies.opentelemetry-api]
-version = ">=1.20,<2"
+version = ">=1.45.1,<2"
 optional = true
 
 [tool.poetry.dependencies.opentelemetry-sdk]
@@ -183,6 +201,8 @@ check_untyped_defs = true
 strict_equality = true
 exclude = [
     "pacs008/templates/",
+    # conftest.py points pytest's basetemp here (gitignored scratch).
+    "pacs008/tmp/",
     "setup.py",
     "scripts/",
     "tmp_env/",

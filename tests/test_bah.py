@@ -34,13 +34,13 @@ _PAYLOAD = (
     "</Document>"
 )
 
-_KW = dict(
-    sender_bic="HSBCGB2L",
-    receiver_bic="DEUTDEFF",
-    biz_msg_idr="BIZMSG-2026-001",
-    msg_def_idr="pacs.008.001.08",
-    creation_dt="2026-06-13T12:00:00Z",
-)
+_KW = {
+    "sender_bic": "HSBCGB2L",
+    "receiver_bic": "DEUTDEFF",
+    "biz_msg_idr": "BIZMSG-2026-001",
+    "msg_def_idr": "pacs.008.001.08",
+    "creation_dt": "2026-06-13T12:00:00Z",
+}
 
 
 # ---------------------------------------------------------------------------

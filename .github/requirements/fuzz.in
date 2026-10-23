@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: 2026 Sebastien Rousseau <sebastian.rousseau@gmail.com>
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+# Atheris for the fuzz job (.github/workflows/fuzz.yml); the package and
+# its runtime tree come from poetry.lock. Atheris ships Linux x86_64
+# wheels only, so this is compiled for that platform:
+#   uv pip compile --generate-hashes --python-platform x86_64-manylinux_2_17 \
+#     --python-version 3.12 .github/requirements/fuzz.in -o .github/requirements/fuzz.txt
+atheris>=3.1
