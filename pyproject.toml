@@ -70,6 +70,10 @@ twine = "^6.2.0"
 types-jsonschema = "^4.26.0.20260109"
 pandas = "^2.3.3"
 interrogate = "^1.7.0"
+# Advisory floors on transitive dependencies (via requests, twine and
+# sphinx): no affected version may resolve.
+# GHSA-vxq7-64xx-v4gw, GHSA-gh4c-6fx4-qh6g: urllib3 < 2.8.0.
+urllib3 = ">=2.8.0"
 
 [tool.poetry.group.docs]
 optional = true
@@ -80,6 +84,10 @@ pydata-sphinx-theme = "^0.15.0"
 sphinx-autodoc-typehints = "^1.0.0"
 sphinx-design = "^0.6.0"
 myst-parser = "^2.0.0"
+# Advisory floor on a transitive dependency (via beautifulsoup4 under
+# pydata-sphinx-theme): no affected version may resolve.
+# GHSA-gjv8-xp57-g29c, GHSA-j934-xhv5-fg8f: soupsieve < 2.9.0.
+soupsieve = ">=2.9.0"
 
 [tool.poetry.extras]
 # Optional OpenTelemetry tracing. `pip install pacs008[otel]` activates
