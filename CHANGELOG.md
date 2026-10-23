@@ -78,6 +78,19 @@ never released for this package. `pacs008`, `pacs008-loader-mt103` and
   were fixed, not suppressed.
 - The Sphinx `release` is read from `pacs008.__version__`; it had said
   `0.0.7`.
+- The Docker image's base is pinned by digest, Poetry is installed from
+  `.github/requirements/poetry.txt` by hash, and dependencies install
+  from `poetry.lock`, which the image previously did not copy.
+- `pacs008.logging_schema` no longer re-exports the private
+  `_redact_pii_from_dict`, `_sanitize_value` and `_request_id_context`;
+  they live in `pacs008.observability.redaction` and
+  `pacs008.observability.tracing`.
+- `validate_path()` returns the resolved path itself once it is inside
+  an allowed base, which CodeQL can follow as sanitised. The result is
+  unchanged.
+- Development tools: ruff 0.17, mypy 2.4, pytest-cov 7, diff-cover 10,
+  twine 7 and sphinx-autodoc-typehints 2.3; runtime lock refreshes for
+  click 8.5.0, lxml 6.1.3 and markupsafe 3.0.4.
 
 ## [0.0.12] - 2026-08-29
 
