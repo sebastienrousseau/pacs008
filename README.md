@@ -14,13 +14,15 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/sebastienrousseau/pacs008/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/sebastienrousseau/pacs008/ci.yml?branch=main&label=CI&style=for-the-badge" alt="CI" /></a>
-  <a href="https://pypi.org/project/pacs008/"><img src="https://img.shields.io/pypi/v/pacs008?style=for-the-badge&logo=pypi&logoColor=white" alt="PyPI" /></a>
-  <a href="https://pypi.org/project/pacs008/"><img src="https://img.shields.io/pypi/pyversions/pacs008.svg?style=for-the-badge&logo=python&logoColor=white" alt="Python versions" /></a>
-  <a href="https://pypi.org/project/pacs008/"><img src="https://img.shields.io/pypi/dm/pacs008.svg?style=for-the-badge" alt="PyPI Downloads" /></a>
-  <a href="https://codecov.io/github/sebastienrousseau/pacs008?branch=main"><img src="https://img.shields.io/codecov/c/github/sebastienrousseau/pacs008?style=for-the-badge&logo=codecov" alt="Codecov" /></a>
-  <a href="https://opensource.org/license/apache-2-0/"><img src="https://img.shields.io/pypi/l/pacs008?style=for-the-badge" alt="Licence" /></a>
-  <a href="https://pacs008.com"><img src="https://img.shields.io/badge/Docs-pacs008.com-blue?style=for-the-badge" alt="Docs" /></a>
+  <a href="https://github.com/sebastienrousseau/pacs008/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/sebastienrousseau/pacs008/ci.yml?branch=main&label=CI&style=for-the-badge" alt="CI" height="28" /></a>
+  <a href="https://pypi.org/project/pacs008/"><img src="https://img.shields.io/pypi/v/pacs008?style=for-the-badge&logo=pypi&logoColor=white" alt="PyPI" height="28" /></a>
+  <a href="https://pypi.org/project/pacs008/"><img src="https://img.shields.io/pypi/pyversions/pacs008.svg?style=for-the-badge&logo=python&logoColor=white" alt="Python versions" height="28" /></a>
+  <a href="https://pypi.org/project/pacs008/"><img src="https://img.shields.io/pypi/dm/pacs008.svg?style=for-the-badge" alt="PyPI Downloads" height="28" /></a>
+  <a href="https://codecov.io/github/sebastienrousseau/pacs008?branch=main"><img src="https://img.shields.io/codecov/c/github/sebastienrousseau/pacs008?style=for-the-badge&logo=codecov" alt="Codecov" height="28" /></a>
+  <a href="https://scorecard.dev/viewer/?uri=github.com/sebastienrousseau/pacs008"><img src="https://img.shields.io/ossf-scorecard/github.com/sebastienrousseau/pacs008?style=for-the-badge&label=OpenSSF%20Scorecard&logo=openssf" alt="OpenSSF Scorecard" height="28" /></a>
+  <a href="https://www.bestpractices.dev/projects/15822"><img src="https://img.shields.io/cii/level/15822?style=for-the-badge&label=OpenSSF%20Best%20Practices&logo=openssf" alt="OpenSSF Best Practices" height="28" /></a>
+  <a href="https://opensource.org/license/apache-2-0/"><img src="https://img.shields.io/pypi/l/pacs008?style=for-the-badge" alt="Licence" height="28" /></a>
+  <a href="https://pacs008.com"><img src="https://img.shields.io/badge/Docs-pacs008.com-blue?style=for-the-badge" alt="Docs" height="28" /></a>
 </p>
 
 ---
