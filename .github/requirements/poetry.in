@@ -3,6 +3,9 @@
 # Poetry itself, hash-pinned for every CI job that runs `poetry install`
 # (OpenSSF Scorecard Pinned-Dependencies). poetry.lock carries the hashes
 # of everything Poetry then installs. Keep in step with the Poetry that
-# wrote poetry.lock.
+# wrote poetry.lock. CI installs it on Python 3.12, so it is compiled for
+# 3.12: filelock <= 4.2.0 (GHSA-9vhv-jxww-xfm5, GHSA-567q-5qvw-pf92,
+# GHSA-v4x8-3wr5-3wq8) is fixed in 4.2.1, which needs Python 3.11.
 # Regenerate with: make pip-compile
 poetry==2.5.1
+filelock>=4.2.1
