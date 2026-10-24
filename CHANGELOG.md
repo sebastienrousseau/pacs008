@@ -5,7 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.15] - Unreleased
+## [Unreleased]
+
+### Security
+
+- CI's Poetry and pip-audit toolchain runs on Python 3.12, compiled for
+  it in `.github/requirements/poetry.txt` and `audit.txt`, with
+  `filelock >= 4.2.1` (GHSA-9vhv-jxww-xfm5, GHSA-567q-5qvw-pf92,
+  GHSA-v4x8-3wr5-3wq8). No fixed filelock supports Python 3.10, so the
+  tests still run on every matrix Python through `poetry env use`, and
+  the audit job checks each `poetry.lock` split in a venv of that Python.
+- The dev group floors `setuptools >= 84.1.0` (GHSA-xmj3-9gf7-h52w),
+  which `safety` pulls in; `poetry.lock` moves it from 83.0.0 to 84.2.1.
+
+## [0.0.15] - 2026-10-23
 
 Security, supply-chain and release-evidence release. The version moves
 from 0.0.12 straight to 0.0.15 to stay in lockstep with the suite:

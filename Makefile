@@ -70,8 +70,10 @@ complexity: ## Complexity ceilings against complexity-baseline.json
 REQS := .github/requirements
 AUDIT_VENV := .venv-audit
 
+# The trees are compiled for Python 3.12 (see poetry.in); CI also audits the
+# lock's 3.10 and 3.11 splits.
 audit: ## pip-audit poetry.lock and every hash-pinned CI requirements file
-	python3 -m venv $(AUDIT_VENV)
+	python3.12 -m venv $(AUDIT_VENV)
 	$(AUDIT_VENV)/bin/pip install --quiet --require-hashes -r $(REQS)/audit.txt
 	$(AUDIT_VENV)/bin/poetry export --all-groups --all-extras \
 		-f requirements.txt -o $(AUDIT_VENV)/poetry-lock.txt
@@ -86,7 +88,7 @@ pip-compile: ## Regenerate hash-pinned $(REQS)/*.txt from their .in files (needs
 	@for f in poetry audit; do \
 		echo "compiling $(REQS)/$$f.in"; \
 		uv pip compile --quiet --generate-hashes --universal \
-			--python-version 3.10 $(REQS)/$$f.in -o $(REQS)/$$f.txt; \
+			--python-version 3.12 $(REQS)/$$f.in -o $(REQS)/$$f.txt; \
 	done
 	uv pip compile --quiet --generate-hashes --python-version 3.12 --universal \
 		$(REQS)/sbom.in -o $(REQS)/sbom.txt
