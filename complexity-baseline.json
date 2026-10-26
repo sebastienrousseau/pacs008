@@ -3,13 +3,13 @@
     "lines": 73
   },
   "pacs008/api/app.py": {
-    "file_lines": 612
+    "file_lines": 611
   },
   "pacs008/api/app.py::_process_generation_job": {
-    "lines": 88
+    "lines": 72
   },
   "pacs008/api/app.py::generate_xml_sync": {
-    "lines": 88
+    "lines": 72
   },
   "pacs008/cli/cli.py::main": {
     "lines": 123

@@ -43,6 +43,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   template it is given, and eight tests passed the packaged template;
   a `template_copy` fixture in `tests/conftest.py` now gives each a copy
   under `tmp_path`.
+- The REST API writes generated XML to `<output_dir>/<version>.xml`
+  (the working directory when `output_dir` is not given), from both
+  `/api/generate` and `/api/generate/async`. It resolved `output_dir`
+  and then ignored it, writing into `pacs008/templates/<version>/`
+  under the working directory, which in a source checkout overwrote
+  the shipped sample.
 
 ## [0.0.15] - 2026-10-23
 
