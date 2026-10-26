@@ -127,10 +127,9 @@ class TestCliDryRun:
 class TestCliGenerate:
     """Test CLI XML generation."""
 
-    def test_generate_xml(self, runner, valid_csv):
+    def test_generate_xml(self, runner, valid_csv, template_copy):
         version = "pacs.008.001.01"
-        tpl = str(TEMPLATES_DIR / version / "template.xml")
-        xsd = str(TEMPLATES_DIR / version / f"{version}.xsd")
+        tpl, xsd = template_copy(version)
         result = runner.invoke(
             main,
             [

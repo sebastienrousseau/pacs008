@@ -18,6 +18,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The dev group floors `setuptools >= 84.1.0` (GHSA-xmj3-9gf7-h52w),
   which `safety` pulls in; `poetry.lock` moves it from 83.0.0 to 84.2.1.
 
+### Fixed
+
+- The test suite no longer rewrites the shipped samples
+  `pacs008/templates/pacs.008.001.08/pacs.008.001.08.xml` and
+  `pacs.008.001.13.xml`. Generation writes `<version>.xml` beside the
+  template it is given, and eight tests passed the packaged template;
+  a `template_copy` fixture in `tests/conftest.py` now gives each a copy
+  under `tmp_path`.
+
 ## [0.0.15] - 2026-10-23
 
 Security, supply-chain and release-evidence release. The version moves

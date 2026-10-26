@@ -128,14 +128,10 @@ class TestWorkingDirectory:
 
 
 class TestGenerateXmlFiles:
-    def test_generation_success(self, csv_file, tmp_path, monkeypatch):
-        # CWD is already tmp_path from csv_file fixture
+    def test_generation_success(self, csv_file, template_copy):
         logger = _configure_logging(False)
         version = "pacs.008.001.01"
-        tpl = str(TEMPLATES_DIR / version / "template.xml")
-        xsd = str(TEMPLATES_DIR / version / f"{version}.xsd")
-        # Process_files needs CWD to contain template — use project root
-        monkeypatch.chdir(Path(__file__).resolve().parent.parent)
+        tpl, xsd = template_copy(version)
         _generate_xml_files(logger, version, tpl, xsd, csv_file, None, False)
 
     def test_generation_failure_exits(self, csv_file, tmp_path, monkeypatch):

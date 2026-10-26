@@ -91,12 +91,7 @@ class TestMainDryRun:
 
 
 class TestMainGenerate:
-    def test_generate_xml(self, test_data_csv, monkeypatch):
-        from pathlib import Path
-
-        # CWD must contain the template dir for path validation
-        monkeypatch.chdir(Path(__file__).resolve().parent.parent)
+    def test_generate_xml(self, test_data_csv, template_copy):
         version = "pacs.008.001.01"
-        tpl = str(TEMPLATES_DIR / version / "template.xml")
-        xsd = str(TEMPLATES_DIR / version / f"{version}.xsd")
+        tpl, xsd = template_copy(version)
         main(version, tpl, xsd, test_data_csv)
