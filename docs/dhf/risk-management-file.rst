@@ -150,9 +150,10 @@ Risks are assessed using an ISO 14971-style framework:
      - High
      - Unlikely
      - Medium
-     - Dependencies pinned to specific versions in ``pyproject.toml``.
-       ``safety`` scanner in dev dependencies. Dependabot / automated
-       alerts on GitHub.
+     - Dependencies locked in ``poetry.lock`` and, for CI tooling,
+       hash-pinned in ``.github/requirements/*.txt``. ``pip-audit`` checks
+       both in the CI ``audit`` job, on each supported Python. Dependabot /
+       automated alerts on GitHub.
    * - R-011
      - Schema mismatch between Jinja2 template and XSD causes silent data
        loss or generation of non-conformant XML
@@ -220,8 +221,8 @@ Risks are assessed using an ISO 14971-style framework:
      - ``test_path_validator.py``, ``test_logging_schema.py``
      - Pass
    * - R-010
-     - Dependency pinning + safety scanner
-     - CI pipeline ``security`` job (Bandit + safety)
+     - Dependency pinning + pip-audit
+     - CI pipeline ``audit`` job (pip-audit)
      - Pass
    * - R-011
      - Gold master tests for all 13 versions

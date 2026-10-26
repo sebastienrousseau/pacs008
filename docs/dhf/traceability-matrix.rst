@@ -528,8 +528,8 @@ Traceability Matrix
        ``logging_schema.py``
      - ``test_path_validator.py``, ``test_logging_schema.py``
    * - R-010
-     - Dependency pinning + safety scanner
-     - ``pyproject.toml``, CI ``security`` job
+     - Dependency pinning + pip-audit
+     - ``poetry.lock``, CI ``audit`` job
      - CI pipeline verification
    * - R-011
      - Gold master tests for all 13 versions

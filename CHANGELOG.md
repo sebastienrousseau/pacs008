@@ -22,6 +22,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   safety 3.8.1 bump failed the audit. `poetry.lock` loses safety,
   dparse, ruamel-yaml and setuptools.
 
+### Changed
+
+- The design history file describes the CI that runs: pip-audit in the
+  `audit` job (not a `safety` scanner) for risk R-010, and in the
+  verification plan the Python 3.10 to 3.14 test matrix on three
+  operating systems, the lint job's lock, docstring and complexity
+  checks, and the 98% coverage gate on Python 3.12 / ubuntu.
+
 ### Fixed
 
 - `validate_via_xsd` and `validate_xml_string_via_xsd` report a date
