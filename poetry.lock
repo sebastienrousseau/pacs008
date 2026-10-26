@@ -2264,13 +2264,14 @@ files = [
 
 [[package]]
 name = "memory-profiler"
-version = "0.60.0"
+version = "0.61.0"
 description = "A module for monitoring memory usage of a python program"
 optional = false
-python-versions = ">=3.4"
+python-versions = ">=3.5"
 groups = ["dev"]
 files = [
-    {file = "memory_profiler-0.60.0.tar.gz", hash = "sha256:6a12869511d6cebcb29b71ba26985675a58e16e06b3c523b49f67c5497a33d1c"},
+    {file = "memory_profiler-0.61.0-py3-none-any.whl", hash = "sha256:400348e61031e3942ad4d4109d18753b2fb08c2f6fb8290671c5513a34182d84"},
+    {file = "memory_profiler-0.61.0.tar.gz", hash = "sha256:4e5b73d7864a1d1292fb76a03e82a3e78ef934d06828a698d9dada76da2067b0"},
 ]
 
 [package.dependencies]
@@ -5059,4 +5060,4 @@ otel = ["opentelemetry-api", "opentelemetry-sdk"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "784bd8afe4bfb969cefcf6a7b72c38ee09daf038ec68a04fd94a21656ebac460"
+content-hash = "e79dd2e141b5aadf2e5aba6fdc670d1f09222175cb3b5ec755036ccc6e69ffed"
