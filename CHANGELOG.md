@@ -15,8 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   GHSA-v4x8-3wr5-3wq8). No fixed filelock supports Python 3.10, so the
   tests still run on every matrix Python through `poetry env use`, and
   the audit job checks each `poetry.lock` split in a venv of that Python.
-- The dev group floors `setuptools >= 84.1.0` (GHSA-xmj3-9gf7-h52w),
-  which `safety` pulls in; `poetry.lock` moves it from 83.0.0 to 84.2.1.
+- The dev group drops `safety`, which nothing ran (CI audits with
+  pip-audit), with the `setuptools >= 84.1.0` floor (GHSA-xmj3-9gf7-h52w)
+  it needed. Its 3.x line pulls in filelock 3.x (GHSA-9vhv-jxww-xfm5,
+  GHSA-567q-5qvw-pf92, GHSA-v4x8-3wr5-3wq8), which is why Dependabot's
+  safety 3.8.1 bump failed the audit. `poetry.lock` loses safety,
+  dparse, ruamel-yaml and setuptools.
 
 ### Fixed
 
