@@ -2998,15 +2998,15 @@ files = [
 ]
 
 [[package]]
-name = "py-cpuinfo"
-version = "9.0.0"
+name = "py-cpuinfo2"
+version = "10.1.1"
 description = "Get CPU info with pure Python"
 optional = false
-python-versions = "*"
+python-versions = ">=3.9"
 groups = ["dev"]
 files = [
-    {file = "py-cpuinfo-9.0.0.tar.gz", hash = "sha256:3cdbbf3fac90dc6f118bfd64384f309edeadd902d7c8fb17f02ffa1fc3f49690"},
-    {file = "py_cpuinfo-9.0.0-py3-none-any.whl", hash = "sha256:859625bc251f64e21f077d099d4162689c762b5d6a4c3c97553d56241c9674d5"},
+    {file = "py_cpuinfo2-10.1.1-py3-none-any.whl", hash = "sha256:adc53396bfb206e6498d078ec2ab407f85799ecd819584ac36a8f80a2d4d762d"},
+    {file = "py_cpuinfo2-10.1.1.tar.gz", hash = "sha256:7861133863663f16e06eca63b12904ef100b5760415e92372dac0162799a4771"},
 ]
 
 [[package]]
@@ -3354,24 +3354,24 @@ dev = ["argcomplete", "attrs (>=19.2)", "hypothesis (>=3.56)", "mock", "requests
 
 [[package]]
 name = "pytest-benchmark"
-version = "4.0.0"
+version = "5.3.0"
 description = "A ``pytest`` fixture for benchmarking code. It will group the tests into rounds that are calibrated to the chosen timer."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "pytest-benchmark-4.0.0.tar.gz", hash = "sha256:fb0785b83efe599a6a956361c0691ae1dbb5318018561af10f3e915caa0048d1"},
-    {file = "pytest_benchmark-4.0.0-py3-none-any.whl", hash = "sha256:fdb7db64e31c8b277dff9850d2a2556d8b60bcb0ea6524e36e28ffd7c87f71d6"},
+    {file = "pytest_benchmark-5.3.0-py3-none-any.whl", hash = "sha256:920ab1dfcffa718d49aa15ba144c7e357bda59216a0dc308016cc1c7236f719d"},
+    {file = "pytest_benchmark-5.3.0.tar.gz", hash = "sha256:358444d4e89be901ee2b6404fb043ac3d7684002ad7f3563cc153fca6339c965"},
 ]
 
 [package.dependencies]
-py-cpuinfo = "*"
-pytest = ">=3.8"
+py-cpuinfo2 = ">=10.1"
+pytest = ">=8.1"
 
 [package.extras]
 aspect = ["aspectlib"]
 elasticsearch = ["elasticsearch"]
-histogram = ["pygal", "pygaljs"]
+histogram = ["pygal", "pygaljs", "setuptools"]
 
 [[package]]
 name = "pytest-cov"
@@ -5060,4 +5060,4 @@ otel = ["opentelemetry-api", "opentelemetry-sdk"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "e79dd2e141b5aadf2e5aba6fdc670d1f09222175cb3b5ec755036ccc6e69ffed"
+content-hash = "571459054777946fb0f479affb52e3f8b63b6a10df0c4fee264b0825fdb94e69"
