@@ -64,7 +64,7 @@ setuptools = ">=84.1.0"
 ruff = ">=0.1,<0.18"
 types-defusedxml = "^0.7.0"
 diff-cover = ">=8,<11"
-types-setuptools = "^65.0.0"
+types-setuptools = ">=65,<85"
 # scripts/check_complexity.py: exact pins, because the committed
 # complexity-baseline.json records the numbers these versions report.
 radon = "==6.0.1"
