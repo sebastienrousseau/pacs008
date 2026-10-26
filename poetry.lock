@@ -4573,18 +4573,6 @@ files = [
 ]
 
 [[package]]
-name = "types-docutils"
-version = "0.22.3.20260712"
-description = "Typing stubs for docutils"
-optional = false
-python-versions = ">=3.10"
-groups = ["dev"]
-files = [
-    {file = "types_docutils-0.22.3.20260712-py3-none-any.whl", hash = "sha256:4bbc5cf949f8b1b1c7e1befa5a4d1c3bcad9f22f823538eea26ba7ff694fa38e"},
-    {file = "types_docutils-0.22.3.20260712.tar.gz", hash = "sha256:bed54a50136c8e7613c03ee1c51eb958b42754915df83535de356b974ca05877"},
-]
-
-[[package]]
 name = "types-jsonschema"
 version = "4.26.0.20260518"
 description = "Typing stubs for jsonschema"
@@ -4601,18 +4589,15 @@ referencing = "*"
 
 [[package]]
 name = "types-setuptools"
-version = "65.7.0.4"
+version = "84.0.0.20261006"
 description = "Typing stubs for setuptools"
 optional = false
-python-versions = "*"
+python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "types-setuptools-65.7.0.4.tar.gz", hash = "sha256:147809433301fe7e0f4ef5c0782f9a0453788960575e1efb6da5fe8cb2493c9f"},
-    {file = "types_setuptools-65.7.0.4-py3-none-any.whl", hash = "sha256:522067dfd8e1771f8d7e047e451de2740dc4e0c9f48a22302a6cc96e6c964a13"},
+    {file = "types_setuptools-84.0.0.20261006-py3-none-any.whl", hash = "sha256:f435ec88f8f2319316969e37b5a1ca49496b276889124de249b422b061b492fe"},
+    {file = "types_setuptools-84.0.0.20261006.tar.gz", hash = "sha256:0f123655f44390a15ec62c9fa30b57f6dafe53014524d28b62cab1edbc303059"},
 ]
-
-[package.dependencies]
-types-docutils = "*"
 
 [[package]]
 name = "typing-extensions"
@@ -5060,4 +5045,4 @@ otel = ["opentelemetry-api", "opentelemetry-sdk"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "571459054777946fb0f479affb52e3f8b63b6a10df0c4fee264b0825fdb94e69"
+content-hash = "952a3c652d1ca4ecb55e4387cff07ec3826733eec97b98544c506850443effbe"
