@@ -21,6 +21,7 @@ import asyncio
 import os
 import tempfile
 from pathlib import Path
+from typing import Any
 
 from fastapi import FastAPI, HTTPException, status
 from fastapi.responses import FileResponse
@@ -46,10 +47,7 @@ from pacs008.security.path_validator import (
     validate_path,
 )
 from pacs008.validation.schema_validator import SchemaValidator
-from pacs008.xml.generate_updated_xml_file_path import (
-    generate_updated_xml_file_path,
-)
-from pacs008.xml.generate_xml import generate_xml
+from pacs008.xml.generate_xml import generate_xml_string
 
 
 def _validate_safe_path(user_path: str, base_dir: Path | None = None) -> Path:
@@ -161,6 +159,39 @@ def _resolve_generation_paths(
         _validate_safe_path(str(template_base / "template.xml"))
     )
     return output_dir, xsd_file_path, xml_template_path
+
+
+def _write_generated_xml(
+    request: GenerateXMLRequest, data: list[dict[str, Any]]
+) -> str:
+    """Generate the message and write it to ``<output_dir>/<version>.xml``.
+
+    Args:
+        request: Generation request with message type and optional output dir.
+        data: Validated payment rows.
+
+    Returns:
+        The path of the written file.
+    """
+    output_dir, xsd_file_path, xml_template_path = _resolve_generation_paths(
+        request
+    )
+    xml_content = generate_xml_string(
+        data, request.message_type.value, xml_template_path, xsd_file_path
+    )
+    output_path = os.path.realpath(
+        os.path.join(output_dir, f"{request.message_type.value}.xml")
+    )
+    # CodeQL CWE-22 guard: same variable for guard and sink
+    if not output_path.startswith(
+        str(Path.cwd().resolve()) + os.sep
+    ):  # pragma: no cover  defence-in-depth: output_dir is already confined
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Access denied"
+        )
+    with open(output_path, "w", encoding="utf-8") as xml_file:
+        xml_file.write(xml_content)
+    return output_path
 
 
 # Create FastAPI application
@@ -312,23 +343,7 @@ async def generate_xml_sync(
                 file_path=None,
             )
 
-        # Generate XML
-        _, xsd_file_path, xml_template_path = _resolve_generation_paths(
-            request
-        )
-
-        generate_xml(
-            data,
-            request.message_type.value,
-            xml_template_path,
-            xsd_file_path,
-        )
-
-        # Get the generated file path
-        result_path = generate_updated_xml_file_path(
-            xml_template_path,
-            request.message_type.value,
-        )
+        result_path = _write_generated_xml(request, data)
 
         return GenerateXMLResponse(
             success=True,
@@ -573,23 +588,7 @@ async def _process_generation_job(
 
         job_manager.update_status(job_id, JobStatus.PROCESSING, progress=70)
 
-        # Generate XML (secure paths)
-        _, xsd_file_path, xml_template_path = _resolve_generation_paths(
-            request
-        )
-
-        generate_xml(
-            data,
-            request.message_type.value,
-            xml_template_path,
-            xsd_file_path,
-        )
-
-        # Get the generated file path
-        result_path = generate_updated_xml_file_path(
-            xml_template_path,
-            request.message_type.value,
-        )
+        result_path = _write_generated_xml(request, data)
 
         job_manager.update_status(
             job_id,

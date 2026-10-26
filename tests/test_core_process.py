@@ -106,10 +106,9 @@ class TestProcessFiles:
             row["expiry_date_time"] = "2026-12-31T23:59:59"
         return [row]
 
-    def test_process_files_with_list_data(self):
+    def test_process_files_with_list_data(self, template_copy):
         version = "pacs.008.001.01"
-        tpl = str(TEMPLATES_DIR / version / "template.xml")
-        xsd = str(TEMPLATES_DIR / version / f"{version}.xsd")
+        tpl, xsd = template_copy(version)
         data = self._make_data(version)
         # Should not raise
         process_files(version, tpl, xsd, data)
@@ -126,8 +125,7 @@ class TestProcessFiles:
     @pytest.mark.parametrize(
         "version", ["pacs.008.001.01", "pacs.008.001.08", "pacs.008.001.13"]
     )
-    def test_process_files_version_samples(self, version):
-        tpl = str(TEMPLATES_DIR / version / "template.xml")
-        xsd = str(TEMPLATES_DIR / version / f"{version}.xsd")
+    def test_process_files_version_samples(self, version, template_copy):
+        tpl, xsd = template_copy(version)
         data = self._make_data(version)
         process_files(version, tpl, xsd, data)

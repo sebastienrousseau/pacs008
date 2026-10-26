@@ -312,20 +312,30 @@ as ``.xml`` reference files for each of the 13 versions.
      - Configuration
    * - mypy
      - Type checking
-     - ``python_version=3.9``, ``strict=true``,
+     - ``python_version=3.10``, ``strict=true``,
        ``disallow_untyped_defs=true``
    * - ruff
      - Linting
-     - ``line-length=79``, ``target-version=py39``
+     - ``line-length=79``, ``target-version=py310``
    * - black
      - Formatting
-     - ``line-length=79``, ``target-version=['py39']``
+     - ``line-length=79``, ``target-version=['py310']``
    * - bandit
      - SAST
-     - ``bandit -r pacs008/`` — zero findings required
-   * - safety
+     - ``bandit -r pacs008/ -c pyproject.toml``: zero findings required
+   * - pip-audit
      - Dependency audit
-     - Checks pinned dependencies against known vulnerability database
+     - Checks ``poetry.lock`` (installed into a venv of each supported
+       Python) and the hash-pinned ``.github/requirements/*.txt`` against
+       known vulnerability databases
+   * - interrogate
+     - Docstring coverage
+     - ``fail-under = 100``
+   * - ``scripts/check_complexity.py``
+     - Complexity gate
+     - Per function: cyclomatic <= 10, cognitive <= 15, Halstead
+       difficulty <= 30, <= 60 lines; <= 500 lines per file, against
+       ``complexity-baseline.json``
 
 6. CI Pipeline
 --------------
@@ -341,21 +351,31 @@ push and pull request:
      - Matrix
      - Actions
    * - **test**
-     - 3 OS (ubuntu, macos, windows) x 4 Python (3.9, 3.10, 3.11, 3.12)
-     - Install dependencies, run full test suite with coverage, upload
-       coverage to Codecov (Python 3.12 / ubuntu only)
+     - 3 OS (ubuntu, macos, windows) x 5 Python (3.10, 3.11, 3.12, 3.13,
+       3.14)
+     - Install dependencies, run the full test suite and the batch
+       benchmark (``--quick``). Python 3.12 / ubuntu gates coverage at
+       ``--cov-fail-under=98`` and uploads it to Codecov; the other
+       configurations run with ``--cov-fail-under=0``
    * - **smoke**
      - ubuntu-latest, Python 3.12
      - Run ``pytest -m smoke`` for quick sanity checks, verify example
        scripts
    * - **lint**
      - ubuntu-latest, Python 3.12
-     - Run ``ruff check``, ``black --check``, ``mypy --strict``
+     - Run ``poetry check --lock``, ``ruff check``, ``black --check``,
+       ``mypy pacs008/`` (strict, from ``pyproject.toml``),
+       ``interrogate pacs008/`` and ``scripts/check_complexity.py``
    * - **security**
      - ubuntu-latest, Python 3.12
-     - Run ``bandit -r pacs008/`` for SAST scan
+     - Run ``bandit -r pacs008/ -c pyproject.toml`` for SAST scan
+   * - **audit**
+     - ubuntu-latest, Python 3.10, 3.11, 3.12
+     - Run ``pip-audit`` on ``poetry.lock`` as installed for that Python;
+       on 3.12, also on every ``.github/requirements/*.txt``
 
-**Total CI matrix:** 14 configurations (12 test + 1 lint + 1 security)
+**Total CI matrix:** 21 configurations (15 test + 1 smoke + 1 lint +
+1 security + 3 audit)
 
 7. Acceptance Criteria
 -----------------------
@@ -370,8 +390,8 @@ The software release is accepted when **all** of the following are satisfied:
      - Criterion
      - Verification Method
    * - 1
-     - All 1,417 tests pass on all CI matrix configurations
-     - GitHub Actions test job (12 configs)
+     - All tests pass on every CI test configuration
+     - GitHub Actions test job (15 configurations)
    * - 2
      - Branch coverage >= 99% (actual: 100%)
      - ``--cov-fail-under=99`` in pytest

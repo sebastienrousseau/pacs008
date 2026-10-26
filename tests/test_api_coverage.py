@@ -136,7 +136,10 @@ class TestGenerateEndpointBranches:
 
 
 class TestAsyncGenerationLifecycle:
-    def test_submit_then_cancel(self, client, tmp_path):
+    def test_submit_then_cancel(self, client, template_copy):
+        # The API resolves pacs008/templates against the working directory,
+        # so work from a copy.
+        template_copy("pacs.008.001.08")
         csv_path = Path.cwd() / "tmp_pytest_async_lifecycle.csv"
         csv_path.write_text(
             "msg_id,creation_date_time,nb_of_txs,settlement_method,end_to_end_id,"
