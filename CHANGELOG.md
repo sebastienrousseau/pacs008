@@ -20,6 +20,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `validate_via_xsd` and `validate_xml_string_via_xsd` report a date
+  whose year elementpath cannot hold (such as
+  `222222222026-01-15T10:30:00`) as invalid, and generation raises its
+  usual "failed validation" error, instead of letting elementpath's
+  `OverflowError` escape.
 - The test suite no longer rewrites the shipped samples
   `pacs008/templates/pacs.008.001.08/pacs.008.001.08.xml` and
   `pacs.008.001.13.xml`. Generation writes `<version>.xml` beside the

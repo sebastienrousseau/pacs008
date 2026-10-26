@@ -1,6 +1,9 @@
 """Tests for XML XSD validation module."""
 
+import re
 import uuid
+
+import pytest
 
 from pacs008.constants import TEMPLATES_DIR
 from pacs008.xml.generate_xml import generate_xml_string
@@ -10,7 +13,7 @@ from pacs008.xml.validate_via_xsd import (
 )
 
 
-def _make_xml(version="pacs.008.001.01"):
+def _make_xml(version="pacs.008.001.01", **overrides):
     ver = int(version.split(".")[-1])
     row = {
         "msg_id": "MSG-XSD-TEST",
@@ -34,6 +37,7 @@ def _make_xml(version="pacs.008.001.01"):
         row["mandate_id"] = "MNDT-XSD"
     if ver == 13:
         row["expiry_date_time"] = "2026-12-31T23:59:59"
+    row.update(overrides)
     tpl = str(TEMPLATES_DIR / version / "template.xml")
     xsd = str(TEMPLATES_DIR / version / f"{version}.xsd")
     return generate_xml_string([row], version, tpl, xsd), xsd
@@ -85,3 +89,36 @@ class TestValidateViaXsd:
         xml_file = tmp_path / "malformed.xml"
         xml_file.write_text("not xml <<<", encoding="utf-8")
         assert not validate_via_xsd(str(xml_file), xsd)
+
+
+# elementpath raises OverflowError, not an XMLSchemaException, for a year
+# its date types cannot hold (found by fuzzing pacs008-mcp).
+_OVERFLOW_YEAR = "222222222026-01-15T10:30:00"
+
+
+def _overflow_xml():
+    xml, xsd = _make_xml("pacs.008.001.08")
+    bad = re.sub(
+        r"<CreDtTm>[^<]*</CreDtTm>",
+        f"<CreDtTm>{_OVERFLOW_YEAR}</CreDtTm>",
+        xml,
+        count=1,
+    )
+    assert bad != xml
+    return bad, xsd
+
+
+class TestYearOverflow:
+    def test_string_is_invalid(self):
+        xml, xsd = _overflow_xml()
+        assert not validate_xml_string_via_xsd(xml, xsd)
+
+    def test_file_is_invalid(self, tmp_path):
+        xml, xsd = _overflow_xml()
+        xml_file = tmp_path / "overflow.xml"
+        xml_file.write_text(xml, encoding="utf-8")
+        assert not validate_via_xsd(str(xml_file), xsd)
+
+    def test_generation_reports_a_validation_failure(self):
+        with pytest.raises(RuntimeError, match="failed validation"):
+            _make_xml("pacs.008.001.08", creation_date_time=_OVERFLOW_YEAR)

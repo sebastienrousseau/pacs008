@@ -27,6 +27,11 @@ def _get_cached_schema(xsd_file_path: str) -> xmlschema.XMLSchema:
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# elementpath raises OverflowError, not an XMLSchemaException, for a date
+# whose year its types cannot hold (e.g. 222222222026-01-15T10:30:00).
+# The document is invalid all the same.
+_VALIDATION_ERRORS = (xmlschema.XMLSchemaException, OverflowError)
+
 
 def validate_via_xsd(xml_file_path: str, xsd_file_path: str) -> bool:
     """
@@ -58,7 +63,7 @@ def validate_via_xsd(xml_file_path: str, xsd_file_path: str) -> bool:
     try:
         xsd.validate(xml_tree)
         return True
-    except xmlschema.XMLSchemaException as e:
+    except _VALIDATION_ERRORS as e:
         print(f"Error validating XML: {e}")
         return False
 
@@ -101,6 +106,6 @@ def validate_xml_string_via_xsd(xml_content: str, xsd_file_path: str) -> bool:
     try:
         xsd.validate(xml_tree)
         return True
-    except xmlschema.XMLSchemaException as e:
+    except _VALIDATION_ERRORS as e:
         print(f"Error validating XML: {e}")
         return False
