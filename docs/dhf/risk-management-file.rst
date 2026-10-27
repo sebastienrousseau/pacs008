@@ -35,7 +35,7 @@ or safety-critical systems. Under IEC 62304, it is classified as **Class A**.
 However, the project voluntarily applies **Class C-level processes** to
 demonstrate the highest level of software engineering rigor:
 
-- Full branch coverage (100%)
+- Branch coverage gated at 98% in CI
 - Formal risk analysis with mitigations
 - Static analysis (mypy strict, bandit SAST)
 - Signed commits with full traceability
