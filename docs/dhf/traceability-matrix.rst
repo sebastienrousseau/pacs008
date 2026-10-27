@@ -335,8 +335,8 @@ Traceability Matrix
      - Test File(s)
    * - NFR-301
      - ``pyproject.toml``
-     - ``python = "^3.10"``
-     - CI test matrix (3.10, 3.11, 3.12, 3.13, 3.14)
+     - ``python = "^3.11"``
+     - CI test matrix (3.11, 3.12, 3.13, 3.14)
    * - NFR-302
      - ``.github/workflows/ci.yml``
      - OS matrix: ubuntu, macos, windows

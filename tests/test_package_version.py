@@ -14,18 +14,12 @@ These tests fail loudly when the four disagree.
 from __future__ import annotations
 
 import re
-import sys
+import tomllib
 from pathlib import Path
 
 import pytest
 
 import pacs008
-
-if sys.version_info >= (3, 11):  # pragma: no cover - version dependent
-    import tomllib
-else:  # pragma: no cover - version dependent
-    # `tomllib` is stdlib only from 3.11, and this package supports 3.10.
-    import tomli as tomllib
 
 ROOT = Path(__file__).resolve().parent.parent
 PYPROJECT = ROOT / "pyproject.toml"

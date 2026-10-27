@@ -18,7 +18,7 @@
 from __future__ import annotations
 
 import dataclasses
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from cryptography.hazmat.primitives import serialization
@@ -192,7 +192,7 @@ class TestSignVerify:
         datetime.fromisoformat(rec.recorded_at.rstrip("Z"))
 
     def test_recorded_at_override(self, signer):
-        when = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
+        when = datetime(2026, 1, 1, 12, 0, 0, tzinfo=UTC)
         rec = _record(signer, recorded_at=when)
         assert rec.recorded_at == "2026-01-01T12:00:00Z"
 

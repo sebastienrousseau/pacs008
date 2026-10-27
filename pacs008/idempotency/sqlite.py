@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import sqlite3
 import threading
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from pacs008.idempotency.base import IdempotencyEntry, IdempotencyStore
@@ -132,7 +132,7 @@ class SQLiteStore(IdempotencyStore):
 
 
 def _utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def _parse_iso(value: str) -> datetime:

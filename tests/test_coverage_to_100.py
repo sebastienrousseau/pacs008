@@ -23,7 +23,7 @@ indirectly.
 
 from __future__ import annotations
 
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 import pytest
 
@@ -177,7 +177,7 @@ def test_idempotency_utcnow_returns_aware_datetime():
     now = _utcnow()
     assert now.tzinfo is not None
     # Aware datetime — utcoffset is zero for the UTC zone.
-    assert now.utcoffset() == datetime.now(timezone.utc).utcoffset()
+    assert now.utcoffset() == datetime.now(UTC).utcoffset()
 
 
 # ---------------------------------------------------------------------------

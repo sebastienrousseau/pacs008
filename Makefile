@@ -71,7 +71,7 @@ REQS := .github/requirements
 AUDIT_VENV := .venv-audit
 
 # The trees are compiled for Python 3.12 (see poetry.in); CI also audits the
-# lock's 3.10 and 3.11 splits.
+# lock's 3.11 split.
 audit: ## pip-audit poetry.lock and every hash-pinned CI requirements file
 	python3.12 -m venv $(AUDIT_VENV)
 	$(AUDIT_VENV)/bin/pip install --quiet --require-hashes -r $(REQS)/audit.txt

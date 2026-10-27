@@ -33,11 +33,10 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import tomllib
 import urllib.error
 import urllib.request
 from pathlib import Path
-
-import tomllib
 
 ROOT = Path(__file__).resolve().parent.parent
 

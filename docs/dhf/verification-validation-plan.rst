@@ -312,14 +312,14 @@ as ``.xml`` reference files for each of the 13 versions.
      - Configuration
    * - mypy
      - Type checking
-     - ``python_version=3.10``, ``strict=true``,
+     - ``python_version=3.11``, ``strict=true``,
        ``disallow_untyped_defs=true``
    * - ruff
      - Linting
-     - ``line-length=79``, ``target-version=py310``
+     - ``line-length=79``, ``target-version=py311``
    * - black
      - Formatting
-     - ``line-length=79``, ``target-version=['py310']``
+     - ``line-length=79``, ``target-version=['py311']``
    * - bandit
      - SAST
      - ``bandit -r pacs008/ -c pyproject.toml``: zero findings required
@@ -351,7 +351,7 @@ push and pull request:
      - Matrix
      - Actions
    * - **test**
-     - 3 OS (ubuntu, macos, windows) x 5 Python (3.10, 3.11, 3.12, 3.13,
+     - 3 OS (ubuntu, macos, windows) x 4 Python (3.11, 3.12, 3.13,
        3.14)
      - Install dependencies, run the full test suite and the batch
        benchmark (``--quick``). Python 3.12 / ubuntu gates coverage at
@@ -370,12 +370,12 @@ push and pull request:
      - ubuntu-latest, Python 3.12
      - Run ``bandit -r pacs008/ -c pyproject.toml`` for SAST scan
    * - **audit**
-     - ubuntu-latest, Python 3.10, 3.11, 3.12
+     - ubuntu-latest, Python 3.11, 3.12
      - Run ``pip-audit`` on ``poetry.lock`` as installed for that Python;
        on 3.12, also on every ``.github/requirements/*.txt``
 
-**Total CI matrix:** 21 configurations (15 test + 1 smoke + 1 lint +
-1 security + 3 audit)
+**Total CI matrix:** 17 configurations (12 test + 1 smoke + 1 lint +
+1 security + 2 audit)
 
 7. Acceptance Criteria
 -----------------------

@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import dataclasses
 import threading
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
@@ -105,7 +105,7 @@ class TestStoreContract:
         )
 
     def test_expired_entry_treated_as_novel(self, store):
-        old = datetime.now(timezone.utc) - timedelta(hours=48)
+        old = datetime.now(UTC) - timedelta(hours=48)
         store.record("k1", "h1", recorded_at=old)
         assert store.check("k1", "h1", window=timedelta(hours=24)) is False
 
@@ -114,10 +114,10 @@ class TestStoreContract:
         assert store.check("k2", "h1", window=timedelta(hours=1)) is False
 
     def test_purge_older_than(self, store):
-        old = datetime.now(timezone.utc) - timedelta(days=2)
+        old = datetime.now(UTC) - timedelta(days=2)
         store.record("k_old", "h", recorded_at=old)
         store.record("k_new", "h")
-        cutoff = datetime.now(timezone.utc) - timedelta(days=1)
+        cutoff = datetime.now(UTC) - timedelta(days=1)
         purged = store.purge_older_than(cutoff)
         assert purged == 1
         # k_old gone, k_new still findable.

@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -35,11 +35,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      # Poetry runs on 3.12, the interpreter poetry.txt is compiled for:
-      # filelock, which Poetry needs, has no fixed release for 3.10
-      # (GHSA-9vhv-jxww-xfm5, GHSA-567q-5qvw-pf92, GHSA-v4x8-3wr5-3wq8 are
-      # fixed in 4.2.1, which needs 3.11). The project still runs on the
-      # matrix Python, through `poetry env use`.
+      # Poetry runs on 3.12, the interpreter poetry.txt is compiled for
+      # (with filelock >= 4.2.1: GHSA-9vhv-jxww-xfm5, GHSA-567q-5qvw-pf92,
+      # GHSA-v4x8-3wr5-3wq8). The project still runs on the matrix
+      # Python, through `poetry env use`.
       - name: Set up Python 3.12 for the toolchain
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
@@ -182,19 +181,19 @@ jobs:
 
   # The native advisory audit, so a published advisory against anything in
   # poetry.lock fails the pull request rather than waiting for a Dependabot
-  # alert. poetry.lock pins different versions of some packages below 3.11
-  # and below 3.12, so each of those splits is audited: the lock is
+  # alert. poetry.lock pins different versions of some packages below
+  # 3.12, so each split is audited: the lock is
   # installed, without dependencies, into a bare venv of that Python (whose
   # own markers pick the lines), and pip-audit reads that venv by --path.
-  # Poetry and pip-audit run on 3.12, as in the test job (filelock has no
-  # fixed release for 3.10).
+  # Poetry and pip-audit run on 3.12, the interpreter audit.txt is
+  # compiled for, as in the test job.
   audit:
     name: Dependency audit (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.11", "3.12"]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

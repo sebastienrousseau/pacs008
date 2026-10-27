@@ -51,7 +51,7 @@ import json
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import serialization
@@ -202,7 +202,7 @@ def sign_envelope(
     Returns:
         A populated, signed :class:`AuditRecord`.
     """
-    timestamp = (recorded_at or datetime.now(timezone.utc)).strftime(
+    timestamp = (recorded_at or datetime.now(UTC)).strftime(
         "%Y-%m-%dT%H:%M:%SZ"
     )
 

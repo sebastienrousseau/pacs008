@@ -21,7 +21,7 @@ import hashlib
 import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from enum import Enum
 from typing import Any
 
@@ -158,4 +158,4 @@ def compute_payload_hash(payload: Any) -> str:
 
 def _utcnow() -> datetime:
     """Module-internal clock helper — overridable in tests via monkeypatch."""
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
