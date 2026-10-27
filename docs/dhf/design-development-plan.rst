@@ -123,8 +123,8 @@ The project follows an **iterative, test-driven, CI-gated** methodology:
      - Tool
      - Purpose
    * - Language
-     - Python 3.9+
-     - Runtime (3.9, 3.10, 3.11, 3.12 supported)
+     - Python 3.10+
+     - Runtime (3.10, 3.11, 3.12, 3.13, 3.14 supported)
    * - Package Manager
      - Poetry
      - Dependency management and build
@@ -133,7 +133,7 @@ The project follows an **iterative, test-driven, CI-gated** methodology:
      - Test runner with markers, fixtures, parametrize
    * - Coverage
      - pytest-cov
-     - Branch coverage reporting (99% minimum gate)
+     - Branch coverage reporting (98% minimum gate)
    * - Type Checking
      - mypy (strict)
      - Static type analysis, ``disallow_untyped_defs=true``
@@ -165,8 +165,9 @@ Every commit must pass all of the following before merge:
 1. **Lint & Format:** ``ruff check`` and ``black --check`` pass with zero findings
 2. **Type Check:** ``mypy --strict`` passes with zero errors
 3. **Security Scan:** ``bandit -r pacs008/`` reports zero issues
-4. **Unit Tests:** All 1,417 tests pass
-5. **Branch Coverage:** >= 99% (enforced via ``--cov-fail-under=99``)
+4. **Unit Tests:** All tests pass on every CI configuration
+5. **Branch Coverage:** >= 98% (enforced via ``--cov-fail-under=98`` on
+   the Python 3.12 / Ubuntu test job)
 6. **Smoke Tests:** Quick sanity checks pass
 7. **Pre-commit Hooks:** All 13 hooks pass
 

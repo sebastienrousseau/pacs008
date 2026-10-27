@@ -292,8 +292,8 @@ Software Requirements Specification
      - Requirement
      - Priority
    * - NFR-201
-     - The test suite shall achieve >= 99% branch coverage as enforced by
-       ``--cov-fail-under=99``.
+     - The test suite shall achieve >= 98% branch coverage as enforced by
+       ``--cov-fail-under=98``.
      - Essential
    * - NFR-202
      - The codebase shall pass ``mypy --strict`` with zero errors.
@@ -317,7 +317,7 @@ Software Requirements Specification
      - Requirement
      - Priority
    * - NFR-301
-     - The system shall support Python 3.9, 3.10, 3.11, and 3.12.
+     - The system shall support Python 3.10, 3.11, 3.12, 3.13, and 3.14.
      - Essential
    * - NFR-302
      - The system shall pass CI on Linux (Ubuntu), macOS, and Windows.

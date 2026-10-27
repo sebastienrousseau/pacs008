@@ -241,8 +241,9 @@ Before any release, the following steps must be completed:
      - All CI pipeline jobs pass (test, lint, security, smoke)
      - GitHub Actions green status
    * - 2
-     - Branch coverage >= 99%
-     - ``--cov-fail-under=99`` in pytest output
+     - Branch coverage >= 98%
+     - ``--cov-fail-under=98`` (``pyproject.toml``) in the pytest output of
+       the Python 3.12 / Ubuntu test job
    * - 3
      - Bandit SAST reports zero findings
      - CI security job output

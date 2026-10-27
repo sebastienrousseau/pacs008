@@ -307,7 +307,7 @@ Traceability Matrix
      - Test File(s)
    * - NFR-201
      - All test files
-     - ``--cov-fail-under=99``
+     - ``--cov-fail-under=98``
      - CI test job (pytest-cov)
    * - NFR-202
      - All source files
@@ -335,8 +335,8 @@ Traceability Matrix
      - Test File(s)
    * - NFR-301
      - ``pyproject.toml``
-     - ``python = "^3.9.2"``
-     - CI test matrix (3.9, 3.10, 3.11, 3.12)
+     - ``python = "^3.10"``
+     - CI test matrix (3.10, 3.11, 3.12, 3.13, 3.14)
    * - NFR-302
      - ``.github/workflows/ci.yml``
      - OS matrix: ubuntu, macos, windows

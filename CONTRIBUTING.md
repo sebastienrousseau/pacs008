@@ -7,7 +7,7 @@ the development workflow and standards.
 
 ### Prerequisites
 
-- Python 3.9.2+
+- Python 3.10+
 - [Poetry](https://python-poetry.org/docs/#installation)
 - Git with SSH commit signing configured
 
@@ -52,7 +52,7 @@ pip install poetry
    git checkout -b feat/my-feature
    ```
 3. **Make changes** — follow the coding standards below
-4. **Run tests** — ensure 99%+ coverage:
+4. **Run tests** — ensure 98%+ coverage (the CI gate):
    ```bash
    poetry run pytest tests/ -v
    ```
@@ -112,7 +112,7 @@ refactor: simplify XML data preparer dispatch
 - **Line length:** 79 characters (enforced by Black + Ruff)
 - **Type hints:** Required on all public functions (mypy strict)
 - **Docstrings:** Required on all public classes and functions
-- **Tests:** Every new feature must include tests; maintain 99%+ coverage
+- **Tests:** Every new feature must include tests; maintain 98%+ coverage
 
 ## Testing
 
@@ -132,7 +132,7 @@ poetry run pytest tests/test_version_matrix.py -v
 ## Pull Request Checklist
 
 - [ ] All tests pass (`poetry run pytest`)
-- [ ] Coverage remains at 99%+
+- [ ] Coverage remains at 98%+
 - [ ] Linters pass (`ruff check`, `mypy`, `black --check`)
 - [ ] Commits are signed
 - [ ] PR title follows conventional commit format

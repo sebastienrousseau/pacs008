@@ -393,8 +393,8 @@ The software release is accepted when **all** of the following are satisfied:
      - All tests pass on every CI test configuration
      - GitHub Actions test job (15 configurations)
    * - 2
-     - Branch coverage >= 99% (actual: 100%)
-     - ``--cov-fail-under=99`` in pytest
+     - Branch coverage >= 98%
+     - ``--cov-fail-under=98`` in pytest (Python 3.12 / Ubuntu job)
    * - 3
      - Zero bandit SAST findings
      - GitHub Actions security job

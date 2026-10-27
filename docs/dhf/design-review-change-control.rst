@@ -194,7 +194,7 @@ All design changes follow this procedure:
 
 1. Create feature branch from main
 2. Implement change following coding standards (ruff, black, mypy strict)
-3. Add or update tests to maintain >= 99% branch coverage
+3. Add or update tests to maintain >= 98% branch coverage
 4. Update documentation if affected
 
 3.4 Verification
@@ -202,7 +202,7 @@ All design changes follow this procedure:
 
 1. All pre-commit hooks pass (13 hooks)
 2. Full CI pipeline passes (test, lint, security, smoke jobs)
-3. Branch coverage >= 99% maintained
+3. Branch coverage >= 98% maintained
 4. Bandit SAST reports zero findings
 5. Gold master tests pass (if XML generation affected)
 

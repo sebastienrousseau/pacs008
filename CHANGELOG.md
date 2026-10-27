@@ -29,6 +29,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   verification plan the Python 3.10 to 3.14 test matrix on three
   operating systems, the lint job's lock, docstring and complexity
   checks, and the 98% coverage gate on Python 3.12 / ubuntu.
+- The rest of the design history file and `CONTRIBUTING.md` state the
+  same gates: NFR-201 and every coverage step require 98%
+  (`--cov-fail-under=98`, as `pyproject.toml` sets), not 99%, and
+  NFR-301, the traceability matrix and the development plan list
+  Python 3.10 to 3.14 (`python = "^3.10"`), not 3.9 to 3.12. The
+  v0.0.1 configuration baseline keeps the values it recorded.
 
 ### Fixed
 
