@@ -717,7 +717,7 @@ Quality gates (CI-enforced):
 | Lint | `ruff check pacs008/` |
 | Format | `black --check pacs008/ tests/` |
 | Types | `mypy pacs008/` (strict mode) |
-| Tests | `pytest --cov=pacs008` (90% branch-coverage floor) |
+| Tests | `pytest --cov=pacs008` (98% branch-coverage floor) |
 | Security | `bandit -r pacs008/` |
 | Smoke | `pytest -m smoke` |
 | Cross-platform matrix | Python 3.11 to 3.14 × Ubuntu / macOS / Windows |
