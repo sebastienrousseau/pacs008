@@ -317,7 +317,7 @@ Software Requirements Specification
      - Requirement
      - Priority
    * - NFR-301
-     - The system shall support Python 3.10, 3.11, 3.12, 3.13, and 3.14.
+     - The system shall support Python 3.11, 3.12, 3.13, and 3.14.
      - Essential
    * - NFR-302
      - The system shall pass CI on Linux (Ubuntu), macOS, and Windows.

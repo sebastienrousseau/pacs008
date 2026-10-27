@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pacs008"
-version = "0.0.15"
+version = "0.0.16"
 description = "Generate, validate, parse and audit ISO 20022 pacs.008 (FI-to-FI Customer Credit Transfer) messages with scheme-aware rules for CBPR+, HVPS+, Fedwire, CHAPS, T2 RTGS and SCT Inst."
 authors = ["Sebastien Rousseau <contact@sebastienrousseau.com>"]
 license = "Apache-2.0 OR MIT"
@@ -20,7 +20,7 @@ include = [
 pacs008 = "pacs008.__main__:cli"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 anyascii = "^0.3"
 click = "^8.1"
 lxml = ">=5,<7"
@@ -44,9 +44,6 @@ certifi = ">=2026.10.19"
 
 [tool.poetry.group.dev.dependencies]
 packaging = ">=23.0"
-# `tomllib` is stdlib only from 3.11; tests/test_package_version.py
-# needs a TOML reader on the 3.10 leg of the matrix.
-tomli = { version = ">=2.0", python = "<3.11" }
 pytest = ">=8.0,<10"
 pytest-cov = ">=4,<8"
 pytest-benchmark = ">=4,<6"
@@ -122,7 +119,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.black]
 extend-exclude = "tests/test_suite_conformance\\.py"
 line-length = 79
-target-version = ['py310']
+target-version = ['py311']
 
 [tool.isort]
 profile = "black"
@@ -166,7 +163,7 @@ timeout = 5
 
 [tool.ruff]
 line-length = 79
-target-version = "py310"
+target-version = "py311"
 extend-exclude = [".github/*.md", "*.md", "docs/**/*.md", "releases/**/*.md", "tmp_env", ".venv", ".eggs"]
 
 [tool.ruff.lint]
@@ -179,6 +176,11 @@ ignore = ["E501"]
 "benches/*.py" = ["E402"]
 "__init__.py" = ["F401"]
 "tests/test_csv_loader.py" = ["B017"]
+# The vendored suite conformance file is byte-pinned to its canonical
+# copy (black excludes it above for the same reason) and keeps a tomli
+# fallback for the suite's 3.10 floor; with this repository on 3.11 that
+# branch is dead, and the fix belongs in the canonical copy, not here.
+"tests/test_suite_conformance.py" = ["UP036"]
 
 [tool.ruff.format]
 quote-style = "double"
@@ -186,7 +188,7 @@ indent-style = "space"
 skip-magic-trailing-comma = false
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 strict = true
 warn_return_any = true
 warn_unused_configs = true

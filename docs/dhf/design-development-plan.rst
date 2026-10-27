@@ -123,8 +123,8 @@ The project follows an **iterative, test-driven, CI-gated** methodology:
      - Tool
      - Purpose
    * - Language
-     - Python 3.10+
-     - Runtime (3.10, 3.11, 3.12, 3.13, 3.14 supported)
+     - Python 3.11+
+     - Runtime (3.11, 3.12, 3.13, 3.14 supported)
    * - Package Manager
      - Poetry
      - Dependency management and build

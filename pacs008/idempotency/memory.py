@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import threading
 from collections import OrderedDict
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from pacs008.idempotency.base import IdempotencyEntry, IdempotencyStore
 
@@ -99,4 +99,4 @@ class MemoryStore(IdempotencyStore):
 
 
 def _utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)

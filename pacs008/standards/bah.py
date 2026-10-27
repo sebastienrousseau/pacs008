@@ -45,7 +45,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from defusedxml import ElementTree as DET
@@ -288,7 +288,7 @@ def _parse_payload(payload_xml: str) -> etree._Element:
 
 
 def _utcnow_iso() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _find(root: Any, path: str) -> Any:

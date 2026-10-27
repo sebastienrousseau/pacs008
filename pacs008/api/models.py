@@ -17,13 +17,13 @@
 
 # pylint: disable=too-few-public-methods
 
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 
-class DataSourceType(str, Enum):
+class DataSourceType(StrEnum):
     """Supported data source types."""
 
     CSV = "csv"
@@ -33,7 +33,7 @@ class DataSourceType(str, Enum):
     PARQUET = "parquet"
 
 
-class MessageType(str, Enum):
+class MessageType(StrEnum):
     """Supported ISO 20022 pacs message types."""
 
     PACS_002_12 = "pacs.002.001.12"

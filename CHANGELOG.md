@@ -5,7 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.0.16] - 2026-10-27
+
+Python 3.11 floor, fixes and audit-toolchain release. Python 3.10 is
+no longer supported (see Removed).
 
 ### Security
 
@@ -33,8 +36,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   same gates: NFR-201 and every coverage step require 98%
   (`--cov-fail-under=98`, as `pyproject.toml` sets), not 99%, and
   NFR-301, the traceability matrix and the development plan list
-  Python 3.10 to 3.14 (`python = "^3.10"`), not 3.9 to 3.12. The
-  v0.0.1 configuration baseline keeps the values it recorded.
+  the supported Python range CI tests (3.11 to 3.14, see Removed), not
+  3.9 to 3.12. The v0.0.1 configuration baseline keeps the values it
+  recorded.
+
+### Removed
+
+- Python 3.10 support. The floor is now 3.11 (`python = "^3.11"`):
+  3.10 reaches end of life in October 2026, and current releases of
+  dev dependencies such as `hypothesis` require 3.11, which left
+  Dependabot unable to resolve their updates. The CI test matrix runs
+  3.11 to 3.14 and the audit job checks the 3.11 and 3.12 splits of
+  `poetry.lock`; ruff, black and mypy target 3.11; the `tomli`
+  fallback in `tests/test_package_version.py` and its dev dependency
+  are gone (`tomllib` is in the standard library from 3.11). The
+  design history file, `README.md` and `CONTRIBUTING.md` state the
+  new range. `poetry.lock` drops the 3.10-only `exceptiongroup` and
+  the 3.10 lines of `numpy`, `rpds-py` and `stevedore`.
+- With ruff targeting 3.11, the code uses `datetime.UTC` for
+  `timezone.utc`, and the REST API enums `JobStatus`, `DataSourceType`
+  and `MessageType` are `enum.StrEnum` rather than `(str, Enum)`. They
+  compare and serialise as before; `str()` and `format()` of a member
+  now give its value (`"success"`) instead of `"JobStatus.SUCCESS"`.
 
 ### Fixed
 
