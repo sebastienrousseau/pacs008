@@ -84,6 +84,22 @@ jobs:
           files: coverage.xml
           fail_ci_if_error: false
 
+  test-all:
+    # Branch protection requires this check by name. It stands for every
+    # leg of the test matrix, so adding or dropping a version never
+    # renames a required check.
+    name: Test (all)
+    if: always()
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Every leg of the matrix passed
+        env:
+          RESULT: ${{ needs.test.result }}
+        run: test "$RESULT" = success
+
   smoke:
     name: Smoke Test
     runs-on: ubuntu-latest
@@ -234,3 +250,19 @@ jobs:
             echo "--- $f ---"
             pip-audit --progress-spinner off --require-hashes --disable-pip -r "$f"
           done
+
+  audit-all:
+    # Branch protection requires this check by name. It stands for every
+    # leg of the audit matrix, so adding or dropping a version never
+    # renames a required check.
+    name: Dependency audit (all)
+    if: always()
+    needs: audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Every leg of the matrix passed
+        env:
+          RESULT: ${{ needs.audit.result }}
+        run: test "$RESULT" = success
