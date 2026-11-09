@@ -51,7 +51,7 @@ pytest-xdist = "^3.0.0"
 # GHSA-cg8m-r9f2-5wm2: black < 26.10.1.
 black = "^26.10.1"
 flake8 = "^7.0.0"
-isort = ">=5.13,<7.0"
+isort = ">=5.13,<10.0"
 mypy = ">=1.11,<3.0"
 # CVE-2026-114608: pylint < 4.0.9.
 pylint = ">=4.0.9,<5.0"
