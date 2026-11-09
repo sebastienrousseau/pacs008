@@ -64,7 +64,7 @@ types-setuptools = ">=65,<85"
 # complexity-baseline.json records the numbers these versions report.
 radon = "==6.0.1"
 complexipy = { version = "==8.1.0", python = "<3.16" }
-mutmut = "^2.4.0"
+mutmut = ">=2.4,<4.0"
 hypothesis = "^6.0.0"
 memory-profiler = ">=0.60,<0.62"
 sphinx = "^7.0.0"
