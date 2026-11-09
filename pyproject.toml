@@ -36,7 +36,7 @@ jsonschema = "^4.17"
 fastapi = ">=0.95,<1.0"
 uvicorn = {version = ">=0.20,<1.0", extras = ["standard"]}
 httpx = ">=0.23,<1.0"
-pyarrow = ">=18.0.0,<26.0.0"
+pyarrow = ">=18.0.0,<27.0.0"
 # Advisory floor on a transitive dependency (via httpx and requests): no
 # affected version may resolve for anyone installing pacs008.
 # GHSA-6q48-6c7w-9gw2: certifi < 2026.10.19 trusts a distrusted root.
